@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_graph"
+    app:startDestination="@id/settingsFragment">
+    <fragment
+        android:id="@+id/previewFragment"
+        android:name="org.cloudbus.fogappcamerademo.PreviewFragment"
+        android:label="fragment_preview"
+        tools:layout="@layout/fragment_preview" >
+        <action
+            android:id="@+id/action_previewFragment_to_resultFragment"
+            app:destination="@id/resultFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="org.cloudbus.fogappcamerademo.SettingsFragment"
+        android:label="fragment_settings" />
+    <fragment
+        android:id="@+id/resultFragment"
+        android:name="org.cloudbus.fogappcamerademo.ResultFragment"
+        android:label="ResultFragment"
+        tools:layout="@layout/fragment_result"/>
+</navigation>

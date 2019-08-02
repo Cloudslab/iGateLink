@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.preference.EditTextPreference
+        app:key="fogbus_master_ip"
+        app:title="FogBus Master IP"
+        app:useSimpleSummaryProvider="true"/>
+
+    <androidx.preference.SwitchPreference
+        app:key="enable_services"
+        app:title="Enable services"
+        app:defaultValue="false"/>
+
+</androidx.preference.PreferenceScreen>
