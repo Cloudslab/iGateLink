@@ -7,32 +7,33 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import androidx.core.widget.ContentLoadingProgressBar;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.cloudbus.foggatewaylib.DataStore;
-import org.cloudbus.foggatewaylib.DataStoreObserver;
-import org.cloudbus.foggatewaylib.camera.ImageData;
-import org.cloudbus.foggatewaylib.camera.ImageStore;
+import org.cloudbus.foggatewaylib.DataTrigger;
+import org.cloudbus.foggatewaylib.FogGatewayActivity;
+import org.cloudbus.foggatewaylib.FogGatewayService;
+import org.cloudbus.foggatewaylib.GenericData;
+import org.cloudbus.foggatewaylib.ProgressData;
 
-import java.util.List;
+import static org.cloudbus.fogappcamerademo.MainActivity.KEY_STORE_INPUT_BITMAP;
+import static org.cloudbus.fogappcamerademo.MainActivity.KEY_STORE_OUTPUT_BITMAP;
 
 
 public class ResultFragment extends Fragment {
+    public static final String TAG = "Result Fragment";
     private OnResultFragmentInteractionListener mListener;
 
     private ImageView imageView;
-    private Integer inputObserverId;
-    private Integer outputObserverId;
+    private TextView progressText;
+    private ContentLoadingProgressBar progressBar;
 
-    private ImageData.BitmapReadyListener bitmapReadyListener = new ImageData.BitmapReadyListener() {
-        @Override
-        public void onBitmapReady(Bitmap bitmap) {
-            imageView.setImageBitmap(bitmap);
-        }
-    };
+    private long request_id;
 
     public ResultFragment() {
         // Required empty public constructor
@@ -56,16 +57,18 @@ public class ResultFragment extends Fragment {
             }
         });
         imageView = rootView.findViewById(R.id.image_view);
-        ImageData latestImage = ImageStore.getInstance(MainActivity.STORE_INPUT).retrieveLast();
-        if (latestImage != null){
-            latestImage.prepareBitmap(bitmapReadyListener);
-        }
+        progressBar = rootView.findViewById(R.id.progress_bar);
+        progressText = rootView.findViewById(R.id.progress_text);
+
+        progressBar.show();
+        progressBar.setIndeterminate(true);
+
         return rootView;
     }
 
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(final Context context) {
         super.onAttach(context);
         if (context instanceof OnResultFragmentInteractionListener) {
             mListener = (OnResultFragmentInteractionListener) context;
@@ -73,7 +76,39 @@ public class ResultFragment extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        request_id = getArguments().getLong("request_id", -1);
+        FogGatewayService service = ((FogGatewayActivity)getActivity()).getService();
+        if (service != null){
+            initService(service);
+        } else{
+            ((FogGatewayActivity)getActivity()).addServiceConnectionListener("resultFragment",
+                    new FogGatewayActivity.ServiceConnectionListener() {
+                        @Override
+                        public void onServiceConnected(FogGatewayService service) {
+                            initService(service);
+                        }
+
+                        @Override
+                        public void onServiceDisconnected() { }
+                    });
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        FogGatewayService service = ((FogGatewayActivity)getActivity()).getService();
+        if (service != null){
+            service.removeUITrigger("inputUpdateUI");
+            service.removeUITrigger("outputUpdateUI");
+            service.removeUITrigger("messageUpdateUI");
+        }
+        ((FogGatewayActivity)getActivity()).removeServiceConnectionListener("resultFragment");
     }
 
     @Override
@@ -82,37 +117,87 @@ public class ResultFragment extends Fragment {
         mListener = null;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    private void initService(FogGatewayService service){
+        ProgressData lastMsg = (ProgressData) service
+                .getDataStore(FogGatewayService.KEY_PROGRESS)
+                .retrieveLast(request_id);
 
-        if (inputObserverId == null)
-            inputObserverId = ImageStore.getInstance(MainActivity.STORE_INPUT).addObserver(new DataStoreObserver<ImageData>() {
-                @Override
-                public void onDataStored(DataStore<ImageData> dataStore, List<ImageData> data) {
-                    data.get(data.size()-1).prepareBitmap(bitmapReadyListener);
-                }
-            });
+        if (lastMsg != null)
+            updateUIOnProgress(lastMsg);
 
-        if (outputObserverId == null)
-            outputObserverId = ImageStore.getInstance(MainActivity.STORE_OUTPUT).addObserver(new DataStoreObserver<ImageData>() {
-                @Override
-                public void onDataStored(DataStore<ImageData> dataStore, List<ImageData> data) {
-                    data.get(data.size()-1).prepareBitmap(bitmapReadyListener);
-                }
-            });
+        if (imageView != null){
+            GenericData<Bitmap> outputBitmap = (GenericData<Bitmap>) service
+                    .getDataStore(KEY_STORE_OUTPUT_BITMAP)
+                    .retrieveLast(request_id);
+            if (outputBitmap != null)
+                imageView.setImageBitmap(outputBitmap.getValue());
+            else{
+                GenericData<Bitmap> inputBitmap = (GenericData<Bitmap>) service
+                        .getDataStore(KEY_STORE_INPUT_BITMAP)
+                        .retrieveLast(request_id);
+                if (inputBitmap != null)
+                    imageView.setImageBitmap(inputBitmap.getValue());
+            }
+        }
+
+        service.addUITrigger(KEY_STORE_INPUT_BITMAP,
+                "inputUpdateUI",
+                request_id,
+                new DataTrigger<GenericData>(GenericData.class) {
+                    @Override
+                    public void onNewData(DataStore dataStore, GenericData data) {
+                        if (imageView != null)
+                            imageView.setImageBitmap(((GenericData<Bitmap>)data)
+                                    .getValue());
+                    }
+                });
+        service.addUITrigger(KEY_STORE_OUTPUT_BITMAP,
+                "outputUpdateUI",
+                request_id,
+                new DataTrigger<GenericData>(GenericData.class) {
+                    @Override
+                    public void onNewData(DataStore dataStore, GenericData data) {
+                        if (imageView != null)
+                            imageView.setImageBitmap(((GenericData<Bitmap>)data)
+                                    .getValue());
+                    }
+                });
+        service.addUITrigger(FogGatewayService.KEY_PROGRESS,
+                "messageUpdateUI",
+                request_id,
+                new DataTrigger<ProgressData>(ProgressData.class) {
+
+                    @Override
+                    public void onNewData(DataStore<ProgressData> dataStore,
+                                          ProgressData data) {
+                        updateUIOnProgress(data);
+                    }
+                });
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (inputObserverId != null){
-            ImageStore.getInstance(MainActivity.STORE_INPUT).removeObserver(inputObserverId);
-            inputObserverId = null;
-        }
-        if (outputObserverId != null){
-            ImageStore.getInstance(MainActivity.STORE_OUTPUT).removeObserver(outputObserverId);
-            outputObserverId = null;
+    private void updateUIOnProgress(ProgressData data){
+        if (progressText == null || progressBar == null)
+            return;
+
+        switch(data.getProgress()){
+            case -1:
+                progressBar.hide();
+                progressText.setText(data.getMessage());
+                break;
+            case 0:
+                progressBar.show();
+                progressText.setText(data.getMessage());
+                break;
+            case 1:
+                progressBar.hide();
+                progressText.setText(data.getMessage());
+                break;
+            default:
+                progressBar.show();
+                progressText.setText("Unknown code: "
+                        + data.getProgress()
+                        + ", message: "
+                        + data.getMessage());
         }
     }
 

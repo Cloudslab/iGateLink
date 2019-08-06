@@ -21,5 +21,11 @@
         android:id="@+id/resultFragment"
         android:name="org.cloudbus.fogappcamerademo.ResultFragment"
         android:label="ResultFragment"
-        tools:layout="@layout/fragment_result"/>
+        tools:layout="@layout/fragment_result">
+        <argument
+            android:name="request_id"
+            app:argType="long"
+            android:defaultValue="-1L" />
+        />
+    </fragment>
 </navigation>

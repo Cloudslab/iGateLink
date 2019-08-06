@@ -1,67 +1,93 @@
 package org.cloudbus.foggatewaylib;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 public class InMemoryDataStore<T extends Data> extends DataStore<T> {
-    private TreeMap<Date, T> dataMap = new TreeMap<>();
-    private int max_elements;
+    private LimitedSortedLinkedList<T> dataList = new LimitedSortedLinkedList<>();
 
-    public InMemoryDataStore(){
-        super();
-        max_elements = 0;
+    public InMemoryDataStore(Class<T> dataType){
+        super(dataType);
     }
 
-    public InMemoryDataStore(int max_elements){
-        super();
-        this.max_elements = max_elements;
+    public InMemoryDataStore(int max_elements, Class<T> dataType){
+        super(dataType);
+        dataList.setMaxElements(max_elements);
     }
 
     @Override
-    public List<T> retrieveLastN(int N) {
-        Iterator<Map.Entry<Date, T>> iter = dataMap.descendingMap().entrySet().iterator();
-        List<T> dataList = new ArrayList<>();
+    public T[] retrieveLastN(int N) {
+        Iterator<T> iter = dataList.descendingIterator();
+        List<T> list = new ArrayList<>();
         for (int i = 0; i < N && iter.hasNext(); i++){
-            dataList.add(iter.next().getValue());
+            list.add(0, iter.next());
         }
-        return dataList;
+        return list.toArray((T[]) Array.newInstance(getDataType(), list.size()));
+    }
+
+    //TODO inefficient
+    @Override
+    public T[] retrieveLastN(int N, long requestID) {
+        Iterator<T> iter = dataList.descendingIterator();
+        List<T> list = new ArrayList<>();
+        for (int i = 0; i < N && iter.hasNext();){
+            T e = iter.next();
+            if (e.getRequestID() == requestID){
+                list.add(0, iter.next());
+                i++;
+            }
+        }
+        return list.toArray((T[]) Array.newInstance(getDataType(), list.size()));
     }
 
     @Override
     public T retrieveLast() {
-        if (dataMap.size() > 0)
-            return dataMap.lastEntry().getValue();
-        else
-            return null;
+        return dataList.getLast();
+    }
+
+    //TODO inefficient
+    @Override
+    public T retrieveLast(long requestID) {
+        Iterator<T> iter = dataList.descendingIterator();
+        while (iter.hasNext()){
+            T e = iter.next();
+            if (e.getRequestID() == requestID){
+                return e;
+            }
+        }
+        return null;
     }
 
     @Override
-    public List<T> retrieveInterval(final Date from, final Date to) {
-        return new ArrayList<>(dataMap.subMap(from, to).values());
+    public T[] retrieveInterval(long from, long to) {
+        List<T> subList = dataList.subList(from, to);
+        return subList.toArray((T[]) Array.newInstance(getDataType(), subList.size()));
+    }
 
+    //TODO inefficient
+    @Override
+    public T[] retrieveInterval(long from, long to, long requestID) {
+        List<T> subList = dataList.subList(from, to);
+        List<T> filteredSubList = new ArrayList<>();
+        for (T e:subList){
+            if (e.getRequestID() == requestID){
+                filteredSubList.add(e);
+            }
+        }
+        return filteredSubList
+                .toArray((T[]) Array.newInstance(getDataType(), filteredSubList.size()));
     }
 
     @Override
-    public void __store(List<T> dataList) {
-        for (T data:dataList){
-            dataMap.put(data.getTimestamp(), data);
-        }
-        if (max_elements > 0 && size() > max_elements){
-            removeFirstN(size() - max_elements);
-        }
+    public void __store(T... data) {
+        dataList.addAll(Arrays.asList(data));
     }
 
     @Override
     public int size() {
-        return dataMap.size();
-    }
-
-    public void removeFirstN(int N){
-        for (int i = 0; i < N; i++)
-            dataMap.pollFirstEntry();
+        return dataList.size();
     }
 }

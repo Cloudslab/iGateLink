@@ -5,6 +5,8 @@ import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -12,7 +14,9 @@ import android.util.Log;
 
 public abstract class ForegroundService extends Service {
 
-    private static final String LOGSTR = "ForegroundService";
+    private static final String TAG = "ForegroundService";
+
+    private final ForegroundServiceBinder binder = new ForegroundServiceBinder();
 
     public static final int KEEP_ALIVE = 1;
     public static final int SHOULD_STOP = 2;
@@ -22,7 +26,9 @@ public abstract class ForegroundService extends Service {
 
     protected abstract int execute();
 
-    protected void init(Bundle extras){ }
+    protected boolean init(Bundle extras){
+        return true;
+    }
 
     public static void sendIntentToForegroundService(Context context, String action, Bundle extras, Class<? extends ForegroundService> cls){
         Intent intent = new Intent(context, cls);
@@ -30,7 +36,7 @@ public abstract class ForegroundService extends Service {
         if (extras != null)
             intent.putExtras(extras);
         context.startService(intent);
-        Log.d(LOGSTR, "Intent sent");
+        Log.d(TAG, "Intent sent");
     }
 
     public static void startForegroundService(Context context, Bundle extras, Class<? extends ForegroundService> serviceClass, Class<? extends Activity> activityClass){
@@ -50,15 +56,43 @@ public abstract class ForegroundService extends Service {
         sendIntentToForegroundService(context, ACTION_STOP, null, cls);
     }
 
+    public static void bind(Context context, ServiceConnection connection, Class<? extends ForegroundService> cls){
+        Intent intent = new Intent(context, cls);
+        context.bindService(intent, connection, 0);
+    }
+
     private void stopMe(){
+        onStop();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            stopForeground(0);
+            stopForeground(true);
         }
         stopSelf();
     }
 
     public void onStop(){
 
+    }
+
+    protected boolean selfStartForeground(Bundle extras){
+        Class activity;
+        try{
+            String activityName = extras.getString("activity");
+            if (activityName != null)
+                activity = Class.forName(activityName);
+            else
+                return false;
+        } catch (ClassNotFoundException e){
+            e.printStackTrace();
+            Log.e(TAG, "Activity string is not valid!");
+            return false;
+        }
+
+        NotificationUtils.initDefaultChannel(this);
+        Notification notification = NotificationUtils.buildDefaultNotification(this,
+                activity);
+
+        startForeground(NotificationUtils.DEFAULT_NOTIFICATION_ID, notification);
+        return true;
     }
 
     protected boolean customAction(String action){
@@ -73,32 +107,14 @@ public abstract class ForegroundService extends Service {
 
         switch (action){
             case ACTION_START:
-                Log.d(LOGSTR, "Starting... (" + getClass().getSimpleName() + ")");
-                Class activity;
-                String title;
-                String text;
-                int icon;
+                Log.d(TAG, "Starting... (" + getClass().getSimpleName() + ")");
 
                 Bundle extras = intent.getExtras();
 
-                try{
-                    activity = Class.forName(intent.getStringExtra("activity"));
-                } catch (ClassNotFoundException e){
-                    e.printStackTrace();
-                    Log.e(LOGSTR, "Activity string is not valid!");
-                    stopSelf();
-                    return START_NOT_STICKY;
+                if (!init(extras) || !selfStartForeground(extras)){
+                    stopMe();
+                    break;
                 }
-
-                title = extras.getString("title", "Running");
-                text = extras.getString("text", "App is running");
-                icon = extras.getInt("icon", 0);
-
-                init(extras);
-
-                Notification notification =  NotificationFactory.build(this, activity, title, text, icon);
-
-                startForeground(NotificationFactory.NOTIFICATION_ID, notification);
 
                 switch (execute()){
                     case KEEP_ALIVE:
@@ -109,23 +125,31 @@ public abstract class ForegroundService extends Service {
                         break;
                 }
                 break;
+
             case ACTION_STOP:
-                onStop();
                 stopMe();
                 break;
 
             default:
                 if (!customAction(action))
-                    Log.w(LOGSTR, "Unrecognized action");
+                    Log.w(TAG, "Unrecognized action");
         }
 
         return START_STICKY;
     }
 
+    public class ForegroundServiceBinder extends Binder {
+        ForegroundService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return ForegroundService.this;
+        }
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return binder;
     }
+
 
     @Override
     public final void onDestroy() {
