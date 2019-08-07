@@ -2,12 +2,12 @@ package org.cloudbus.foggatewaylib;
 
 import android.util.Log;
 
-public abstract class ProviderChooser {
-    public static final String TAG = "ProviderChooser";
+public abstract class Chooser {
+    public static final String TAG = "Chooser";
 
     private ExecutionManager executionManager;
 
-    public ProviderChooser(){ }
+    public Chooser(){ }
 
     public abstract String chooseProvider(String... providers);
 

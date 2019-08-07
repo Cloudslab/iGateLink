@@ -135,7 +135,7 @@ public class ResultFragment extends Fragment {
     @SuppressWarnings("unchecked")
     private void initExecutionManager(ExecutionManager executionManager){
         ProgressData lastMsg = (ProgressData) executionManager
-                .getDataStore(ExecutionManager.KEY_PROGRESS)
+                .getStore(ExecutionManager.KEY_DATA_PROGRESS)
                 .retrieveLast(request_id);
 
         if (lastMsg != null)
@@ -143,13 +143,13 @@ public class ResultFragment extends Fragment {
 
         if (imageView != null){
             GenericData<Bitmap> outputBitmap = (GenericData<Bitmap>) executionManager
-                    .getDataStore(KEY_DATA_OUTPUT_BITMAP)
+                    .getStore(KEY_DATA_OUTPUT_BITMAP)
                     .retrieveLast(request_id);
             if (outputBitmap != null)
                 imageView.setImageBitmap(outputBitmap.getValue());
             else{
                 GenericData<Bitmap> inputBitmap = (GenericData<Bitmap>) executionManager
-                        .getDataStore(KEY_DATA_INPUT_BITMAP)
+                        .getStore(KEY_DATA_INPUT_BITMAP)
                         .retrieveLast(request_id);
                 if (inputBitmap != null)
                     imageView.setImageBitmap(inputBitmap.getValue());
@@ -178,7 +178,7 @@ public class ResultFragment extends Fragment {
                                     .getValue());
                     }
                 })
-            .addUITrigger(ExecutionManager.KEY_PROGRESS,
+            .addUITrigger(ExecutionManager.KEY_DATA_PROGRESS,
                 "messageUpdateUI",
                 request_id,
                 new Trigger<ProgressData>(ProgressData.class) {

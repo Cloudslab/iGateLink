@@ -16,7 +16,7 @@ import org.cloudbus.foggatewaylib.ExecutionManager;
 import org.cloudbus.foggatewaylib.FogGatewayServiceActivity;
 import org.cloudbus.foggatewaylib.GenericData;
 import org.cloudbus.foggatewaylib.ProduceDataTrigger;
-import org.cloudbus.foggatewaylib.RoundRobinProviderChooser;
+import org.cloudbus.foggatewaylib.RoundRobinChooser;
 import org.cloudbus.foggatewaylib.camera.BitmapProvider;
 import org.cloudbus.foggatewaylib.camera.CameraProvider;
 import org.cloudbus.foggatewaylib.camera.ImageData;
@@ -129,6 +129,6 @@ public class MainActivity extends FogGatewayServiceActivity
                         new ProduceDataTrigger<>(KEY_DATA_INPUT_BITMAP, ImageData.class))
                 .addTrigger(KEY_DATA_OUTPUT, KEY_TRIGGER_BITMAP_OUTPUT,
                         new ProduceDataTrigger<>(KEY_DATA_OUTPUT_BITMAP, ImageData.class))
-                .addChooser(KEY_DATA_OUTPUT, new RoundRobinProviderChooser());
+                .addChooser(KEY_DATA_OUTPUT, new RoundRobinChooser());
     }
 }

@@ -50,7 +50,7 @@ public class InMemoryStoreTest {
         Store<Data> store = new InMemoryStore<>(Data.class);
         Trigger<Data> mTrigger = new Trigger<Data>(Data.class) {
             @Override
-            public void onNewData(Store<Data> dataStore, Data data) { }
+            public void onNewData(Store<Data> store, Data data) { }
         };
         store.addObserver("mObserver", mTrigger);
 

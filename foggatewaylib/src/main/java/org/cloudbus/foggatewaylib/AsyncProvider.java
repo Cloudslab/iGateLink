@@ -29,17 +29,17 @@ public abstract class AsyncProvider<T extends Data, S extends Data> extends Prov
     @Override
     @SuppressWarnings("unchecked")
     public void execute(long requestID, T... input){
-        AsyncProvider.DataProviderAsyncTask task =
-                new AsyncProvider.DataProviderAsyncTask(requestID);
+        ProviderAsyncTask task =
+                new ProviderAsyncTask(requestID);
         task.executeOnExecutor(executor, input);
     }
 
-    private class DataProviderAsyncTask extends AsyncTask<T, ProgressData, S[]>
+    private class ProviderAsyncTask extends AsyncTask<T, ProgressData, S[]>
                                         implements ProgressPublisher {
         private Throwable throwable;
         private long requestID;
 
-        public DataProviderAsyncTask(long requestID){
+        public ProviderAsyncTask(long requestID){
             super();
             this.requestID = requestID;
         }

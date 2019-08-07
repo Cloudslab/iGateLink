@@ -14,16 +14,16 @@ import java.util.Map;
 
 public class ExecutionManager{
     public static final String TAG = "ExecutionManager";
-    public static final String KEY_PROGRESS = "progressStore";
+    public static final String KEY_DATA_PROGRESS = "progressStore";
 
     private static long NEXT_REQUEST_ID = 1;
 
-    private Map<String, Store> dataStores;
+    private Map<String, Store> stores;
     private Map<String, Provider> providers;
     private MultiMap<String, String> providersOfData;
     private Map<String, String> triggers;
-    private Map<String, ProviderChooser> choosers;
     private Map<String, String> UITriggers;
+    private Map<String, Chooser> choosers;
 
     private Context context;
 
@@ -32,14 +32,14 @@ public class ExecutionManager{
 
         this.context = context;
 
-        dataStores = new HashMap<>();
+        stores = new HashMap<>();
         providers = new HashMap<>();
         providersOfData = new MultiMap<>();
         triggers = new HashMap<>();
         choosers = new HashMap<>();
         UITriggers = new HashMap<>();
 
-        addDataStore(KEY_PROGRESS, new InMemoryStore<>(ProgressData.class));
+        addStore(KEY_DATA_PROGRESS, new InMemoryStore<>(ProgressData.class));
     }
 
     public Context getContext() {
@@ -50,19 +50,19 @@ public class ExecutionManager{
         return NEXT_REQUEST_ID++;
     }
 
-    public ExecutionManager addDataStore(String key, Store store){
+    public ExecutionManager addStore(String key, Store store){
 
-        if (dataStores.containsKey(key)){
+        if (stores.containsKey(key)){
             Log.w(TAG, "Store " + key + " already exists");
             return this;
         }
-        dataStores.put(key, store);
+        stores.put(key, store);
 
         return this;
     }
 
-    public boolean removeDataStore(String key){
-        return dataStores.remove(key) != null;
+    public boolean removeStore(String key){
+        return stores.remove(key) != null;
     }
 
     @SuppressWarnings("unchecked")
@@ -75,7 +75,7 @@ public class ExecutionManager{
         }
 
 
-        Store store = dataStores.get(dataKey);
+        Store store = stores.get(dataKey);
         if (store == null)
             throw new StoreNotDefinedException(dataKey);
 
@@ -115,7 +115,7 @@ public class ExecutionManager{
         if (dataKey == null)
             return false;
 
-        Store store = dataStores.get(dataKey);
+        Store store = stores.get(dataKey);
         if (store == null)
             return false;
 
@@ -143,12 +143,12 @@ public class ExecutionManager{
     }
 
     @SuppressWarnings("unchecked")
-    private void checkDataStore(String key, @Nullable Class type, boolean autoCreate){
-        Store store = dataStores.get(key);
+    private void checkStore(String key, @Nullable Class type, boolean autoCreate){
+        Store store = stores.get(key);
         if (store == null){
             if (type != null && autoCreate){
                 store = new InMemoryStore(type);
-                addDataStore(key, store);
+                addStore(key, store);
             } else
                 throw new StoreNotDefinedException(key);
         }
@@ -160,13 +160,13 @@ public class ExecutionManager{
 
     @SuppressWarnings("unchecked")
     public ExecutionManager addChooser(String outputKey,
-                                       ProviderChooser chooser){
+                                       Chooser chooser){
         if (choosers.containsKey(outputKey)){
             Log.w(TAG, "Chooser for data " + outputKey + " already exists");
             return this;
         }
 
-        checkDataStore(outputKey, null, false);
+        checkStore(outputKey, null, false);
         choosers.put(outputKey, chooser);
         chooser.attach(this);
 
@@ -174,7 +174,7 @@ public class ExecutionManager{
     }
 
     public boolean removeChooser(String outputKey){
-        ProviderChooser chooser = choosers.get(outputKey);
+        Chooser chooser = choosers.get(outputKey);
 
         if (chooser != null){
             chooser.detach();
@@ -191,14 +191,14 @@ public class ExecutionManager{
             return this;
         }
 
-        checkDataStore(outputKey, provider.getOutputType(), true);
+        checkStore(outputKey, provider.getOutputType(), true);
 
         providers.put(providerKey, provider);
         providersOfData.put(outputKey, providerKey);
 
         provider.attach(this,
-                dataStores.get(outputKey),
-                dataStores.get(KEY_PROGRESS));
+                stores.get(outputKey),
+                stores.get(KEY_DATA_PROGRESS));
 
         return this;
     }
@@ -240,7 +240,7 @@ public class ExecutionManager{
                 return;
             }
 
-            ProviderChooser chooser = choosers.get(dataKey);
+            Chooser chooser = choosers.get(dataKey);
             if (chooser == null)
                 throw new ChooserNotDefinedException(dataKey);
 
@@ -250,15 +250,15 @@ public class ExecutionManager{
             throw new ProviderForDataNotDefinedException(dataKey);
     }
 
-    public Store getDataStore(String key){
-        return dataStores.get(key);
+    public Store getStore(String key){
+        return stores.get(key);
     }
 
     public Provider getProvider(String key){
         return providers.get(key);
     }
 
-    public ProviderChooser getChooser(String key){
+    public Chooser getChooser(String key){
         return choosers.get(key);
     }
 
