@@ -2,6 +2,9 @@ package org.cloudbus.foggatewaylib;
 
 import android.util.Log;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 public abstract class DataProvider<T extends Data, S extends Data>{
     private static final String TAG = "DataProvider";
 
@@ -61,5 +64,11 @@ public abstract class DataProvider<T extends Data, S extends Data>{
     public void onAttach(){}
     public void onDetach(){}
 
-    public abstract void execute(long requestID, Data... input);
+    public abstract void execute(long requestID, T... input);
+
+    @SuppressWarnings("unchecked")
+    public void executeCast(long requestID, Data... input){
+        execute(requestID, Arrays.asList(input).toArray(
+                (T[]) Array.newInstance(getInputType(), input.length)));
+    }
 }

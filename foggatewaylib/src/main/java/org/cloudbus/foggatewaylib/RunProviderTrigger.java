@@ -10,12 +10,8 @@ public class RunProviderTrigger<T extends Data> extends BulkDataTrigger<T> {
 
     @Override
     public void onNewData(DataStore<T> dataStore, T... data) {
-        try {
-            getService().runProvider(providerKey,
-                    data[0].getRequestID(),
-                    data);
-        } catch (FogGatewayService.ProviderNotDefinedException e) {
-            e.printStackTrace();
-        }
+        getService().runProvider(providerKey,
+                data[0].getRequestID(),
+                data);
     }
 }

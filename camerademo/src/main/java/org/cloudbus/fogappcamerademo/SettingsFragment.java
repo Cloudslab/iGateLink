@@ -9,13 +9,17 @@ import androidx.preference.SwitchPreference;
 
 import org.cloudbus.foggatewaylib.FogGatewayActivity;
 import org.cloudbus.foggatewaylib.FogGatewayService;
+import org.cloudbus.foggatewaylib.ForegroundService;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
     public static final String KEY_ENABLE_SERVICES = "enable_services";
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        PreferenceManager.getDefaultSharedPreferences(getContext())
+        if (getActivity() == null)
+            return;
+
+        PreferenceManager.getDefaultSharedPreferences(getActivity())
                 .edit()
                 .putBoolean(KEY_ENABLE_SERVICES,
                         ((FogGatewayActivity) getActivity()).getService() != null)
@@ -24,16 +28,23 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         setPreferencesFromResource(R.xml.preferences, rootKey);
 
         SwitchPreference preference = findPreference(KEY_ENABLE_SERVICES);
-        preference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                if ((boolean) newValue) {
-                    FogGatewayService.start(getContext(), MainActivity.class);
-                } else {
-                    FogGatewayService.stop(getContext());
+        if (preference != null){
+            preference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    if (getActivity() == null)
+                        return false;
+
+                    if ((boolean) newValue) {
+                        FogGatewayService.start(getActivity(), MainActivity.class);
+                        ForegroundService.bind(getActivity(), (FogGatewayActivity) getActivity(),
+                                FogGatewayService.class);
+                    } else {
+                        FogGatewayService.stop(getActivity());
+                    }
+                    return true;
                 }
-                return true;
-            }
-        });
+            });
+        }
     }
 }

@@ -3,7 +3,6 @@ package org.cloudbus.foggatewaylib.camera;
 import android.hardware.Camera;
 import android.util.Log;
 
-import org.cloudbus.foggatewaylib.Data;
 import org.cloudbus.foggatewaylib.DataProvider;
 import org.cloudbus.foggatewaylib.ForegroundService;
 import org.cloudbus.foggatewaylib.VoidData;
@@ -78,7 +77,7 @@ public class CameraProvider extends DataProvider<VoidData, ImageData> {
     }
 
     @Override
-    public void execute(long requestID, Data... input) {
+    public void execute(long requestID, VoidData... input) {
         takePicture(requestID);
     }
 }

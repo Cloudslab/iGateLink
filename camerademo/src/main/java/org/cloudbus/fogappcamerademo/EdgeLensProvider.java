@@ -6,10 +6,11 @@ import android.util.Pair;
 
 import androidx.preference.PreferenceManager;
 
-import org.cloudbus.foggatewaylib.Data;
 import org.cloudbus.foggatewaylib.SimpleHttpConnection;
 import org.cloudbus.foggatewaylib.ThreadPoolDataProvider;
 import org.cloudbus.foggatewaylib.camera.ImageData;
+
+import java.io.IOException;
 
 public class EdgeLensProvider extends ThreadPoolDataProvider<ImageData, ImageData> {
     public static final String TAG = "EdgeLensProvider";
@@ -34,8 +35,9 @@ public class EdgeLensProvider extends ThreadPoolDataProvider<ImageData, ImageDat
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public ImageData[] getData(ProgressPublisher progressPublisher,
-                               long requestID, Data... input) throws Exception {
+                               long requestID, ImageData... input) throws Exception {
 
         SimpleHttpConnection arbiterConnection;
         SimpleHttpConnection uploadConnection;
@@ -45,7 +47,7 @@ public class EdgeLensProvider extends ThreadPoolDataProvider<ImageData, ImageDat
         ImageData output;
 
         if (input.length == 0)
-            throw new Exception("Input image is empty.");
+            throw new Exception("Input array is empty.");
 
         Log.d(TAG, "Starting image upload...");
         progressPublisher.publish(0, "Querying arbiter");
@@ -63,12 +65,12 @@ public class EdgeLensProvider extends ThreadPoolDataProvider<ImageData, ImageDat
         progressPublisher.publish(0, "Uploading image");
 
         uploadConnection  = new SimpleHttpConnection(workerIP, UPLOAD_URL);
-        String uploadResult = uploadConnection.postBytes(((ImageData)input[0]).getBytes());
+        String uploadResult = uploadConnection.postBytes(input[0].getBytes());
 
         Log.d(TAG, "Image uploaded (result: " + uploadResult + ")");
 
         if (!uploadResult.contains("File xfer completed."))
-            throw new Exception("Error in file transfer.");
+            throw new IOException("Error in file transfer.");
 
         if (cloud){
             execConnection = new SimpleHttpConnection(workerIP, EXEC_URL,

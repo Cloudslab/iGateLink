@@ -6,7 +6,6 @@ import java.util.TimerTask;
 
 public class Timer {
     private java.util.Timer timer;
-    private TimerTask timerTask;
     private Handler handler = new Handler();
     private int delay;
     private int period;
@@ -27,7 +26,7 @@ public class Timer {
 
     public void start(){
         timer = new java.util.Timer();
-        timerTask = new TimerTask() {
+        TimerTask timerTask = new TimerTask() {
             public void run() {
                 handler.post(runnable);
             }

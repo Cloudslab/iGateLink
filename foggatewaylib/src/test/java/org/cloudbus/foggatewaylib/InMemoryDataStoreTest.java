@@ -4,6 +4,8 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class InMemoryDataStoreTest {
 
@@ -40,5 +42,22 @@ public class InMemoryDataStoreTest {
         assertEquals(11, store.retrieveLast().getId());
         assertArrayEquals(new long[]{7, 8, 9, 10, 11}, dataToLong(store.retrieveLastN(5)));
         assertArrayEquals(new long[]{3, 4, 5}, dataToLong(store.retrieveInterval(3,6)));
+    }
+
+
+    @Test
+    public void cast_isCorrect() {
+        DataStore<Data> dataStore = new InMemoryDataStore<>(Data.class);
+        DataTrigger<Data> mTrigger = new DataTrigger<Data>(Data.class) {
+            @Override
+            public void onNewData(DataStore<Data> dataStore, Data data) { }
+        };
+        dataStore.addObserver("mObserver", mTrigger);
+
+        DataTrigger trigger1 = (DataTrigger) dataStore.removeObserver("mObserver");
+        assertNotNull(trigger1);
+
+        DataTrigger trigger2 = (DataTrigger) dataStore.removeObserver("mObserver");
+        assertNull(trigger2);
     }
 }

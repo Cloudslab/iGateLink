@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
@@ -29,7 +30,6 @@ import static org.cloudbus.foggatewaylib.camera.CameraUtils.checkCameraHardware;
 
 public class PreviewFragment extends Fragment {
     private OnPreviewFragmentInteractionListener mListener;
-    private FrameLayout preview;
 
     private Camera mCamera;
     private CameraPreview mPreview;
@@ -44,7 +44,7 @@ public class PreviewFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (checkCameraHardware(getContext())){
+        if (getActivity() != null && checkCameraHardware(getActivity())){
 
             FogGatewayService service = ((FogGatewayActivity)getActivity()).getService();
             if (service == null)
@@ -65,7 +65,7 @@ public class PreviewFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_preview, container, false);
@@ -76,9 +76,12 @@ public class PreviewFragment extends Fragment {
                 mListener.onButtonClick();
             }
         });
-        preview = rootView.findViewById(R.id.camera_preview);
+        FrameLayout preview = rootView.findViewById(R.id.camera_preview);
         if (mPreview != null && preview.getChildCount() == 0)
             preview.addView(mPreview);
+
+        if (getActivity() == null)
+            return rootView;
 
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         Point size = new Point();
@@ -124,7 +127,7 @@ public class PreviewFragment extends Fragment {
 
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (context instanceof OnPreviewFragmentInteractionListener) {
             mListener = (OnPreviewFragmentInteractionListener) context;
@@ -137,8 +140,8 @@ public class PreviewFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (((FogGatewayActivity) getActivity()).getService() == null){
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        if (getActivity() != null && ((FogGatewayActivity) getActivity()).getService() == null){
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             alertDialog = builder.setMessage("Service is not running")
                     .setNegativeButton("Back", new DialogInterface.OnClickListener() {
                         @Override

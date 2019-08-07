@@ -172,19 +172,18 @@ public class SimpleHttpConnection {
      */
     private String readStream(InputStream stream)
             throws IOException {
-        Reader reader = null;
-        reader = new InputStreamReader(stream, "UTF-8");
+        Reader reader = new InputStreamReader(stream, "UTF-8");
         char[] rawBuffer = new char[maxReadSize];
         int readSize;
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder builder = new StringBuilder();
         while (((readSize = reader.read(rawBuffer)) != -1) && maxReadSize > 0) {
             if (readSize > maxReadSize) {
                 readSize = maxReadSize;
             }
-            buffer.append(rawBuffer, 0, readSize);
+            builder.append(rawBuffer, 0, readSize);
             maxReadSize -= readSize;
         }
-        return buffer.toString();
+        return builder.toString();
     }
 
     /**

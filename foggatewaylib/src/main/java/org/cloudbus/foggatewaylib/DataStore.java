@@ -30,6 +30,9 @@ public abstract class DataStore<T extends Data> {
     public abstract int size();
 
     protected void notifyObservers(T... data){
+        if (data.length == 0)
+            return;
+
         for (DataStoreObserver<T> observer: observers.values()){
             observer.onDataStored(this, data);
         }
@@ -44,12 +47,8 @@ public abstract class DataStore<T extends Data> {
         observers.put(key, observer);
     }
 
-    public boolean removeObserver(String key){
-        if (!observers.containsKey(key))
-            return false;
-
-        observers.remove(key);
-        return true;
+    public DataStoreObserver<T> removeObserver(String key){
+        return observers.remove(key);
     }
 
     public T[] retrieveIntervalFrom(long from){

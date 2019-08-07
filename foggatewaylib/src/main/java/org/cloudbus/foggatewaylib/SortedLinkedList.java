@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
 public class SortedLinkedList<E extends Data> implements Collection<E> {
     private LinkedList<E> list;
@@ -19,7 +20,7 @@ public class SortedLinkedList<E extends Data> implements Collection<E> {
     }
 
 
-    public SortedLinkedList(Collection c) {
+    public SortedLinkedList(Collection<E> c) {
         list = new LinkedList<>(c);
     }
 
@@ -34,7 +35,7 @@ public class SortedLinkedList<E extends Data> implements Collection<E> {
         return list.isEmpty();
     }
 
-
+    @SuppressWarnings("unchecked")
     private ListIterator<E> findPosition(@Nullable Object o) {
         if (o == null)
             return null;
@@ -149,6 +150,7 @@ public class SortedLinkedList<E extends Data> implements Collection<E> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean remove(@Nullable Object o) {
         ListIterator<E> iterator = findPosition(o);
         if (iterator != null && iterator.next().getId() == ((E)o).getId()){
@@ -227,19 +229,35 @@ public class SortedLinkedList<E extends Data> implements Collection<E> {
     }
 
     public E getLast() {
-        return list.getLast();
+        try {
+            return list.getLast();
+        } catch (NoSuchElementException e){
+            return null;
+        }
     }
 
     public E getFirst() {
-        return list.getFirst();
+        try {
+            return list.getFirst();
+        } catch (NoSuchElementException e){
+            return null;
+        }
     }
 
     public E removeFirst() {
-        return list.removeFirst();
+        try {
+            return list.removeFirst();
+        } catch (NoSuchElementException e){
+            return null;
+        }
     }
 
     public E removeLast() {
-        return list.removeLast();
+        try {
+            return list.removeLast();
+        } catch (NoSuchElementException e){
+            return null;
+        }
     }
 
     public List<E> subList(long from, long to) {

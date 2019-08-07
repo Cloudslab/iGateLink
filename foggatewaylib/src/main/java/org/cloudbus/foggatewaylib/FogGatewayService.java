@@ -6,17 +6,22 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FogGatewayService extends ForegroundService{
     public static final String TAG = "FogGatewayService";
     public static final String KEY_PROGRESS = "progressStore";
 
-    private Map<String, DataStore<? extends Data>> dataStores;
+    private Map<String, DataStore> dataStores;
     private Map<String, DataProvider> providers;
-    private Map<String, String> providerOutputs;
+    private MultiMap<String, String> providersOfData;
     private Map<String, String> triggers;
+    private Map<String, DataProviderChooser> choosers;
     private Map<String, String> UITriggers;
 
     private static long NEXT_REQUEST_ID = 1;
@@ -25,8 +30,9 @@ public class FogGatewayService extends ForegroundService{
         super();
         dataStores = new HashMap<>();
         providers = new HashMap<>();
-        providerOutputs = new HashMap<>();
+        providersOfData = new MultiMap<>();
         triggers = new HashMap<>();
+        choosers = new HashMap<>();
         UITriggers = new HashMap<>();
 
         addDataStore(KEY_PROGRESS, new InMemoryDataStore<>(ProgressData.class));
@@ -58,93 +64,117 @@ public class FogGatewayService extends ForegroundService{
     }
 
     public boolean removeDataStore(String key){
-        if (!dataStores.containsKey(key))
-            return false;
-
-        dataStores.remove(key);
-        return true;
+        return dataStores.remove(key) != null;
     }
 
-    private FogGatewayService addTriggerGeneric(String storeKey, String triggerkey,
+    @SuppressWarnings("unchecked")
+    private FogGatewayService addTriggerGeneric(String dataKey, String triggerKey,
                                                 BulkDataTrigger trigger,
                                                 Map<String, String> map){
-        if (map.containsKey(triggerkey)){
-            Log.w(TAG, "Trigger " + triggerkey + " already exists");
+        if (map.containsKey(triggerKey)){
+            Log.w(TAG, "Trigger " + triggerKey + " already exists");
             return this;
         }
 
-        if (!dataStores.containsKey(storeKey))
-            throw new StoreNotDefinedException(storeKey);
 
-        DataStore dataStore = dataStores.get(storeKey);
+        DataStore dataStore = dataStores.get(dataKey);
+        if (dataStore == null)
+            throw new StoreNotDefinedException(dataKey);
+
         if (dataStore.getDataType().equals(trigger.getDataType())){
             trigger.bindService(this);
-            dataStore.addObserver(triggerkey, trigger);
-            map.put(triggerkey, storeKey);
+            dataStore.addObserver(triggerKey, trigger);
+            map.put(triggerKey, dataKey);
         } else
-            throw new TypeMismatchException(storeKey, dataStore.getDataType(),
+            throw new TypeMismatchException(dataKey, dataStore.getDataType(),
                     trigger.getDataType());
 
         return this;
     }
 
-    public FogGatewayService addTrigger(String storeKey, String triggerkey,
+    public FogGatewayService addTrigger(String dataKey, String triggerKey,
                                         BulkDataTrigger trigger){
 
-        return addTriggerGeneric(storeKey, triggerkey, trigger, triggers);
+        return addTriggerGeneric(dataKey, triggerKey, trigger, triggers);
     }
 
-    public FogGatewayService addUITrigger(String storeKey, String triggerkey,
-                                          final BulkDataTrigger trigger){
+    public FogGatewayService addUITrigger(String dataKey, String triggerKey,
+                                          BulkDataTrigger trigger){
 
-        return addTriggerGeneric(storeKey, triggerkey, trigger, UITriggers);
+        return addTriggerGeneric(dataKey, triggerKey, trigger, UITriggers);
     }
 
-    public FogGatewayService addUITrigger(String storeKey, String triggerkey,
-                                          final long requestID, final BulkDataTrigger trigger){
-        BulkDataTrigger actualTrigger = new BulkDataTrigger(trigger.getDataType()) {
-            @Override
-            public void onNewData(DataStore dataStore, Data[] data) {
-                if (data[0].getRequestID() == requestID)
-                    trigger.onNewData(dataStore, data);
-            }
-        };
-
-        return addTriggerGeneric(storeKey, triggerkey, actualTrigger, UITriggers);
+    @SuppressWarnings("unchecked")
+    public FogGatewayService addUITrigger(String dataKey, String triggerKey, long requestID,
+                                          BulkDataTrigger trigger){
+        return addTriggerGeneric(dataKey, triggerKey,
+                new FilteredBulkDataTrigger(requestID, trigger),
+                UITriggers);
     }
 
-    public boolean removeTriggerGeneric(String triggerkey,
-                                        Map<String, String> map){
-        if (!map.containsKey(triggerkey)){
-            return false;
-        }
-        String storeKey = map.get(triggerkey);
-        if (!dataStores.containsKey(storeKey))
+    public boolean removeTriggerGeneric(String triggerKey, Map<String, String> map){
+        String dataKey = map.get(triggerKey);
+        if (dataKey == null)
             return false;
 
-        DataStore dataStore = dataStores.get(storeKey);
-        map.remove(triggerkey);
+        DataStore dataStore = dataStores.get(dataKey);
+        if (dataStore == null)
+            return false;
 
-        return dataStore.removeObserver(triggerkey);
+        map.remove(triggerKey);
+
+        BulkDataTrigger trigger = (BulkDataTrigger) dataStore.removeObserver(triggerKey);
+        if (trigger == null)
+            return false;
+
+        trigger.unbindService();
+        return true;
     }
 
-    public boolean removeTrigger(String triggerkey){
-        return removeTriggerGeneric(triggerkey, triggers);
+    public boolean removeTrigger(String triggerKey){
+        return removeTriggerGeneric(triggerKey, triggers);
     }
 
-    public boolean removeUITrigger(String triggerkey){
-        return removeTriggerGeneric(triggerkey, UITriggers);
+    public boolean removeUITrigger(String triggerKey){
+        return removeTriggerGeneric(triggerKey, UITriggers);
     }
 
-    private void checkDataStore(String key, Class type){
-        if (!dataStores.containsKey(key))
+    private void checkDataStore(String key, @Nullable Class type){
+        DataStore dataStore = dataStores.get(key);
+        if (dataStore == null)
             throw new StoreNotDefinedException(key);
-        if (!dataStores.get(key).getDataType().equals(type))
-            throw new TypeMismatchException(key,
-                    dataStores.get(key).getDataType(),
-                    type);
+        if (type != null && !dataStore.getDataType().equals(type))
+                throw new TypeMismatchException(key,
+                        dataStore.getDataType(),
+                        type);
     }
 
+    @SuppressWarnings("unchecked")
+    public FogGatewayService addChooser(String outputKey,
+                                        DataProviderChooser chooser){
+        if (choosers.containsKey(outputKey)){
+            Log.w(TAG, "Chooser for data " + outputKey + " already exists");
+            return this;
+        }
+
+        checkDataStore(outputKey, null);
+        choosers.put(outputKey, chooser);
+        chooser.attach(this);
+
+        return this;
+    }
+
+    public boolean removeChooser(String outputKey){
+        DataProviderChooser chooser = choosers.get(outputKey);
+
+        if (chooser != null){
+            chooser.detach();
+            return choosers.remove(outputKey) != null;
+        } else
+            return false;
+    }
+
+    @SuppressWarnings("unchecked")
     public FogGatewayService addProvider(String providerKey, String outputKey,
                                          DataProvider provider){
         if (providers.containsKey(providerKey)){
@@ -155,29 +185,60 @@ public class FogGatewayService extends ForegroundService{
         checkDataStore(outputKey, provider.getOutputType());
 
         providers.put(providerKey, provider);
-        providerOutputs.put(providerKey, outputKey);
+        providersOfData.put(outputKey, providerKey);
 
-        provider.attach(this, dataStores.get(outputKey), dataStores.get(KEY_PROGRESS));
+        provider.attach(this,
+                dataStores.get(outputKey),
+                dataStores.get(KEY_PROGRESS));
 
         return this;
     }
 
     public boolean removeProvider(String providerKey){
-        if (!providers.containsKey(providerKey))
-            return false;
-
         DataProvider provider = providers.get(providerKey);
-        provider.detach();
 
-        providers.remove(providerKey);
-        return true;
+        if (provider != null){
+            provider.detach();
+            providersOfData.removeValue(providerKey);
+            return providers.remove(providerKey) != null;
+        } else
+            return false;
     }
 
-    public void runProvider(String key, long request_id, Data... input){
-        if (!providers.containsKey(key))
-            throw new ProviderNotDefinedException(key);
-        DataProvider provider = providers.get(key);
-        provider.execute(request_id, input);
+    @SuppressWarnings("unchecked")
+    public void runProvider(String providerKey, long request_id, Data... input){
+        DataProvider provider = providers.get(providerKey);
+        if (provider != null){
+            if (input.length == 0 || input[0].getClass().equals(provider.getInputType())){
+                provider.executeCast(request_id, input);
+            } else
+                throw new IllegalArgumentException("Expected "
+                        + provider.getInputType()
+                        + " but "
+                        + input[0].getClass()
+                        + " was given");
+        } else
+            throw new ProviderNotDefinedException(providerKey);
+
+    }
+
+    @SuppressWarnings("unchecked")
+    public void produceData(String dataKey, long request_id, Data... input){
+        List<String> providers = new ArrayList<>(providersOfData.getAll(dataKey));
+        if (!providers.isEmpty()){
+            if (providers.size() == 1){
+                runProvider(providers.get(0), request_id, input);
+                return;
+            }
+
+            DataProviderChooser chooser = choosers.get(dataKey);
+            if (chooser == null)
+                throw new ChooserNotDefinedException(dataKey);
+
+            runProvider(chooser.chooseProvider(providers.toArray(new String[providers.size()])),
+                    request_id, input);
+        } else
+            throw new ProviderForDataNotDefinedException(dataKey);
     }
 
     public DataStore getDataStore(String key){
@@ -188,20 +249,36 @@ public class FogGatewayService extends ForegroundService{
         return providers.get(key);
     }
 
+    public DataProviderChooser getChooser(String key){
+        return choosers.get(key);
+    }
+
     public class StoreNotDefinedException extends RuntimeException{
-        public StoreNotDefinedException(String key){
-            super("No data store was defined for key " + key);
+        StoreNotDefinedException(String key){
+            super("No data store was defined for data with key " + key);
         }
     }
 
     public class ProviderNotDefinedException extends RuntimeException{
-        public ProviderNotDefinedException(String key){
+        ProviderNotDefinedException(String key){
             super("No provider was defined for key " + key);
         }
     }
 
+    public class ProviderForDataNotDefinedException extends RuntimeException{
+        ProviderForDataNotDefinedException(String key){
+            super("No provider produces data with key " + key);
+        }
+    }
+
+    public class ChooserNotDefinedException extends RuntimeException{
+        ChooserNotDefinedException(String key){
+            super("Multiple providers for data with key " + key + " but no chooser was defined!");
+        }
+    }
+
     public class TypeMismatchException extends RuntimeException{
-        public TypeMismatchException(String key, Class storeType, Class otherType){
+        TypeMismatchException(String key, Class storeType, Class otherType){
             super("Data store for key " + key + " is of type " + storeType.getName() +
                     " but type " + otherType.getName() + " was given.");
         }

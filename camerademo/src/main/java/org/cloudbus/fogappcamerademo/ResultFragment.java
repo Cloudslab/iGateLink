@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.core.widget.ContentLoadingProgressBar;
 import androidx.fragment.app.Fragment;
 
@@ -21,8 +22,8 @@ import org.cloudbus.foggatewaylib.FogGatewayService;
 import org.cloudbus.foggatewaylib.GenericData;
 import org.cloudbus.foggatewaylib.ProgressData;
 
-import static org.cloudbus.fogappcamerademo.MainActivity.KEY_STORE_INPUT_BITMAP;
-import static org.cloudbus.fogappcamerademo.MainActivity.KEY_STORE_OUTPUT_BITMAP;
+import static org.cloudbus.fogappcamerademo.MainActivity.KEY_DATA_INPUT_BITMAP;
+import static org.cloudbus.fogappcamerademo.MainActivity.KEY_DATA_OUTPUT_BITMAP;
 
 
 public class ResultFragment extends Fragment {
@@ -45,7 +46,7 @@ public class ResultFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_result, container, false);
@@ -68,7 +69,7 @@ public class ResultFragment extends Fragment {
 
 
     @Override
-    public void onAttach(final Context context) {
+    public void onAttach(@NonNull final Context context) {
         super.onAttach(context);
         if (context instanceof OnResultFragmentInteractionListener) {
             mListener = (OnResultFragmentInteractionListener) context;
@@ -81,7 +82,13 @@ public class ResultFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        request_id = getArguments().getLong("request_id", -1);
+        if (getArguments() != null)
+            request_id = getArguments().getLong("request_id", -1);
+        else
+            request_id = -1;
+        if (getActivity() == null)
+            return;
+
         FogGatewayService service = ((FogGatewayActivity)getActivity()).getService();
         if (service != null){
             initService(service);
@@ -102,6 +109,9 @@ public class ResultFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        if (getActivity() == null)
+            return;
+
         FogGatewayService service = ((FogGatewayActivity)getActivity()).getService();
         if (service != null){
             service.removeUITrigger("inputUpdateUI");
@@ -117,6 +127,7 @@ public class ResultFragment extends Fragment {
         mListener = null;
     }
 
+    @SuppressWarnings("unchecked")
     private void initService(FogGatewayService service){
         ProgressData lastMsg = (ProgressData) service
                 .getDataStore(FogGatewayService.KEY_PROGRESS)
@@ -127,20 +138,20 @@ public class ResultFragment extends Fragment {
 
         if (imageView != null){
             GenericData<Bitmap> outputBitmap = (GenericData<Bitmap>) service
-                    .getDataStore(KEY_STORE_OUTPUT_BITMAP)
+                    .getDataStore(KEY_DATA_OUTPUT_BITMAP)
                     .retrieveLast(request_id);
             if (outputBitmap != null)
                 imageView.setImageBitmap(outputBitmap.getValue());
             else{
                 GenericData<Bitmap> inputBitmap = (GenericData<Bitmap>) service
-                        .getDataStore(KEY_STORE_INPUT_BITMAP)
+                        .getDataStore(KEY_DATA_INPUT_BITMAP)
                         .retrieveLast(request_id);
                 if (inputBitmap != null)
                     imageView.setImageBitmap(inputBitmap.getValue());
             }
         }
 
-        service.addUITrigger(KEY_STORE_INPUT_BITMAP,
+        service.addUITrigger(KEY_DATA_INPUT_BITMAP,
                 "inputUpdateUI",
                 request_id,
                 new DataTrigger<GenericData>(GenericData.class) {
@@ -151,7 +162,7 @@ public class ResultFragment extends Fragment {
                                     .getValue());
                     }
                 });
-        service.addUITrigger(KEY_STORE_OUTPUT_BITMAP,
+        service.addUITrigger(KEY_DATA_OUTPUT_BITMAP,
                 "outputUpdateUI",
                 request_id,
                 new DataTrigger<GenericData>(GenericData.class) {

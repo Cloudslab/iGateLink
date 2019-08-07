@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 
 import androidx.exifinterface.media.ExifInterface;
 
-import org.cloudbus.foggatewaylib.Data;
 import org.cloudbus.foggatewaylib.GenericData;
 import org.cloudbus.foggatewaylib.SequentialDataProvider;
 
@@ -21,12 +20,13 @@ public class BitmapProvider extends SequentialDataProvider<ImageData, GenericDat
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public GenericData[] getData(ProgressPublisher progressListener, long requestID,
-                                         Data... input) throws Exception {
+                                 ImageData... input) {
         GenericData<Bitmap>[] output = new GenericData[input.length];
 
         for (int i = 0; i < input.length; i++){
-            ImageData imageData = (ImageData) input[i];
+            ImageData imageData = input[i];
             Bitmap bitmap = byteArray2Bitmap(imageData.getBytes());
             if (imageData.getOrientation() == Configuration.ORIENTATION_UNDEFINED){
                 bitmap = getcorrectRotationBitmap(bitmap, getExifOrientation(imageData.getBytes()));

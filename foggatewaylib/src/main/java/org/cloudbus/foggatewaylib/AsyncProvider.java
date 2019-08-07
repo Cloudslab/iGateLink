@@ -14,7 +14,7 @@ public abstract class AsyncProvider<T extends Data, S extends Data> extends Data
         this.executor = AsyncTask.THREAD_POOL_EXECUTOR;
     }
 
-    public abstract S[] getData(ProgressPublisher progressListener, long requestID, Data... input)
+    public abstract S[] getData(ProgressPublisher progressListener, long requestID, T... input)
             throws Exception;
 
     public void onPreExecute(long requestID){}
@@ -27,13 +27,14 @@ public abstract class AsyncProvider<T extends Data, S extends Data> extends Data
     }
 
     @Override
-    public void execute(long requestID, Data... input){
+    @SuppressWarnings("unchecked")
+    public void execute(long requestID, T... input){
         AsyncProvider.DataProviderAsyncTask task =
                 new AsyncProvider.DataProviderAsyncTask(requestID);
         task.executeOnExecutor(executor, input);
     }
 
-    private class DataProviderAsyncTask extends AsyncTask<Data, ProgressData, S[]>
+    private class DataProviderAsyncTask extends AsyncTask<T, ProgressData, S[]>
                                         implements ProgressPublisher {
         private Throwable throwable;
         private long requestID;
@@ -50,7 +51,7 @@ public abstract class AsyncProvider<T extends Data, S extends Data> extends Data
         }
 
         @Override
-        protected S[] doInBackground(Data... input) {
+        protected S[] doInBackground(T... input) {
             try {
                 return getData(this, requestID, input);
             } catch (Throwable e){

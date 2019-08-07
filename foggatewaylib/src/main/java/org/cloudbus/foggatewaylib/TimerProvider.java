@@ -3,10 +3,8 @@ package org.cloudbus.foggatewaylib;
 import android.util.Log;
 
 public abstract class TimerProvider<T extends Data, S extends Data>
-        extends DataProvider<T,S> {
+        extends AsyncProvider<T,S> {
     private static final String TAG = "TimerProvider";
-    private int period;
-    private int delay;
     private Timer timer;
 
     protected abstract T[] retrieveInputData();
@@ -17,8 +15,6 @@ public abstract class TimerProvider<T extends Data, S extends Data>
 
     public TimerProvider(int period, int delay, Class<T> inputType, Class<S> outputType) {
         super(inputType, outputType);
-        this.period = period;
-        this.delay = delay;
 
         if (period <= 0) {
             Log.e(TAG, "No period was set");

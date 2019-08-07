@@ -73,6 +73,7 @@ public abstract class ForegroundService extends Service {
 
     }
 
+    @SuppressWarnings("unchecked")
     protected boolean selfStartForeground(Bundle extras){
         Class activity;
         try{
@@ -101,6 +102,10 @@ public abstract class ForegroundService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent == null){
+            stopMe();
+            return START_NOT_STICKY;
+        }
         String action = intent.getAction();
 
         Log.d("DEBUG", "Received intent " + action);
