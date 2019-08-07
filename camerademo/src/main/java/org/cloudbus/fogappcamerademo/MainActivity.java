@@ -15,7 +15,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import org.cloudbus.foggatewaylib.ExecutionManager;
 import org.cloudbus.foggatewaylib.FogGatewayServiceActivity;
 import org.cloudbus.foggatewaylib.GenericData;
-import org.cloudbus.foggatewaylib.InMemoryStore;
 import org.cloudbus.foggatewaylib.ProduceDataTrigger;
 import org.cloudbus.foggatewaylib.RoundRobinProviderChooser;
 import org.cloudbus.foggatewaylib.camera.BitmapProvider;
@@ -114,17 +113,8 @@ public class MainActivity extends FogGatewayServiceActivity
 
     protected void initExecutionManager(ExecutionManager executionManager) {
         executionManager
-                .addDataStore(KEY_DATA_INPUT,
-                        new InMemoryStore<>(10, ImageData.class))
-                .addDataStore(KEY_DATA_INPUT_BITMAP,
-                        new InMemoryStore<>(10, GenericData.class))
-                .addDataStore(KEY_DATA_OUTPUT,
-                        new InMemoryStore<>(10, ImageData.class))
-                .addDataStore(KEY_DATA_OUTPUT_BITMAP,
-                        new InMemoryStore<>(10, GenericData.class))
                 .addProvider(KEY_PROVIDER_INPUT, KEY_DATA_INPUT,
                         new CameraProvider())
-                .addChooser(KEY_DATA_OUTPUT, new RoundRobinProviderChooser())
                 .addProvider(KEY_PROVIDER_OUTPUT, KEY_DATA_OUTPUT,
                         new EdgeLensProvider(4))
                 .addProvider(KEY_PROVIDER_DUMMY, KEY_DATA_OUTPUT,
@@ -138,6 +128,7 @@ public class MainActivity extends FogGatewayServiceActivity
                 .addTrigger(KEY_DATA_INPUT, KEY_TRIGGER_BITMAP_INPUT,
                         new ProduceDataTrigger<>(KEY_DATA_INPUT_BITMAP, ImageData.class))
                 .addTrigger(KEY_DATA_OUTPUT, KEY_TRIGGER_BITMAP_OUTPUT,
-                        new ProduceDataTrigger<>(KEY_DATA_OUTPUT_BITMAP, ImageData.class));
+                        new ProduceDataTrigger<>(KEY_DATA_OUTPUT_BITMAP, ImageData.class))
+                .addChooser(KEY_DATA_OUTPUT, new RoundRobinProviderChooser());
     }
 }

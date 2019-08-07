@@ -1,5 +1,7 @@
 package org.cloudbus.foggatewaylib;
 
+import androidx.annotation.NonNull;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,11 +9,12 @@ public abstract class Store<T extends Data> {
     private Map<String, StoreObserver<T>> observers;
     Class<T> dataType;
 
-    public Store(Class<T> dataType){
+    public Store(@NonNull Class<T> dataType){
         observers = new HashMap<>();
         this.dataType = dataType;
     }
 
+    @NonNull
     public Class<T> getDataType() {
         return dataType;
     }

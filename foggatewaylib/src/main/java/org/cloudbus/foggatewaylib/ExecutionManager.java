@@ -142,10 +142,16 @@ public class ExecutionManager{
             removeUITrigger(trigger);
     }
 
-    private void checkDataStore(String key, @Nullable Class type){
+    @SuppressWarnings("unchecked")
+    private void checkDataStore(String key, @Nullable Class type, boolean autoCreate){
         Store store = dataStores.get(key);
-        if (store == null)
-            throw new StoreNotDefinedException(key);
+        if (store == null){
+            if (type != null && autoCreate){
+                store = new InMemoryStore(type);
+                addDataStore(key, store);
+            } else
+                throw new StoreNotDefinedException(key);
+        }
         if (type != null && !store.getDataType().equals(type))
                 throw new TypeMismatchException(key,
                         store.getDataType(),
@@ -160,7 +166,7 @@ public class ExecutionManager{
             return this;
         }
 
-        checkDataStore(outputKey, null);
+        checkDataStore(outputKey, null, false);
         choosers.put(outputKey, chooser);
         chooser.attach(this);
 
@@ -185,7 +191,7 @@ public class ExecutionManager{
             return this;
         }
 
-        checkDataStore(outputKey, provider.getOutputType());
+        checkDataStore(outputKey, provider.getOutputType(), true);
 
         providers.put(providerKey, provider);
         providersOfData.put(outputKey, providerKey);
