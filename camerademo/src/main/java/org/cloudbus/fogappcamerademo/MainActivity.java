@@ -15,9 +15,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import org.cloudbus.foggatewaylib.FogGatewayActivity;
 import org.cloudbus.foggatewaylib.FogGatewayService;
 import org.cloudbus.foggatewaylib.GenericData;
-import org.cloudbus.foggatewaylib.InMemoryDataStore;
+import org.cloudbus.foggatewaylib.InMemoryStore;
 import org.cloudbus.foggatewaylib.ProduceDataTrigger;
-import org.cloudbus.foggatewaylib.RoundRobinDataProviderChooser;
+import org.cloudbus.foggatewaylib.RoundRobinProviderChooser;
 import org.cloudbus.foggatewaylib.camera.BitmapProvider;
 import org.cloudbus.foggatewaylib.camera.CameraProvider;
 import org.cloudbus.foggatewaylib.camera.ImageData;
@@ -115,16 +115,16 @@ public class MainActivity extends FogGatewayActivity
     @Override
     protected void initService(FogGatewayService service) {
         service.addDataStore(KEY_DATA_INPUT,
-                        new InMemoryDataStore<>(10, ImageData.class))
+                        new InMemoryStore<>(10, ImageData.class))
                 .addDataStore(KEY_DATA_INPUT_BITMAP,
-                        new InMemoryDataStore<>(10, GenericData.class))
+                        new InMemoryStore<>(10, GenericData.class))
                 .addDataStore(KEY_DATA_OUTPUT,
-                        new InMemoryDataStore<>(10, ImageData.class))
+                        new InMemoryStore<>(10, ImageData.class))
                 .addDataStore(KEY_DATA_OUTPUT_BITMAP,
-                        new InMemoryDataStore<>(10, GenericData.class))
+                        new InMemoryStore<>(10, GenericData.class))
                 .addProvider(KEY_PROVIDER_INPUT, KEY_DATA_INPUT,
                         new CameraProvider())
-                .addChooser(KEY_DATA_OUTPUT, new RoundRobinDataProviderChooser())
+                .addChooser(KEY_DATA_OUTPUT, new RoundRobinProviderChooser())
                 .addProvider(KEY_PROVIDER_OUTPUT, KEY_DATA_OUTPUT,
                         new EdgeLensProvider(4))
                 .addProvider(KEY_PROVIDER_DUMMY, KEY_DATA_OUTPUT,

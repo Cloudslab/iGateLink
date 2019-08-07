@@ -7,7 +7,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-public class InMemoryDataStoreTest {
+public class InMemoryStoreTest {
 
     private long[] dataToLong(Data[] dataList){
         long[] outArray = new long[dataList.length];
@@ -18,7 +18,7 @@ public class InMemoryDataStoreTest {
 
     @Test
     public void add_isCorrect() {
-        InMemoryDataStore<Data> store = new InMemoryDataStore<>(Data.class);
+        InMemoryStore<Data> store = new InMemoryStore<>(Data.class);
         long[] array = new long[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         store.store(new Data[]{
                 new Data(2),
@@ -47,17 +47,17 @@ public class InMemoryDataStoreTest {
 
     @Test
     public void cast_isCorrect() {
-        DataStore<Data> dataStore = new InMemoryDataStore<>(Data.class);
-        DataTrigger<Data> mTrigger = new DataTrigger<Data>(Data.class) {
+        Store<Data> store = new InMemoryStore<>(Data.class);
+        Trigger<Data> mTrigger = new Trigger<Data>(Data.class) {
             @Override
-            public void onNewData(DataStore<Data> dataStore, Data data) { }
+            public void onNewData(Store<Data> dataStore, Data data) { }
         };
-        dataStore.addObserver("mObserver", mTrigger);
+        store.addObserver("mObserver", mTrigger);
 
-        DataTrigger trigger1 = (DataTrigger) dataStore.removeObserver("mObserver");
+        Trigger trigger1 = (Trigger) store.removeObserver("mObserver");
         assertNotNull(trigger1);
 
-        DataTrigger trigger2 = (DataTrigger) dataStore.removeObserver("mObserver");
+        Trigger trigger2 = (Trigger) store.removeObserver("mObserver");
         assertNull(trigger2);
     }
 }

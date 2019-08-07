@@ -17,11 +17,11 @@ public class FogGatewayService extends ForegroundService{
     public static final String TAG = "FogGatewayService";
     public static final String KEY_PROGRESS = "progressStore";
 
-    private Map<String, DataStore> dataStores;
-    private Map<String, DataProvider> providers;
+    private Map<String, Store> dataStores;
+    private Map<String, Provider> providers;
     private MultiMap<String, String> providersOfData;
     private Map<String, String> triggers;
-    private Map<String, DataProviderChooser> choosers;
+    private Map<String, ProviderChooser> choosers;
     private Map<String, String> UITriggers;
 
     private static long NEXT_REQUEST_ID = 1;
@@ -35,7 +35,7 @@ public class FogGatewayService extends ForegroundService{
         choosers = new HashMap<>();
         UITriggers = new HashMap<>();
 
-        addDataStore(KEY_PROGRESS, new InMemoryDataStore<>(ProgressData.class));
+        addDataStore(KEY_PROGRESS, new InMemoryStore<>(ProgressData.class));
     }
 
     @Override
@@ -52,10 +52,10 @@ public class FogGatewayService extends ForegroundService{
         return NEXT_REQUEST_ID++;
     }
 
-    public FogGatewayService addDataStore(String key, DataStore store){
+    public FogGatewayService addDataStore(String key, Store store){
 
         if (dataStores.containsKey(key)){
-            Log.w(TAG, "DataStore " + key + " already exists");
+            Log.w(TAG, "Store " + key + " already exists");
             return this;
         }
         dataStores.put(key, store);
@@ -69,7 +69,7 @@ public class FogGatewayService extends ForegroundService{
 
     @SuppressWarnings("unchecked")
     private FogGatewayService addTriggerGeneric(String dataKey, String triggerKey,
-                                                BulkDataTrigger trigger,
+                                                BulkTrigger trigger,
                                                 Map<String, String> map){
         if (map.containsKey(triggerKey)){
             Log.w(TAG, "Trigger " + triggerKey + " already exists");
@@ -77,38 +77,38 @@ public class FogGatewayService extends ForegroundService{
         }
 
 
-        DataStore dataStore = dataStores.get(dataKey);
-        if (dataStore == null)
+        Store store = dataStores.get(dataKey);
+        if (store == null)
             throw new StoreNotDefinedException(dataKey);
 
-        if (dataStore.getDataType().equals(trigger.getDataType())){
+        if (store.getDataType().equals(trigger.getDataType())){
             trigger.bindService(this);
-            dataStore.addObserver(triggerKey, trigger);
+            store.addObserver(triggerKey, trigger);
             map.put(triggerKey, dataKey);
         } else
-            throw new TypeMismatchException(dataKey, dataStore.getDataType(),
+            throw new TypeMismatchException(dataKey, store.getDataType(),
                     trigger.getDataType());
 
         return this;
     }
 
     public FogGatewayService addTrigger(String dataKey, String triggerKey,
-                                        BulkDataTrigger trigger){
+                                        BulkTrigger trigger){
 
         return addTriggerGeneric(dataKey, triggerKey, trigger, triggers);
     }
 
     public FogGatewayService addUITrigger(String dataKey, String triggerKey,
-                                          BulkDataTrigger trigger){
+                                          BulkTrigger trigger){
 
         return addTriggerGeneric(dataKey, triggerKey, trigger, UITriggers);
     }
 
     @SuppressWarnings("unchecked")
     public FogGatewayService addUITrigger(String dataKey, String triggerKey, long requestID,
-                                          BulkDataTrigger trigger){
+                                          BulkTrigger trigger){
         return addTriggerGeneric(dataKey, triggerKey,
-                new FilteredBulkDataTrigger(requestID, trigger),
+                new FilteredBulkTrigger(requestID, trigger),
                 UITriggers);
     }
 
@@ -117,13 +117,13 @@ public class FogGatewayService extends ForegroundService{
         if (dataKey == null)
             return false;
 
-        DataStore dataStore = dataStores.get(dataKey);
-        if (dataStore == null)
+        Store store = dataStores.get(dataKey);
+        if (store == null)
             return false;
 
         map.remove(triggerKey);
 
-        BulkDataTrigger trigger = (BulkDataTrigger) dataStore.removeObserver(triggerKey);
+        BulkTrigger trigger = (BulkTrigger) store.removeObserver(triggerKey);
         if (trigger == null)
             return false;
 
@@ -140,18 +140,18 @@ public class FogGatewayService extends ForegroundService{
     }
 
     private void checkDataStore(String key, @Nullable Class type){
-        DataStore dataStore = dataStores.get(key);
-        if (dataStore == null)
+        Store store = dataStores.get(key);
+        if (store == null)
             throw new StoreNotDefinedException(key);
-        if (type != null && !dataStore.getDataType().equals(type))
+        if (type != null && !store.getDataType().equals(type))
                 throw new TypeMismatchException(key,
-                        dataStore.getDataType(),
+                        store.getDataType(),
                         type);
     }
 
     @SuppressWarnings("unchecked")
     public FogGatewayService addChooser(String outputKey,
-                                        DataProviderChooser chooser){
+                                        ProviderChooser chooser){
         if (choosers.containsKey(outputKey)){
             Log.w(TAG, "Chooser for data " + outputKey + " already exists");
             return this;
@@ -165,7 +165,7 @@ public class FogGatewayService extends ForegroundService{
     }
 
     public boolean removeChooser(String outputKey){
-        DataProviderChooser chooser = choosers.get(outputKey);
+        ProviderChooser chooser = choosers.get(outputKey);
 
         if (chooser != null){
             chooser.detach();
@@ -176,7 +176,7 @@ public class FogGatewayService extends ForegroundService{
 
     @SuppressWarnings("unchecked")
     public FogGatewayService addProvider(String providerKey, String outputKey,
-                                         DataProvider provider){
+                                         Provider provider){
         if (providers.containsKey(providerKey)){
             Log.w(TAG, "Provider " + providerKey + " already exists");
             return this;
@@ -195,7 +195,7 @@ public class FogGatewayService extends ForegroundService{
     }
 
     public boolean removeProvider(String providerKey){
-        DataProvider provider = providers.get(providerKey);
+        Provider provider = providers.get(providerKey);
 
         if (provider != null){
             provider.detach();
@@ -207,7 +207,7 @@ public class FogGatewayService extends ForegroundService{
 
     @SuppressWarnings("unchecked")
     public void runProvider(String providerKey, long request_id, Data... input){
-        DataProvider provider = providers.get(providerKey);
+        Provider provider = providers.get(providerKey);
         if (provider != null){
             if (input.length == 0 || input[0].getClass().equals(provider.getInputType())){
                 provider.executeCast(request_id, input);
@@ -231,7 +231,7 @@ public class FogGatewayService extends ForegroundService{
                 return;
             }
 
-            DataProviderChooser chooser = choosers.get(dataKey);
+            ProviderChooser chooser = choosers.get(dataKey);
             if (chooser == null)
                 throw new ChooserNotDefinedException(dataKey);
 
@@ -241,15 +241,15 @@ public class FogGatewayService extends ForegroundService{
             throw new ProviderForDataNotDefinedException(dataKey);
     }
 
-    public DataStore getDataStore(String key){
+    public Store getDataStore(String key){
         return dataStores.get(key);
     }
 
-    public DataProvider getProvider(String key){
+    public Provider getProvider(String key){
         return providers.get(key);
     }
 
-    public DataProviderChooser getChooser(String key){
+    public ProviderChooser getChooser(String key){
         return choosers.get(key);
     }
 

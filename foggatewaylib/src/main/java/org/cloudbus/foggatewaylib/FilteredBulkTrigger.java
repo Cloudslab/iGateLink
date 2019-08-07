@@ -1,22 +1,22 @@
 package org.cloudbus.foggatewaylib;
 
-public class FilteredBulkDataTrigger<T extends Data> extends BulkDataTrigger<T> {
+public class FilteredBulkTrigger<T extends Data> extends BulkTrigger<T> {
     private long requestID;
-    private BulkDataTrigger<T> trigger;
+    private BulkTrigger<T> trigger;
 
     public long getRequestID() {
         return requestID;
     }
 
-    public FilteredBulkDataTrigger(long requestID, BulkDataTrigger<T> trigger) {
+    public FilteredBulkTrigger(long requestID, BulkTrigger<T> trigger) {
         super(trigger.getDataType());
         this.requestID = requestID;
         this.trigger = trigger;
     }
 
     @Override
-    public void onNewData(DataStore<T> dataStore, T... data) {
+    public void onNewData(Store<T> store, T... data) {
         if (data[0].getRequestID() == requestID)
-            trigger.onNewData(dataStore, data);
+            trigger.onNewData(store, data);
     }
 }

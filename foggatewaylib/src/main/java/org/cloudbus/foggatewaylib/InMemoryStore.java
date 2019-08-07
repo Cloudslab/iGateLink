@@ -8,17 +8,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class InMemoryDataStore<E extends Data> extends DataStore<E> {
+public class InMemoryStore<E extends Data> extends Store<E> {
     private SortedLinkedList<E> dataList = new SortedLinkedList<>();
     private Map<Long, SortedLinkedList<E>> dataRequestMap = new HashMap<>();
 
     private int maxElements;
 
-    public InMemoryDataStore(Class<E> dataType){
+    public InMemoryStore(Class<E> dataType){
         super(dataType);
     }
 
-    public InMemoryDataStore(int maxElements, Class<E> dataType){
+    public InMemoryStore(int maxElements, Class<E> dataType){
         super(dataType);
         this.maxElements = maxElements;
     }

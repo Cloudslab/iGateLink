@@ -6,13 +6,13 @@ import android.graphics.Bitmap;
 import androidx.exifinterface.media.ExifInterface;
 
 import org.cloudbus.foggatewaylib.GenericData;
-import org.cloudbus.foggatewaylib.SequentialDataProvider;
+import org.cloudbus.foggatewaylib.SequentialProvider;
 
 import static org.cloudbus.foggatewaylib.camera.CameraUtils.byteArray2Bitmap;
 import static org.cloudbus.foggatewaylib.camera.CameraUtils.getExifOrientation;
 import static org.cloudbus.foggatewaylib.camera.CameraUtils.getcorrectRotationBitmap;
 
-public class BitmapProvider extends SequentialDataProvider<ImageData, GenericData> {
+public class BitmapProvider extends SequentialProvider<ImageData, GenericData> {
 
     public BitmapProvider(Class<ImageData> inputType,
                           Class<GenericData> outputType) {

@@ -3,7 +3,7 @@ package org.cloudbus.foggatewaylib.camera;
 import android.hardware.Camera;
 import android.util.Log;
 
-import org.cloudbus.foggatewaylib.DataProvider;
+import org.cloudbus.foggatewaylib.Provider;
 import org.cloudbus.foggatewaylib.ForegroundService;
 import org.cloudbus.foggatewaylib.VoidData;
 
@@ -11,7 +11,7 @@ import java.util.HashMap;
 
 import static org.cloudbus.foggatewaylib.camera.CameraUtils.getCameraInstance;
 
-public class CameraProvider extends DataProvider<VoidData, ImageData> {
+public class CameraProvider extends Provider<VoidData, ImageData> {
     public static final String TAG = "CameraProvider";
 
     private Camera mCamera;

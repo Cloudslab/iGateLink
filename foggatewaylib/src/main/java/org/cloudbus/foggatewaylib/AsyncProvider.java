@@ -4,7 +4,7 @@ import android.os.AsyncTask;
 
 import java.util.concurrent.Executor;
 
-public abstract class AsyncProvider<T extends Data, S extends Data> extends DataProvider<T, S>{
+public abstract class AsyncProvider<T extends Data, S extends Data> extends Provider<T, S> {
     private static final String TAG = "AsyncProvider";
 
     private Executor executor;

@@ -15,8 +15,8 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import org.cloudbus.foggatewaylib.DataStore;
-import org.cloudbus.foggatewaylib.DataTrigger;
+import org.cloudbus.foggatewaylib.Store;
+import org.cloudbus.foggatewaylib.Trigger;
 import org.cloudbus.foggatewaylib.FogGatewayActivity;
 import org.cloudbus.foggatewaylib.FogGatewayService;
 import org.cloudbus.foggatewaylib.GenericData;
@@ -154,9 +154,9 @@ public class ResultFragment extends Fragment {
         service.addUITrigger(KEY_DATA_INPUT_BITMAP,
                 "inputUpdateUI",
                 request_id,
-                new DataTrigger<GenericData>(GenericData.class) {
+                new Trigger<GenericData>(GenericData.class) {
                     @Override
-                    public void onNewData(DataStore dataStore, GenericData data) {
+                    public void onNewData(Store store, GenericData data) {
                         if (imageView != null)
                             imageView.setImageBitmap(((GenericData<Bitmap>)data)
                                     .getValue());
@@ -165,9 +165,9 @@ public class ResultFragment extends Fragment {
         service.addUITrigger(KEY_DATA_OUTPUT_BITMAP,
                 "outputUpdateUI",
                 request_id,
-                new DataTrigger<GenericData>(GenericData.class) {
+                new Trigger<GenericData>(GenericData.class) {
                     @Override
-                    public void onNewData(DataStore dataStore, GenericData data) {
+                    public void onNewData(Store store, GenericData data) {
                         if (imageView != null)
                             imageView.setImageBitmap(((GenericData<Bitmap>)data)
                                     .getValue());
@@ -176,10 +176,10 @@ public class ResultFragment extends Fragment {
         service.addUITrigger(FogGatewayService.KEY_PROGRESS,
                 "messageUpdateUI",
                 request_id,
-                new DataTrigger<ProgressData>(ProgressData.class) {
+                new Trigger<ProgressData>(ProgressData.class) {
 
                     @Override
-                    public void onNewData(DataStore<ProgressData> dataStore,
+                    public void onNewData(Store<ProgressData> store,
                                           ProgressData data) {
                         updateUIOnProgress(data);
                     }

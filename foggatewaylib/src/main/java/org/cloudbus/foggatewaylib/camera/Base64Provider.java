@@ -3,9 +3,9 @@ package org.cloudbus.foggatewaylib.camera;
 import android.util.Base64;
 
 import org.cloudbus.foggatewaylib.GenericData;
-import org.cloudbus.foggatewaylib.SequentialDataProvider;
+import org.cloudbus.foggatewaylib.SequentialProvider;
 
-public class Base64Provider extends SequentialDataProvider<ImageData, GenericData> {
+public class Base64Provider extends SequentialProvider<ImageData, GenericData> {
 
     public Base64Provider(Class<ImageData> inputType,
                           Class<GenericData> outputType) {

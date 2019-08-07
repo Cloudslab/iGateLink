@@ -7,12 +7,12 @@ import android.util.Pair;
 import androidx.preference.PreferenceManager;
 
 import org.cloudbus.foggatewaylib.SimpleHttpConnection;
-import org.cloudbus.foggatewaylib.ThreadPoolDataProvider;
+import org.cloudbus.foggatewaylib.ThreadPoolProvider;
 import org.cloudbus.foggatewaylib.camera.ImageData;
 
 import java.io.IOException;
 
-public class EdgeLensProvider extends ThreadPoolDataProvider<ImageData, ImageData> {
+public class EdgeLensProvider extends ThreadPoolProvider<ImageData, ImageData> {
     public static final String TAG = "EdgeLensProvider";
 
     public static final String ARBITER_URL = "/EdgeLens/arbiter.php";

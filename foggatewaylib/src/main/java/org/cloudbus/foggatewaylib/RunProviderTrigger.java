@@ -1,6 +1,6 @@
 package org.cloudbus.foggatewaylib;
 
-public class RunProviderTrigger<T extends Data> extends BulkDataTrigger<T> {
+public class RunProviderTrigger<T extends Data> extends BulkTrigger<T> {
     private String providerKey;
 
     public RunProviderTrigger(String providerKey, Class<T> dataType) {
@@ -9,7 +9,7 @@ public class RunProviderTrigger<T extends Data> extends BulkDataTrigger<T> {
     }
 
     @Override
-    public void onNewData(DataStore<T> dataStore, T... data) {
+    public void onNewData(Store<T> store, T... data) {
         getService().runProvider(providerKey,
                 data[0].getRequestID(),
                 data);

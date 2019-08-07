@@ -1,10 +1,10 @@
 package org.cloudbus.fogappcamerademo;
 
 import org.cloudbus.foggatewaylib.Data;
-import org.cloudbus.foggatewaylib.SequentialDataProvider;
+import org.cloudbus.foggatewaylib.SequentialProvider;
 
 
-public class DummyProvider<T extends Data> extends SequentialDataProvider<T, T> {
+public class DummyProvider<T extends Data> extends SequentialProvider<T, T> {
 
     public DummyProvider(Class<T> type) {
         super(type, type);

@@ -1,9 +1,9 @@
 package org.cloudbus.foggatewaylib;
 
-public class RoundRobinDataProviderChooser extends DataProviderChooser {
+public class RoundRobinProviderChooser extends ProviderChooser {
     private int lastChoice;
 
-    public RoundRobinDataProviderChooser(){
+    public RoundRobinProviderChooser(){
         super();
         lastChoice=0;
     }

@@ -5,17 +5,17 @@ import android.util.Log;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 
-public abstract class DataProvider<T extends Data, S extends Data>{
-    private static final String TAG = "DataProvider";
+public abstract class Provider<T extends Data, S extends Data>{
+    private static final String TAG = "Provider";
 
     private Class<T> inputType;
     private Class<S> outputType;
     private FogGatewayService service;
 
-    protected DataStore<S> outStore;
-    protected DataStore<ProgressData> progressStore;
+    protected Store<S> outStore;
+    protected Store<ProgressData> progressStore;
 
-    public DataProvider(Class<T> inputType, Class<S> outputType){
+    public Provider(Class<T> inputType, Class<S> outputType){
         this.inputType = inputType;
         this.outputType = outputType;
     }
@@ -23,8 +23,8 @@ public abstract class DataProvider<T extends Data, S extends Data>{
     public Class<T> getInputType(){return inputType;}
     public Class<S> getOutputType(){return outputType;}
 
-    public void attach(FogGatewayService service, DataStore<S> outStore,
-                       DataStore<ProgressData> progressStore){
+    public void attach(FogGatewayService service, Store<S> outStore,
+                       Store<ProgressData> progressStore){
         this.service = service;
         if (service == null){
             Log.e(TAG, "service is null");

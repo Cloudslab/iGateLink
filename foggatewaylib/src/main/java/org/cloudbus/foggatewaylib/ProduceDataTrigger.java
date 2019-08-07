@@ -1,6 +1,6 @@
 package org.cloudbus.foggatewaylib;
 
-public class ProduceDataTrigger<T extends Data> extends BulkDataTrigger<T> {
+public class ProduceDataTrigger<T extends Data> extends BulkTrigger<T> {
     private String outputDataKey;
 
     public ProduceDataTrigger(String outputDataKey, Class<T> dataType) {
@@ -9,7 +9,7 @@ public class ProduceDataTrigger<T extends Data> extends BulkDataTrigger<T> {
     }
 
     @Override
-    public void onNewData(DataStore<T> dataStore, T... data) {
+    public void onNewData(Store<T> store, T... data) {
         getService().produceData(outputDataKey,
                 data[0].getRequestID(),
                 data);

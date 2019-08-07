@@ -3,11 +3,11 @@ package org.cloudbus.foggatewaylib;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class DataStore<T extends Data> {
-    private Map<String, DataStoreObserver<T>> observers;
+public abstract class Store<T extends Data> {
+    private Map<String, StoreObserver<T>> observers;
     Class<T> dataType;
 
-    public DataStore(Class<T> dataType){
+    public Store(Class<T> dataType){
         observers = new HashMap<>();
         this.dataType = dataType;
     }
@@ -33,7 +33,7 @@ public abstract class DataStore<T extends Data> {
         if (data.length == 0)
             return;
 
-        for (DataStoreObserver<T> observer: observers.values()){
+        for (StoreObserver<T> observer: observers.values()){
             observer.onDataStored(this, data);
         }
     }
@@ -43,11 +43,11 @@ public abstract class DataStore<T extends Data> {
         notifyObservers(data);
     }
 
-    public void addObserver(String key, DataStoreObserver<T> observer){
+    public void addObserver(String key, StoreObserver<T> observer){
         observers.put(key, observer);
     }
 
-    public DataStoreObserver<T> removeObserver(String key){
+    public StoreObserver<T> removeObserver(String key){
         return observers.remove(key);
     }
 

@@ -1,10 +1,10 @@
 package org.cloudbus.foggatewaylib;
 
-public abstract class BulkDataTrigger<T extends Data> implements DataStoreObserver<T>{
+public abstract class BulkTrigger<T extends Data> implements StoreObserver<T> {
     private Class<T> dataType;
     private FogGatewayService service;
 
-    public BulkDataTrigger(Class<T> dataType){
+    public BulkTrigger(Class<T> dataType){
         this.dataType = dataType;
     }
 
@@ -20,11 +20,11 @@ public abstract class BulkDataTrigger<T extends Data> implements DataStoreObserv
         this.service = null;
     }
 
-    public void onDataStored(DataStore<T> dataStore, T... data){
-        onNewData(dataStore, data);
+    public void onDataStored(Store<T> store, T... data){
+        onNewData(store, data);
     }
 
-    public abstract void onNewData(DataStore<T> dataStore, T... data);
+    public abstract void onNewData(Store<T> store, T... data);
 
     protected FogGatewayService getService() {
         return service;
