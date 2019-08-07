@@ -20,8 +20,8 @@ import androidx.navigation.Navigation;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import org.cloudbus.foggatewaylib.FogGatewayActivity;
-import org.cloudbus.foggatewaylib.FogGatewayService;
+import org.cloudbus.foggatewaylib.ExecutionManager;
+import org.cloudbus.foggatewaylib.ExecutionManagerHolder;
 import org.cloudbus.foggatewaylib.camera.CameraPreview;
 import org.cloudbus.foggatewaylib.camera.CameraProvider;
 import org.cloudbus.foggatewaylib.camera.CameraUtils;
@@ -46,11 +46,13 @@ public class PreviewFragment extends Fragment {
 
         if (getActivity() != null && checkCameraHardware(getActivity())){
 
-            FogGatewayService service = ((FogGatewayActivity)getActivity()).getService();
-            if (service == null)
+            ExecutionManager executionManager
+                    = ((ExecutionManagerHolder)getActivity()).getExecutionManager();
+            if (executionManager == null)
                 return;
             // Create an instance of Camera
-            mCamera = ((CameraProvider)service.getProvider("inputProvider")).getCamera();
+            mCamera = ((CameraProvider)executionManager.getProvider("inputProvider"))
+                    .getCamera();
 
             if (mCamera == null)
                 return;
@@ -140,7 +142,8 @@ public class PreviewFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (getActivity() != null && ((FogGatewayActivity) getActivity()).getService() == null){
+        if (getActivity() != null
+                && ((ExecutionManagerHolder) getActivity()).getExecutionManager() == null){
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             alertDialog = builder.setMessage("Service is not running")
                     .setNegativeButton("Back", new DialogInterface.OnClickListener() {

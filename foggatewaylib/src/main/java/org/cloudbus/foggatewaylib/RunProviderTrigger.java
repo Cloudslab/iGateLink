@@ -10,7 +10,7 @@ public class RunProviderTrigger<T extends Data> extends BulkTrigger<T> {
 
     @Override
     public void onNewData(Store<T> store, T... data) {
-        getService().runProvider(providerKey,
+        getExecutionManager().runProvider(providerKey,
                 data[0].getRequestID(),
                 data);
     }

@@ -15,12 +15,14 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import org.cloudbus.foggatewaylib.Store;
-import org.cloudbus.foggatewaylib.Trigger;
-import org.cloudbus.foggatewaylib.FogGatewayActivity;
+import org.cloudbus.foggatewaylib.ExecutionManager;
+import org.cloudbus.foggatewaylib.ExecutionManagerHolder;
 import org.cloudbus.foggatewaylib.FogGatewayService;
+import org.cloudbus.foggatewaylib.FogGatewayServiceActivity;
 import org.cloudbus.foggatewaylib.GenericData;
 import org.cloudbus.foggatewaylib.ProgressData;
+import org.cloudbus.foggatewaylib.Store;
+import org.cloudbus.foggatewaylib.Trigger;
 
 import static org.cloudbus.fogappcamerademo.MainActivity.KEY_DATA_INPUT_BITMAP;
 import static org.cloudbus.fogappcamerademo.MainActivity.KEY_DATA_OUTPUT_BITMAP;
@@ -89,15 +91,17 @@ public class ResultFragment extends Fragment {
         if (getActivity() == null)
             return;
 
-        FogGatewayService service = ((FogGatewayActivity)getActivity()).getService();
-        if (service != null){
-            initService(service);
+        ExecutionManager executionManager
+                = ((ExecutionManagerHolder)getActivity()).getExecutionManager();
+        if (executionManager != null){
+            initExecutionManager(executionManager);
         } else{
-            ((FogGatewayActivity)getActivity()).addServiceConnectionListener("resultFragment",
-                    new FogGatewayActivity.ServiceConnectionListener() {
+            ((FogGatewayServiceActivity)getActivity())
+                    .addServiceConnectionListener("resultFragment",
+                    new FogGatewayServiceActivity.ServiceConnectionListener() {
                         @Override
                         public void onServiceConnected(FogGatewayService service) {
-                            initService(service);
+                            initExecutionManager(service.getExecutionManager());
                         }
 
                         @Override
@@ -112,13 +116,14 @@ public class ResultFragment extends Fragment {
         if (getActivity() == null)
             return;
 
-        FogGatewayService service = ((FogGatewayActivity)getActivity()).getService();
-        if (service != null){
-            service.removeUITrigger("inputUpdateUI");
-            service.removeUITrigger("outputUpdateUI");
-            service.removeUITrigger("messageUpdateUI");
+        ExecutionManager executionManager
+                = ((ExecutionManagerHolder)getActivity()).getExecutionManager();
+        if (executionManager != null){
+            executionManager.removeUITrigger("inputUpdateUI");
+            executionManager.removeUITrigger("outputUpdateUI");
+            executionManager.removeUITrigger("messageUpdateUI");
         }
-        ((FogGatewayActivity)getActivity()).removeServiceConnectionListener("resultFragment");
+        ((FogGatewayServiceActivity)getActivity()).removeServiceConnectionListener("resultFragment");
     }
 
     @Override
@@ -128,22 +133,22 @@ public class ResultFragment extends Fragment {
     }
 
     @SuppressWarnings("unchecked")
-    private void initService(FogGatewayService service){
-        ProgressData lastMsg = (ProgressData) service
-                .getDataStore(FogGatewayService.KEY_PROGRESS)
+    private void initExecutionManager(ExecutionManager executionManager){
+        ProgressData lastMsg = (ProgressData) executionManager
+                .getDataStore(ExecutionManager.KEY_PROGRESS)
                 .retrieveLast(request_id);
 
         if (lastMsg != null)
             updateUIOnProgress(lastMsg);
 
         if (imageView != null){
-            GenericData<Bitmap> outputBitmap = (GenericData<Bitmap>) service
+            GenericData<Bitmap> outputBitmap = (GenericData<Bitmap>) executionManager
                     .getDataStore(KEY_DATA_OUTPUT_BITMAP)
                     .retrieveLast(request_id);
             if (outputBitmap != null)
                 imageView.setImageBitmap(outputBitmap.getValue());
             else{
-                GenericData<Bitmap> inputBitmap = (GenericData<Bitmap>) service
+                GenericData<Bitmap> inputBitmap = (GenericData<Bitmap>) executionManager
                         .getDataStore(KEY_DATA_INPUT_BITMAP)
                         .retrieveLast(request_id);
                 if (inputBitmap != null)
@@ -151,7 +156,7 @@ public class ResultFragment extends Fragment {
             }
         }
 
-        service.addUITrigger(KEY_DATA_INPUT_BITMAP,
+        executionManager.addUITrigger(KEY_DATA_INPUT_BITMAP,
                 "inputUpdateUI",
                 request_id,
                 new Trigger<GenericData>(GenericData.class) {
@@ -161,8 +166,8 @@ public class ResultFragment extends Fragment {
                             imageView.setImageBitmap(((GenericData<Bitmap>)data)
                                     .getValue());
                     }
-                });
-        service.addUITrigger(KEY_DATA_OUTPUT_BITMAP,
+                })
+            .addUITrigger(KEY_DATA_OUTPUT_BITMAP,
                 "outputUpdateUI",
                 request_id,
                 new Trigger<GenericData>(GenericData.class) {
@@ -172,8 +177,8 @@ public class ResultFragment extends Fragment {
                             imageView.setImageBitmap(((GenericData<Bitmap>)data)
                                     .getValue());
                     }
-                });
-        service.addUITrigger(FogGatewayService.KEY_PROGRESS,
+                })
+            .addUITrigger(ExecutionManager.KEY_PROGRESS,
                 "messageUpdateUI",
                 request_id,
                 new Trigger<ProgressData>(ProgressData.class) {

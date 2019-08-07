@@ -10,7 +10,7 @@ public abstract class Provider<T extends Data, S extends Data>{
 
     private Class<T> inputType;
     private Class<S> outputType;
-    private FogGatewayService service;
+    private ExecutionManager executionManager;
 
     protected Store<S> outStore;
     protected Store<ProgressData> progressStore;
@@ -23,11 +23,11 @@ public abstract class Provider<T extends Data, S extends Data>{
     public Class<T> getInputType(){return inputType;}
     public Class<S> getOutputType(){return outputType;}
 
-    public void attach(FogGatewayService service, Store<S> outStore,
+    public void attach(ExecutionManager executionManager, Store<S> outStore,
                        Store<ProgressData> progressStore){
-        this.service = service;
-        if (service == null){
-            Log.e(TAG, "service is null");
+        this.executionManager = executionManager;
+        if (executionManager == null){
+            Log.e(TAG, "executionManager is null");
             return;
         }
         this.outStore = outStore;
@@ -35,15 +35,15 @@ public abstract class Provider<T extends Data, S extends Data>{
         onAttach();
     }
 
-    protected FogGatewayService getService(){
-        if (this.service == null)
-            Log.e(TAG, "Service is not bound");
-        return this.service;
+    protected ExecutionManager getExecutionManager(){
+        if (this.executionManager == null)
+            Log.e(TAG, "ExecutionManager is not bound");
+        return this.executionManager;
     }
 
     public void detach(){
         onDetach();
-        this.service = null;
+        this.executionManager = null;
     }
 
     protected void publishProgress(long requestID, int progress, String message){

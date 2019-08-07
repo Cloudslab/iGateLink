@@ -12,12 +12,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class FogGatewayActivity extends AppCompatActivity
-                                         implements ServiceConnection {
+public abstract class FogGatewayServiceActivity extends AppCompatActivity
+                                         implements ServiceConnection, ExecutionManagerHolder {
 
-    public static final String TAG = "FogGatewayActivity";
+    public static final String TAG = "FGServiceActivity";
 
     private FogGatewayService fogGatewayService;
+    private ExecutionManager executionManager;
 
     private Map<String, ServiceConnectionListener> listeners = new HashMap<>();
 
@@ -28,12 +29,17 @@ public abstract class FogGatewayActivity extends AppCompatActivity
     }
 
     @Override
+    public ExecutionManager getExecutionManager() {
+        return executionManager;
+    }
+
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FogGatewayService.bind(this, this, FogGatewayService.class);
     }
 
-    protected abstract void initService(FogGatewayService fogGatewayService);
+    protected abstract void initExecutionManager(ExecutionManager executionManager);
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
@@ -41,7 +47,8 @@ public abstract class FogGatewayActivity extends AppCompatActivity
         ForegroundService.ForegroundServiceBinder binder
                 = (ForegroundService.ForegroundServiceBinder) service;
         this.fogGatewayService = (FogGatewayService) binder.getService();
-        initService(fogGatewayService);
+        this.executionManager = this.fogGatewayService.getExecutionManager();
+        initExecutionManager(executionManager);
         for(ServiceConnectionListener listener:listeners.values())
             listener.onServiceConnected(fogGatewayService);
     }

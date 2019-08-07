@@ -10,7 +10,7 @@ public abstract class TimerProvider<T extends Data, S extends Data>
     protected abstract T[] retrieveInputData();
 
     protected long makeRequestID(){
-        return FogGatewayService.nextRequestID();
+        return ExecutionManager.nextRequestID();
     }
 
     public TimerProvider(int period, int delay, Class<T> inputType, Class<S> outputType) {

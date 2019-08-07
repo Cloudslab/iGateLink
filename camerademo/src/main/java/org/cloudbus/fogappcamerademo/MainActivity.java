@@ -12,8 +12,8 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import org.cloudbus.foggatewaylib.FogGatewayActivity;
-import org.cloudbus.foggatewaylib.FogGatewayService;
+import org.cloudbus.foggatewaylib.ExecutionManager;
+import org.cloudbus.foggatewaylib.FogGatewayServiceActivity;
 import org.cloudbus.foggatewaylib.GenericData;
 import org.cloudbus.foggatewaylib.InMemoryStore;
 import org.cloudbus.foggatewaylib.ProduceDataTrigger;
@@ -22,7 +22,7 @@ import org.cloudbus.foggatewaylib.camera.BitmapProvider;
 import org.cloudbus.foggatewaylib.camera.CameraProvider;
 import org.cloudbus.foggatewaylib.camera.ImageData;
 
-public class MainActivity extends FogGatewayActivity
+public class MainActivity extends FogGatewayServiceActivity
         implements PreviewFragment.OnPreviewFragmentInteractionListener,
                    ResultFragment.OnResultFragmentInteractionListener {
 
@@ -73,9 +73,9 @@ public class MainActivity extends FogGatewayActivity
 
     @Override
     public void onButtonClick() {
-        long request_ID = FogGatewayService.nextRequestID();
-        if (getService() != null)
-            getService().runProvider(KEY_PROVIDER_INPUT, request_ID);
+        long request_ID = ExecutionManager.nextRequestID();
+        if (getExecutionManager() != null)
+            getExecutionManager().runProvider(KEY_PROVIDER_INPUT, request_ID);
         Bundle args = new Bundle();
         args.putLong("request_id", request_ID);
         Navigation.findNavController(this, R.id.mainNavigationFragment)
@@ -112,9 +112,9 @@ public class MainActivity extends FogGatewayActivity
         }
     }
 
-    @Override
-    protected void initService(FogGatewayService service) {
-        service.addDataStore(KEY_DATA_INPUT,
+    protected void initExecutionManager(ExecutionManager executionManager) {
+        executionManager
+                .addDataStore(KEY_DATA_INPUT,
                         new InMemoryStore<>(10, ImageData.class))
                 .addDataStore(KEY_DATA_INPUT_BITMAP,
                         new InMemoryStore<>(10, GenericData.class))

@@ -5,7 +5,7 @@ import android.util.Log;
 public abstract class ProviderChooser {
     public static final String TAG = "ProviderChooser";
 
-    private FogGatewayService service;
+    private ExecutionManager executionManager;
 
     public ProviderChooser(){ }
 
@@ -14,10 +14,10 @@ public abstract class ProviderChooser {
     public void onAttach(){}
     public void onDetach(){}
 
-    public void attach(FogGatewayService service){
-        this.service = service;
-        if (service == null){
-            Log.e(TAG, "service is null");
+    public void attach(ExecutionManager executionManager){
+        this.executionManager = executionManager;
+        if (executionManager == null){
+            Log.e(TAG, "executionManager is null");
             return;
         }
         onAttach();
@@ -25,12 +25,12 @@ public abstract class ProviderChooser {
 
     public void detach(){
         onDetach();
-        this.service = null;
+        this.executionManager = null;
     }
 
-    protected FogGatewayService getService(){
-        if (this.service == null)
-            Log.e(TAG, "Service is not bound");
-        return this.service;
+    protected ExecutionManager getExecutionManager(){
+        if (this.executionManager == null)
+            Log.e(TAG, "ExecutionManager is not bound");
+        return this.executionManager;
     }
 }

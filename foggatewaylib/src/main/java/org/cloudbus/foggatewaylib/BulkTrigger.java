@@ -2,7 +2,7 @@ package org.cloudbus.foggatewaylib;
 
 public abstract class BulkTrigger<T extends Data> implements StoreObserver<T> {
     private Class<T> dataType;
-    private FogGatewayService service;
+    private ExecutionManager executionManager;
 
     public BulkTrigger(Class<T> dataType){
         this.dataType = dataType;
@@ -12,12 +12,12 @@ public abstract class BulkTrigger<T extends Data> implements StoreObserver<T> {
         return dataType;
     }
 
-    public void bindService(FogGatewayService service){
-        this.service = service;
+    public void bindExecutionManager(ExecutionManager executionManager){
+        this.executionManager = executionManager;
     }
 
-    public void unbindService(){
-        this.service = null;
+    public void unbindExecutionManager(){
+        this.executionManager = null;
     }
 
     public void onDataStored(Store<T> store, T... data){
@@ -26,7 +26,7 @@ public abstract class BulkTrigger<T extends Data> implements StoreObserver<T> {
 
     public abstract void onNewData(Store<T> store, T... data);
 
-    protected FogGatewayService getService() {
-        return service;
+    protected ExecutionManager getExecutionManager() {
+        return executionManager;
     }
 }

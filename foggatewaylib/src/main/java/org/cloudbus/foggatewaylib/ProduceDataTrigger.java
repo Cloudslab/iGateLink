@@ -10,7 +10,7 @@ public class ProduceDataTrigger<T extends Data> extends BulkTrigger<T> {
 
     @Override
     public void onNewData(Store<T> store, T... data) {
-        getService().produceData(outputDataKey,
+        getExecutionManager().produceData(outputDataKey,
                 data[0].getRequestID(),
                 data);
     }

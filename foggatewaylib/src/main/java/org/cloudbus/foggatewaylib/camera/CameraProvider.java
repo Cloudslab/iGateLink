@@ -3,8 +3,8 @@ package org.cloudbus.foggatewaylib.camera;
 import android.hardware.Camera;
 import android.util.Log;
 
+import org.cloudbus.foggatewaylib.ExecutionManager;
 import org.cloudbus.foggatewaylib.Provider;
-import org.cloudbus.foggatewaylib.ForegroundService;
 import org.cloudbus.foggatewaylib.VoidData;
 
 import java.util.HashMap;
@@ -39,10 +39,11 @@ public class CameraProvider extends Provider<VoidData, ImageData> {
 
                 @Override
                 public void onShutter() {
-                    ForegroundService service = getService();
+                    ExecutionManager executionManager = getExecutionManager();
                     int orientation;
-                    if (service != null) {
-                        orientation = getService().getResources().getConfiguration().orientation;
+                    if (executionManager != null) {
+                        orientation = executionManager.getContext().getResources()
+                                .getConfiguration().orientation;
                     }
                     else {
                         orientation = -1;
