@@ -1,16 +1,32 @@
 package org.cloudbus.foggatewaylib;
 
-public abstract class Trigger<T extends Data> extends BulkTrigger<T> {
+public abstract class Trigger<T extends Data> implements StoreObserver<T> {
+    private Class<T> dataType;
+    private ExecutionManager executionManager;
 
-    public Trigger(Class<T> dataType) {
-        super(dataType);
+    public Trigger(Class<T> dataType){
+        this.dataType = dataType;
     }
 
-    public abstract void onNewData(Store<T> store, T data);
+    public Class<T> getDataType() {
+        return dataType;
+    }
 
-    @Override
-    public void onNewData(Store<T> store, T... data) {
-        for (T d:data)
-            onNewData(store, d);
+    public void bindExecutionManager(ExecutionManager executionManager){
+        this.executionManager = executionManager;
+    }
+
+    public void unbindExecutionManager(){
+        this.executionManager = null;
+    }
+
+    public void onDataStored(Store<T> store, T... data){
+        onNewData(store, data);
+    }
+
+    public abstract void onNewData(Store<T> store, T... data);
+
+    protected ExecutionManager getExecutionManager() {
+        return executionManager;
     }
 }

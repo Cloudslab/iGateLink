@@ -1,6 +1,6 @@
 package org.cloudbus.foggatewaylib;
 
-public class ProduceDataTrigger<T extends Data> extends BulkTrigger<T> {
+public class ProduceDataTrigger<T extends Data> extends Trigger<T> {
     private String outputDataKey;
 
     public ProduceDataTrigger(String outputDataKey, Class<T> dataType) {

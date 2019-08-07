@@ -20,9 +20,9 @@ import org.cloudbus.foggatewaylib.ExecutionManagerHolder;
 import org.cloudbus.foggatewaylib.FogGatewayService;
 import org.cloudbus.foggatewaylib.FogGatewayServiceActivity;
 import org.cloudbus.foggatewaylib.GenericData;
+import org.cloudbus.foggatewaylib.IndividualTrigger;
 import org.cloudbus.foggatewaylib.ProgressData;
 import org.cloudbus.foggatewaylib.Store;
-import org.cloudbus.foggatewaylib.Trigger;
 
 import static org.cloudbus.fogappcamerademo.MainActivity.KEY_DATA_INPUT_BITMAP;
 import static org.cloudbus.fogappcamerademo.MainActivity.KEY_DATA_OUTPUT_BITMAP;
@@ -159,7 +159,7 @@ public class ResultFragment extends Fragment {
         executionManager.addUITrigger(KEY_DATA_INPUT_BITMAP,
                 "inputUpdateUI",
                 request_id,
-                new Trigger<GenericData>(GenericData.class) {
+                new IndividualTrigger<GenericData>(GenericData.class) {
                     @Override
                     public void onNewData(Store store, GenericData data) {
                         if (imageView != null)
@@ -170,7 +170,7 @@ public class ResultFragment extends Fragment {
             .addUITrigger(KEY_DATA_OUTPUT_BITMAP,
                 "outputUpdateUI",
                 request_id,
-                new Trigger<GenericData>(GenericData.class) {
+                new IndividualTrigger<GenericData>(GenericData.class) {
                     @Override
                     public void onNewData(Store store, GenericData data) {
                         if (imageView != null)
@@ -181,7 +181,7 @@ public class ResultFragment extends Fragment {
             .addUITrigger(ExecutionManager.KEY_DATA_PROGRESS,
                 "messageUpdateUI",
                 request_id,
-                new Trigger<ProgressData>(ProgressData.class) {
+                new IndividualTrigger<ProgressData>(ProgressData.class) {
 
                     @Override
                     public void onNewData(Store<ProgressData> store,

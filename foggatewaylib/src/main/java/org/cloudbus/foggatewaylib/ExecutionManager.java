@@ -67,10 +67,10 @@ public class ExecutionManager{
 
     @SuppressWarnings("unchecked")
     private ExecutionManager addTriggerGeneric(String dataKey, String triggerKey,
-                                               BulkTrigger trigger,
+                                               Trigger trigger,
                                                Map<String, String> map){
         if (map.containsKey(triggerKey)){
-            Log.w(TAG, "Trigger " + triggerKey + " already exists");
+            Log.w(TAG, "IndividualTrigger " + triggerKey + " already exists");
             return this;
         }
 
@@ -91,22 +91,22 @@ public class ExecutionManager{
     }
 
     public ExecutionManager addTrigger(String dataKey, String triggerKey,
-                                       BulkTrigger trigger){
+                                       Trigger trigger){
 
         return addTriggerGeneric(dataKey, triggerKey, trigger, triggers);
     }
 
     public ExecutionManager addUITrigger(String dataKey, String triggerKey,
-                                         BulkTrigger trigger){
+                                         Trigger trigger){
 
         return addTriggerGeneric(dataKey, triggerKey, trigger, UITriggers);
     }
 
     @SuppressWarnings("unchecked")
     public ExecutionManager addUITrigger(String dataKey, String triggerKey, long requestID,
-                                         BulkTrigger trigger){
+                                         Trigger trigger){
         return addTriggerGeneric(dataKey, triggerKey,
-                new FilteredBulkTrigger(requestID, trigger),
+                new FilteredTrigger(requestID, trigger),
                 UITriggers);
     }
 
@@ -121,7 +121,7 @@ public class ExecutionManager{
 
         map.remove(triggerKey);
 
-        BulkTrigger trigger = (BulkTrigger) store.removeObserver(triggerKey);
+        Trigger trigger = (Trigger) store.removeObserver(triggerKey);
         if (trigger == null)
             return false;
 

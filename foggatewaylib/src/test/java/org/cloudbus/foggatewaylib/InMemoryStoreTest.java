@@ -48,16 +48,16 @@ public class InMemoryStoreTest {
     @Test
     public void cast_isCorrect() {
         Store<Data> store = new InMemoryStore<>(Data.class);
-        Trigger<Data> mTrigger = new Trigger<Data>(Data.class) {
+        IndividualTrigger<Data> mIndividualTrigger = new IndividualTrigger<Data>(Data.class) {
             @Override
             public void onNewData(Store<Data> store, Data data) { }
         };
-        store.addObserver("mObserver", mTrigger);
+        store.addObserver("mObserver", mIndividualTrigger);
 
-        Trigger trigger1 = (Trigger) store.removeObserver("mObserver");
-        assertNotNull(trigger1);
+        IndividualTrigger individualTrigger1 = (IndividualTrigger) store.removeObserver("mObserver");
+        assertNotNull(individualTrigger1);
 
-        Trigger trigger2 = (Trigger) store.removeObserver("mObserver");
-        assertNull(trigger2);
+        IndividualTrigger individualTrigger2 = (IndividualTrigger) store.removeObserver("mObserver");
+        assertNull(individualTrigger2);
     }
 }

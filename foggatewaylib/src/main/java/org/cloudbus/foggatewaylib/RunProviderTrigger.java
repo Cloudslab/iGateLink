@@ -1,6 +1,6 @@
 package org.cloudbus.foggatewaylib;
 
-public class RunProviderTrigger<T extends Data> extends BulkTrigger<T> {
+public class RunProviderTrigger<T extends Data> extends Trigger<T> {
     private String providerKey;
 
     public RunProviderTrigger(String providerKey, Class<T> dataType) {
