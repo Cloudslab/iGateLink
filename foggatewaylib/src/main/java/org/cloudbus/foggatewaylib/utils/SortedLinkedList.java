@@ -1,7 +1,9 @@
-package org.cloudbus.foggatewaylib;
+package org.cloudbus.foggatewaylib.utils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import org.cloudbus.foggatewaylib.Data;
 
 import java.util.ArrayList;
 import java.util.Collection;

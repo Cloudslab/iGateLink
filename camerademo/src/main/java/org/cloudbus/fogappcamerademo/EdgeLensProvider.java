@@ -6,9 +6,9 @@ import android.util.Pair;
 
 import androidx.preference.PreferenceManager;
 
-import org.cloudbus.foggatewaylib.SimpleHttpConnection;
 import org.cloudbus.foggatewaylib.ThreadPoolProvider;
 import org.cloudbus.foggatewaylib.camera.ImageData;
+import org.cloudbus.foggatewaylib.utils.SimpleHttpConnection;
 
 import java.io.IOException;
 

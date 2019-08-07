@@ -1,4 +1,4 @@
-package org.cloudbus.foggatewaylib;
+package org.cloudbus.foggatewaylib.utils;
 
 import android.os.Handler;
 

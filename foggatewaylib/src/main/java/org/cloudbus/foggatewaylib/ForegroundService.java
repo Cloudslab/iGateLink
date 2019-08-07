@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
+import org.cloudbus.foggatewaylib.utils.NotificationUtils;
+
 public abstract class ForegroundService extends Service {
 
     private static final String TAG = "ForegroundService";

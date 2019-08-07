@@ -2,6 +2,8 @@ package org.cloudbus.foggatewaylib;
 
 import android.util.Log;
 
+import org.cloudbus.foggatewaylib.utils.Timer;
+
 public abstract class TimerProvider<T extends Data, S extends Data>
         extends AsyncProvider<T,S> {
     private static final String TAG = "TimerProvider";
