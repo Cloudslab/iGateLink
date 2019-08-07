@@ -3,20 +3,20 @@ package org.cloudbus.foggatewaylib.utils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class MultiMap<K, V> implements Map<K, V> {
+public class MultiMap<K, V> {
     private Map<K, Set<V>> map;
 
     public MultiMap(){
         this.map = new HashMap<>();
     }
 
-    @Override
     public int size() {
         int size = 0;
         for (Set<V> set:map.values())
@@ -24,29 +24,19 @@ public class MultiMap<K, V> implements Map<K, V> {
         return size;
     }
 
-    @Override
     public boolean isEmpty() {
         return size() == 0;
     }
 
-    @Override
     public boolean containsKey(@Nullable Object key) {
         return map.containsKey(key);
     }
 
-    @Override
     public boolean containsValue(@Nullable Object value) {
         for (Set<V> set:map.values())
             if (set.contains(value))
                 return true;
         return false;
-    }
-
-    @Nullable
-    @Deprecated
-    @Override
-    public V get(@Nullable Object key) {
-        throw new UnsupportedOperationException("Use getAll(...) instead");
     }
 
     @NonNull
@@ -67,7 +57,6 @@ public class MultiMap<K, V> implements Map<K, V> {
     }
 
     @Nullable
-    @Override
     public V put(@NonNull K key, @NonNull V value) {
         Set<V> set = map.get(key);
         if (set == null){
@@ -78,11 +67,8 @@ public class MultiMap<K, V> implements Map<K, V> {
         return value;
     }
 
-    @Nullable
-    @Override
-    public V remove(@Nullable Object key) {
+    public void removeAll(@Nullable Object key) {
         map.remove(key);
-        return null;
     }
 
 
@@ -97,65 +83,34 @@ public class MultiMap<K, V> implements Map<K, V> {
         }
     }
 
-    @Override
+    public void putAll(@NonNull K key, @NonNull Collection<V> values) {
+        Set<V> set = map.get(key);
+        if (set == null){
+            set = new HashSet<>();
+            map.put(key, set);
+        }
+        set.addAll(values);
+    }
+
     public void putAll(@NonNull Map<? extends K, ? extends V> m) {
         for (K key:m.keySet())
             put(key, m.get(key));
     }
 
-    @Override
     public void clear() {
         map.clear();
     }
 
     @NonNull
-    @Override
     public Set<K> keySet() {
         return map.keySet();
     }
 
     @NonNull
-    @Override
     public Collection<V> values() {
-        Collection<V> val = new HashSet<>();
+        Collection<V> val = new ArrayList<>();
         for (Set<V> set:map.values())
             val.addAll(set);
         return val;
-    }
-
-    @NonNull
-    @Override
-    public Set<Map.Entry<K, V>> entrySet() {
-        Set<Map.Entry<K, V>> entries = new HashSet<>();
-        for (K key:map.keySet())
-            for (V val:map.get(key))
-                entries.add(new Entry<>(key, val));
-        return entries;
-    }
-
-    class Entry<K, V> implements Map.Entry<K,V>{
-        private K key;
-        private V value;
-
-        Entry(K key, V value){
-            this.key = key;
-            this.value = value;
-        }
-
-        @Override
-        public K getKey() {
-            return key;
-        }
-
-        @Override
-        public V getValue() {
-            return value;
-        }
-
-        @Override
-        public V setValue(V value) {
-            this.value = value;
-            return value;
-        }
     }
 }
