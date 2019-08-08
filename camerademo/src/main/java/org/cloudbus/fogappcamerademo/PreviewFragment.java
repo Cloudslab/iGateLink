@@ -79,9 +79,11 @@ public class PreviewFragment extends Fragment {
             }
         });
         FrameLayout preview = rootView.findViewById(R.id.camera_preview);
-        if (mPreview != null && preview.getChildCount() == 0)
+        if (mPreview != null && preview.getChildCount() == 0){
+            if (mPreview.getParent() != null)
+                ((FrameLayout) mPreview.getParent()).removeView(mPreview);
             preview.addView(mPreview);
-
+        }
         if (getActivity() == null)
             return rootView;
 
