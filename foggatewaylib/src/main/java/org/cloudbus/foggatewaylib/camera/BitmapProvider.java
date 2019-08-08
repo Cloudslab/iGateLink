@@ -21,7 +21,7 @@ public class BitmapProvider extends SequentialProvider<ImageData, GenericData> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public GenericData[] getData(ProgressPublisher progressListener, long requestID,
+    public GenericData[] getData(ProgressPublisher progressPublisher, long requestID,
                                  ImageData... input) {
         GenericData<Bitmap>[] output = new GenericData[input.length];
 

@@ -31,7 +31,7 @@ public class CameraProvider extends Provider<VoidData, ImageData> {
 
                 @Override
                 public void onPictureTaken(byte[] bytes, android.hardware.Camera camera) {
-                    publishResult(requestID, new ImageData(bytes, orientations.get(requestID)));
+                    publishResults(requestID, new ImageData(bytes, orientations.get(requestID)));
                     publishProgress(requestID, 0, "Picture taken");
                 }
             };

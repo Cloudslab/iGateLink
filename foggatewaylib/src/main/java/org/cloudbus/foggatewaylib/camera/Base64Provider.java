@@ -14,7 +14,7 @@ public class Base64Provider extends SequentialProvider<ImageData, GenericData> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public GenericData[] getData(ProgressPublisher progressListener, long requestID,
+    public GenericData[] getData(ProgressPublisher progressPublisher, long requestID,
                                  ImageData... input) {
         GenericData[] output = new GenericData[input.length];
 

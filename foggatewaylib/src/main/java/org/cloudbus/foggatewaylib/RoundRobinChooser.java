@@ -1,5 +1,12 @@
 package org.cloudbus.foggatewaylib;
 
+/**
+ * Simple {@link Chooser} implementation using the Round-Robin algorithm.
+ * In other words, every time a choice has to be taken, the value following the previous choice
+ * will be chosen.
+ *
+ * @author Riccardo Mancini
+ */
 public class RoundRobinChooser extends Chooser {
     private int lastChoice;
 
