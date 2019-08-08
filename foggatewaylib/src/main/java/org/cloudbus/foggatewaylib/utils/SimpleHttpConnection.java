@@ -205,8 +205,8 @@ public class SimpleHttpConnection {
         return os.toByteArray();
     }
 
-    private URL makeUrl(String domain, String page, boolean ssl, Pair<String, String>... parameters)
-            throws MalformedURLException {
+    private URL makeUrl(String domain, String page, boolean ssl,
+                        Pair<String, String>... parameters) throws MalformedURLException {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("http");
         if (ssl)

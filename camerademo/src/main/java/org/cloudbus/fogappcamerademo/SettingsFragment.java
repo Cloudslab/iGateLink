@@ -38,7 +38,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
                     if ((boolean) newValue) {
                         FogGatewayService.start(getActivity(), MainActivity.class);
-                        ForegroundService.bind(getActivity(), (FogGatewayServiceActivity) getActivity(),
+                        ForegroundService.bind(getActivity(),
+                                (FogGatewayServiceActivity) getActivity(),
                                 FogGatewayService.class);
                     } else {
                         FogGatewayService.stop(getActivity());

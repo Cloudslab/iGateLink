@@ -32,7 +32,8 @@ public abstract class ForegroundService extends Service {
         return true;
     }
 
-    public static void sendIntentToForegroundService(Context context, String action, Bundle extras, Class<? extends ForegroundService> cls){
+    public static void sendIntentToForegroundService(Context context, String action, Bundle extras,
+                                                     Class<? extends ForegroundService> cls){
         Intent intent = new Intent(context, cls);
         intent.setAction(action);
         if (extras != null)
@@ -41,24 +42,30 @@ public abstract class ForegroundService extends Service {
         Log.d(TAG, "Intent sent");
     }
 
-    public static void startForegroundService(Context context, Bundle extras, Class<? extends ForegroundService> serviceClass, Class<? extends Activity> activityClass){
+    public static void startForegroundService(Context context, Bundle extras,
+                                              Class<? extends ForegroundService> serviceClass,
+                                              Class<? extends Activity> activityClass){
         if (extras == null)
             extras = new Bundle();
         extras.putString("activity", activityClass.getName());
         sendIntentToForegroundService(context, ACTION_START, extras, serviceClass);
     }
 
-    public static void startForegroundService(Context context, Class<? extends ForegroundService> serviceClass, Class<? extends Activity> activityClass){
+    public static void startForegroundService(Context context,
+                                              Class<? extends ForegroundService> serviceClass,
+                                              Class<? extends Activity> activityClass){
         Bundle extras = new Bundle();
         extras.putString("activity", activityClass.getName());
         sendIntentToForegroundService(context, ACTION_START, extras, serviceClass);
     }
 
-    public static void stopForegroundService(Context context, Class<? extends ForegroundService> cls){
+    public static void stopForegroundService(Context context,
+                                             Class<? extends ForegroundService> cls){
         sendIntentToForegroundService(context, ACTION_STOP, null, cls);
     }
 
-    public static void bind(Context context, ServiceConnection connection, Class<? extends ForegroundService> cls){
+    public static void bind(Context context, ServiceConnection connection,
+                            Class<? extends ForegroundService> cls){
         Intent intent = new Intent(context, cls);
         context.bindService(intent, connection, 0);
     }

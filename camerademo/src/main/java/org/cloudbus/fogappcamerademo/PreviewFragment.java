@@ -97,14 +97,17 @@ public class PreviewFragment extends Fragment {
             double screenRatio = (double) width / height;
             double previewRatio = (double) cameraSize.width / cameraSize.height;
 
-            boolean portrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+            boolean portrait = getResources().getConfiguration().orientation
+                    == Configuration.ORIENTATION_PORTRAIT;
 
             if (portrait) {
                 previewRatio = 1/previewRatio;
             }
 
-            Log.d("DEBUG", "Screen size is " + width + "x" + height + " ratio: " + screenRatio);
-            Log.d("DEBUG", "Camera size is " + cameraSize.width + "x" + cameraSize.height+ " ratio: " + previewRatio);
+            Log.d("DEBUG", "Screen size is " + width + "x" + height + " ratio: "
+                    + screenRatio);
+            Log.d("DEBUG", "Camera size is " + cameraSize.width + "x"
+                    + cameraSize.height+ " ratio: " + previewRatio);
 
             int targetWidth;
             int targetHeight;
@@ -118,8 +121,8 @@ public class PreviewFragment extends Fragment {
                 targetHeight = height;
                 targetWidth = (int) (((double) height) * previewRatio);
             }
-            Log.d("DEBUG", "Setting preview size to " + targetWidth + "x" + targetHeight +
-                    ", ratio=" + ((double) targetWidth / targetHeight));
+            Log.d("DEBUG", "Setting preview size to " + targetWidth + "x"
+                    + targetHeight + ", ratio=" + ((double) targetWidth / targetHeight));
 
             preview.setLayoutParams(new FrameLayout.LayoutParams(targetWidth, targetHeight));
         }
@@ -149,7 +152,8 @@ public class PreviewFragment extends Fragment {
                     .setNegativeButton("Back", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            Navigation.findNavController(getActivity(), R.id.mainNavigationFragment)
+                            Navigation.findNavController(getActivity(),
+                                            R.id.mainNavigationFragment)
                                     .navigate(R.id.settingsFragment);
                         }
                     })

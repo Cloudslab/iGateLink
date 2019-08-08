@@ -123,7 +123,8 @@ public class ResultFragment extends Fragment {
             executionManager.removeUITrigger("outputUpdateUI");
             executionManager.removeUITrigger("messageUpdateUI");
         }
-        ((FogGatewayServiceActivity)getActivity()).removeServiceConnectionListener("resultFragment");
+        ((FogGatewayServiceActivity)getActivity())
+                .removeServiceConnectionListener("resultFragment");
     }
 
     @Override

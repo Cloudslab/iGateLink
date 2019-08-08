@@ -18,7 +18,7 @@ public class NotificationUtils {
     public static final String DEFAULT_CHANNEL_DESCRIPTION = "Default channel.";
     public static final int DEFAULT_NOTIFICATION_ID = 1;
     public static final String DEFAULT_NOTIFICATION_TITLE = "App is running";
-    public static final String DEFAULT_NOTIFICATION_DESCRIPTION = "App service running in background";
+    public static final String DEFAULT_NOTIFICATION_DESCRIPTION = "Service running in background";
 
     public static void initChannel(Context context, String channel_id, String name,
                                    String description, int importance) {
@@ -38,8 +38,9 @@ public class NotificationUtils {
                 NotificationManager.IMPORTANCE_DEFAULT);
     }
 
-    public static Notification buildNotification(Context context, PendingIntent intent, String title,
-                                                 String text, int icon, String channelId){
+    public static Notification buildNotification(Context context, PendingIntent intent,
+                                                 String title, String text, int icon,
+                                                 String channelId){
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(context, channelId)
                 .setContentTitle(title)
