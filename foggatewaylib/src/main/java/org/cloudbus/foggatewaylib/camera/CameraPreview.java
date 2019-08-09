@@ -9,7 +9,11 @@ import android.view.SurfaceView;
 import java.io.IOException;
 import java.util.List;
 
-/** A basic Camera preview class */
+/**
+ * A basic Camera preview class.
+ *
+ * @see <a href="https://developer.android.com/guide/topics/media/camera">https://developer.android.com/guide/topics/media/camera</a>
+ */
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private static final String TAG = "CameraPreview";
 
@@ -71,6 +75,12 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
     }
 
+    /**
+     * Chooses the optimal preview sized among the ones in the list based on the given width and
+     * height.
+     *
+     * @see <a href="https://stackoverflow.com/a/19592492">https://stackoverflow.com/a/19592492</a>
+     */
     public static Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {
         final double ASPECT_TOLERANCE = 0.1;
         double targetRatio = (double) h / w;
