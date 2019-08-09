@@ -10,19 +10,39 @@ import android.hardware.Camera;
 import android.util.Log;
 import android.view.Surface;
 
+import androidx.annotation.Nullable;
 import androidx.exifinterface.media.ExifInterface;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Collection of useful functions for the camera.
+ *
+ * @see <a href="https://developer.android.com/guide/topics/media/camera">https://developer.android.com/guide/topics/media/camera</a>
+ *
+ * @author Riccardo Mancini
+ */
 public class CameraUtils {
-    /** Check if this device has a camera */
+
+    /**
+     * Check if this device has a camera.
+     *
+     * @return {@code true} if the device has a camera, {@code false} otherwise.
+     * @see <a href="https://developer.android.com/guide/topics/media/camera">https://developer.android.com/guide/topics/media/camera</a>
+     */
     public static boolean checkCameraHardware(Context context) {
         return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
     }
 
-    /** A safe way to get an instance of the Camera object. */
+    /**
+     * Gets an instance of the Camera object.
+     *
+     * @return the camera if {@link Camera#open()} was successful, {@link false} otherwise.
+     * @see <a href="https://developer.android.com/guide/topics/media/camera">https://developer.android.com/guide/topics/media/camera</a>
+     */
+    @Nullable
     public static Camera getCameraInstance(){
         Camera c = null;
         try {
@@ -35,6 +55,14 @@ public class CameraUtils {
         return c; // returns null if camera is unavailable
     }
 
+    /**
+     * Sets the orientation of the picture taken by the camera to the one of the display.
+     * Without a call to this method, the picture could be shown rotated in portrait mode.
+     *
+     * @param activity the activity showing the preview.
+     * @param cameraId the id of the camera .
+     * @param camera the camera instance.
+     */
     public static void setCameraDisplayOrientation(Activity activity,
                                                    int cameraId, android.hardware.Camera camera) {
         android.hardware.Camera.CameraInfo info =
@@ -60,6 +88,15 @@ public class CameraUtils {
         camera.setDisplayOrientation(result);
     }
 
+    /**
+     * Calculates the correct transformation matrix for the given exif orientation flag.
+     *
+     * @param orientation exif orientation flag.
+     * @param width  image width.
+     * @param height image height.
+     * @return the matrix transformation to apply to the image.
+     * @see <a href="https://stackoverflow.com/a/6010475">https://stackoverflow.com/a/6010475</a>
+     */
     private static Matrix getExifTransformation(int orientation, int width, int height) {
         Matrix matrix = new Matrix();
 
@@ -101,10 +138,23 @@ public class CameraUtils {
         return matrix;
     }
 
+    /**
+     * Converts the image as a byte array to a {@link Bitmap}.
+     *
+     * @see BitmapFactory#decodeByteArray(byte[], int, int)
+     */
     public static Bitmap byteArray2Bitmap(byte[] bytes){
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
+    /**
+     * Returns the Exif orientation flag in the image.
+     *
+     * @param bytes the image as a byte array.
+     * @return the Exif orientation flag if found, {@link ExifInterface#ORIENTATION_NORMAL}
+     * otherwise.
+     */
+    //TODO consider returning ORIENTATION_UNDEFINED as a default instead
     public static int getExifOrientation(byte[] bytes){
         InputStream inputStream = new ByteArrayInputStream(bytes);
         int orientation = ExifInterface.ORIENTATION_NORMAL;
@@ -121,6 +171,13 @@ public class CameraUtils {
         return orientation;
     }
 
+    /**
+     * Rotates the image depending on the source orientation.
+     *
+     * @param sourceBitmap the source image
+     * @param orientation the Exif orientation flag
+     * @return the rotated image
+     */
     public static Bitmap getcorrectRotationBitmap(Bitmap sourceBitmap, int orientation){
         Log.d("DEBUG", "width = " + sourceBitmap.getWidth() + ", height = " + sourceBitmap.getHeight()  + ", orientation = " + orientation);
 
