@@ -38,18 +38,21 @@ public abstract class Trigger<T extends Data> implements Store.Observer<T> {
     }
 
     /**
-     * Binds the {@link ExecutionManager} to this {@link Trigger}.
+     * Attaches to the {@link ExecutionManager} and calls {@link #onAttach()}.
      *
-     * @param executionManager the {@link ExecutionManager} that is being bound.
+     * @param executionManager the {@link ExecutionManager} that is being attached.
      */
-    public void bindExecutionManager(ExecutionManager executionManager){
+    public void attach(ExecutionManager executionManager){
         this.executionManager = executionManager;
+        onAttach();
     }
 
     /**
-     * Unbinds the {@link ExecutionManager} previously bound to this {@link Trigger}.
+     * Detaches from the {@link ExecutionManager} attached to this {@link Trigger} after calling
+     * {@link #onDetach()}.
      */
-    public void unbindExecutionManager(){
+    public void detach(){
+        onDetach();
         this.executionManager = null;
     }
 
@@ -60,4 +63,20 @@ public abstract class Trigger<T extends Data> implements Store.Observer<T> {
     protected ExecutionManager getExecutionManager() {
         return executionManager;
     }
+
+    /**
+     * Performs actions after the {@link ExecutionManager} is bound.
+     * It does nothing unless overridden.
+     *
+     * @see #attach(ExecutionManager)
+     */
+    public void onAttach(){}
+
+    /**
+     * Performs actions before the {@link ExecutionManager} is unbound.
+     * It does nothing unless overridden.
+     *
+     * @see #detach()
+     */
+    public void onDetach(){}
 }

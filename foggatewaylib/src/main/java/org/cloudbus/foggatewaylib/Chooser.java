@@ -36,7 +36,7 @@ public abstract class Chooser {
 
     /**
      * Performs actions after the {@link ExecutionManager} is bound.
-     * It does nothing unless overwritten.
+     * It does nothing unless overridden.
      *
      * @see #attach(ExecutionManager)
      */
@@ -44,7 +44,7 @@ public abstract class Chooser {
 
     /**
      * Performs actions before the {@link ExecutionManager} is unbound.
-     * It does nothing unless overwritten.
+     * It does nothing unless overridden.
      *
      * @see #detach()
      */

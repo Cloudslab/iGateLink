@@ -233,7 +233,7 @@ public class ExecutionManager{
             throw new StoreNotDefinedException(dataKey);
 
         if (store.getDataType().equals(trigger.getDataType())){
-            trigger.bindExecutionManager(this);
+            trigger.attach(this);
             store.addObserver(triggerKey, trigger);
             map.put(triggerKey, dataKey);
         } else
@@ -338,7 +338,7 @@ public class ExecutionManager{
         if (trigger == null)
             return false;
 
-        trigger.unbindExecutionManager();
+        trigger.detach();
         return true;
     }
 

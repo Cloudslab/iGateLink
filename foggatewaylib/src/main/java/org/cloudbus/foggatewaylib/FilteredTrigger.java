@@ -10,7 +10,6 @@ package org.cloudbus.foggatewaylib;
  *
  * @author Riccardo Mancini
  */
-//TODO missing binding of the wrapped trigger with the ExecutionManager
 public class FilteredTrigger<T extends Data> extends Trigger<T> {
 
     /**
@@ -55,5 +54,21 @@ public class FilteredTrigger<T extends Data> extends Trigger<T> {
     public void onDataStored(Store<T> store, T... data) {
         if (data[0].getRequestID() == requestID)
             trigger.onDataStored(store, data);
+    }
+
+    /**
+     * Calls {@link Trigger#attach(ExecutionManager)} on the wrapped {@link Trigger}.
+     */
+    @Override
+    public void onAttach() {
+        trigger.attach(getExecutionManager());
+    }
+
+    /**
+     * Calls {@link Trigger#detach()} on the wrapped {@link Trigger}.
+     */
+    @Override
+    public void onDetach() {
+        trigger.detach();
     }
 }

@@ -188,7 +188,7 @@ public abstract class Provider<T extends Data, S extends Data>{
 
     /**
      * Performs actions after the {@link ExecutionManager} is bound.
-     * It does nothing unless overwritten.
+     * It does nothing unless overridden.
      *
      * @see #attach(ExecutionManager, Store, Store)
      */
@@ -196,7 +196,7 @@ public abstract class Provider<T extends Data, S extends Data>{
 
     /**
      * Performs actions before the {@link ExecutionManager} is unbound.
-     * It does nothing unless overwritten.
+     * It does nothing unless overridden.
      *
      * @see #detach()
      */
