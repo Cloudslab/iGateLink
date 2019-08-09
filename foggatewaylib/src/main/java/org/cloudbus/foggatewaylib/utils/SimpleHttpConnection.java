@@ -2,6 +2,8 @@ package org.cloudbus.foggatewaylib.utils;
 
 import android.util.Pair;
 
+import androidx.annotation.NonNull;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +16,15 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
+/**
+ * Simplified connection management for HTTP GET/POST requests.
+ * The same {@link SimpleHttpConnection} could be used for multiple requests to the same
+ * {@link URL}.
+ *
+ * @see HttpURLConnection
+ *
+ * @author Riccardo Mancini
+ */
 public class SimpleHttpConnection {
     private int maxReadSize = 5000000;
     private int connectionTimeout = 5000;
@@ -21,47 +32,142 @@ public class SimpleHttpConnection {
 
     private URL url;
 
-    public SimpleHttpConnection(String domain, String page, Pair<String, String>... parameters)
-            throws MalformedURLException{
-        url = makeUrl(domain, page, false, parameters);
-    }
-
-    public SimpleHttpConnection(URL url){
+    /**
+     * Constructor that initializes a new request to the specified url.
+     *
+     * @param url the url of the request.
+     */
+    public SimpleHttpConnection(@NonNull URL url){
         this.url = url;
     }
 
+    /**
+     * Constructor that initializes a new request to the url built using
+     * {@link #makeUrl(String, String, boolean, Pair[])}.
+     *
+     * @param domain the domain of the web server.
+     * @param page the page to request from the web server.
+     * @param parameters additional GET parameters.
+     * @throws MalformedURLException refer to {@link #makeUrl(String, String, boolean, Pair[])}.
+     * @see #makeUrl(String, String, boolean, Pair[])
+     */
+    public SimpleHttpConnection(String domain, String page, Pair<String, String>... parameters)
+            throws MalformedURLException{
+        this(makeUrl(domain, page, false, parameters));
+    }
+
+    /**
+     * Sets the maximum size of the response from the server.
+     * Default is {@code 5000000}.
+     *
+     * @param maxReadSize the new maximum size in bytes.
+     * @see #getMaxReadSize()
+     * @see #readStream(InputStream)
+     * @see #readByteStream(InputStream)
+     */
     public void setMaxReadSize(int maxReadSize) {
         this.maxReadSize = maxReadSize;
     }
 
+    /**
+     * Gets the maximum read size (default is {@code 5000000} bytes).
+     *
+     * @return the previously set maximum read size in bytes or {@code 5000000}.
+     * @see #setMaxReadSize(int)
+     * @see #readStream(InputStream)
+     * @see #readByteStream(InputStream)
+     */
     public int getMaxReadSize() {
         return maxReadSize;
     }
 
+    /**
+     * Sets the connection timeout.
+     * {@code 0} means infinite timeout.
+     * Default is 5 seconds.
+     * Refer to {@link HttpURLConnection#setConnectTimeout(int)} for more details.
+     *
+     * @param connectionTimeout the new connection timeout in milliseconds.
+     * @see HttpURLConnection#setConnectTimeout(int)
+     * @see #getConnectionTimeout()
+     */
     public void setConnectionTimeout(int connectionTimeout) {
         this.connectionTimeout = connectionTimeout;
     }
 
+    /**
+     * Gets the connection timeout.
+     * {@code 0} means infinite timeout.
+     * Default is 5 seconds.
+     *
+     * @return the previously set connection timeout in milliseconds or {@code 5000}.
+     * @see HttpURLConnection#getConnectTimeout()
+     * @see #setConnectionTimeout(int)
+     */
     public int getConnectionTimeout() {
         return connectionTimeout;
     }
 
+    /**
+     * Sets the read timeout.
+     * {@code 0} means infinite timeout.
+     * Default is 5 seconds.
+     * Refer to {@link HttpURLConnection#setReadTimeout(int)} for more details.
+     *
+     * @param readTimeout the new read timeout in milliseconds.
+     * @see HttpURLConnection#setReadTimeout(int)
+     * @see #getReadTimeout()
+     */
     public void setReadTimeout(int readTimeout) {
         this.readTimeout = readTimeout;
     }
 
+    /**
+     * Gets the read timeout.
+     * {@code 0} means infinite timeout.
+     * Default is 5 seconds.
+     *
+     * @return the previously set read timeout in milliseconds or {@code 5000}.
+     * @see HttpURLConnection#getReadTimeout()
+     * @see #setReadTimeout(int)
+     */
     public int getReadTimeout() {
         return readTimeout;
     }
 
+    /**
+     * Gets the {@link URL} of this connection.
+     *
+     * @return the {@link URL} of this connection.
+     * @see #SimpleHttpConnection(URL)
+     * @see #getStringUrl()
+     */
+    @NonNull
     public URL getUrl() {
         return url;
     }
 
+    /**
+     * Gets the {@link URL} of this connection as a {@link String}.
+     *
+     * @return the {@code url} of this connection as a {@link String}.
+     * @see #SimpleHttpConnection(URL)
+     * @see URL#toString()
+     * @see #getUrl()
+     */
     public String getStringUrl() {
         return url.toString();
     }
 
+    //TODO getStream() for common code between get() and getBytes()
+
+    /**
+     * Makes a GET request to the server.
+     *
+     * @return the response of the server as a {@link String}
+     * @throws IOException in case of an HTTP error.
+     * @see #getBytes()
+     */
     public String get() throws IOException {
         InputStream stream = null;
         HttpURLConnection connection = null;
@@ -95,6 +201,56 @@ public class SimpleHttpConnection {
         return result;
     }
 
+    /**
+     * Makes a GET request to the server.
+     *
+     * @return the response of the server as a byte array ({@code byte[]}).
+     * @throws IOException in case of an HTTP error.
+     * @see #get()
+     */
+    public byte[] getBytes() throws IOException {
+        InputStream stream = null;
+        HttpURLConnection connection = null;
+        byte[] result = null;
+        try {
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setReadTimeout(readTimeout);
+            connection.setConnectTimeout(connectionTimeout);
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode != HttpsURLConnection.HTTP_OK) {
+                throw new IOException("HTTP error code: " + responseCode);
+            }
+
+            // Retrieve the response body as an InputStream.
+            stream = connection.getInputStream();
+
+            if (stream != null) {
+                // Converts Stream to String with max length of 500.
+                result = readByteStream(stream);
+            }
+        } finally {
+            // Close Stream and disconnect HTTPS connection.
+            if (stream != null) {
+                stream.close();
+            }
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+        return result;
+    }
+
+    //TODO post(...) for simple key-value pair post request
+
+    /**
+     * Posts the given {@code bytes} to the server as a raw POST request.
+     *
+     * @param bytes the {@code bytes} to be sent.
+     * @return the response of the server as a {@link String}.
+     * @throws IOException in case of an HTTP error.
+     */
     public String postBytes(byte[] bytes) throws IOException {
         InputStream inputStream = null;
         OutputStream outputStream = null;
@@ -133,42 +289,14 @@ public class SimpleHttpConnection {
         return result;
     }
 
-    public byte[] getBytes() throws IOException {
-        InputStream stream = null;
-        HttpURLConnection connection = null;
-        byte[] result = null;
-        try {
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setReadTimeout(readTimeout);
-            connection.setConnectTimeout(connectionTimeout);
-            connection.setRequestMethod("GET");
-
-            int responseCode = connection.getResponseCode();
-            if (responseCode != HttpsURLConnection.HTTP_OK) {
-                throw new IOException("HTTP error code: " + responseCode);
-            }
-
-            // Retrieve the response body as an InputStream.
-            stream = connection.getInputStream();
-
-            if (stream != null) {
-                // Converts Stream to String with max length of 500.
-                result = readByteStream(stream);
-            }
-        } finally {
-            // Close Stream and disconnect HTTPS connection.
-            if (stream != null) {
-                stream.close();
-            }
-            if (connection != null) {
-                connection.disconnect();
-            }
-        }
-        return result;
-    }
-
     /**
-     * Converts the contents of an InputStream to a String.
+     * Converts the contents of an InputStream to a {@link String} up to a maximum of
+     * {@link #maxReadSize}.
+     *
+     * @param stream the input stream.
+     * @return the converted {@code stream} as a {@link String}.
+     * @see #setMaxReadSize(int)
+     * @see #readByteStream(InputStream)
      */
     private String readStream(InputStream stream)
             throws IOException {
@@ -187,7 +315,13 @@ public class SimpleHttpConnection {
     }
 
     /**
-     * Converts the contents of an InputStream to a Byte array.
+     * Converts the contents of an InputStream to a byte array ({@code byte[]}) up to a maximum
+     * of {@link #maxReadSize}.
+     *
+     * @param stream the input stream.
+     * @return the converted {@code stream} as a {@code byte[]}.
+     * @see #setMaxReadSize(int)
+     * @see #readStream(InputStream)
      */
     private byte[] readByteStream(InputStream stream)
             throws IOException {
@@ -205,7 +339,20 @@ public class SimpleHttpConnection {
         return os.toByteArray();
     }
 
-    private URL makeUrl(String domain, String page, boolean ssl,
+    /**
+     * Builds an URL from domain, page and optional key-value parameters.
+     * The URL is built as follows:
+     * http[s]://$domain/$page[?$key1=$val1&$key2=$val2&...&$keyN=$valN]
+     *
+     * @param domain the domain of the server.
+     * @param page the page to request from the server.
+     * @param ssl {@code true} if ssl should be enabled, false otherwise.
+     * @param parameters key-value pairs for the parameters (optional).
+     * @return the built URL.
+     * @throws MalformedURLException refer to {@link URL#URL(String)}.
+     * @see URL#URL(String)
+     */
+    private static URL makeUrl(String domain, String page, boolean ssl,
                         Pair<String, String>... parameters) throws MalformedURLException {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("http");
@@ -216,10 +363,13 @@ public class SimpleHttpConnection {
         stringBuilder.append(page);
         if (parameters.length > 0){
             stringBuilder.append('?');
-            for (Pair<String, String> param:parameters){
+            for (int i = 0; i < parameters.length; i++){
+                Pair<String, String> param = parameters[i];
                 stringBuilder.append(param.first);
-                stringBuilder.append(':');
+                stringBuilder.append('=');
                 stringBuilder.append(param.second);
+                if (i < parameters.length - 1)
+                    stringBuilder.append('&');
             }
         }
         return new URL(stringBuilder.toString());
