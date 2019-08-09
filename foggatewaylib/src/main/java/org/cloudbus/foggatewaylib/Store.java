@@ -24,12 +24,12 @@ public abstract class Store<T extends Data> {
      * They will be called on every call to {@link #store(Data[])}.
      *
      * @see #notifyObservers(Data[])
-     * @see #addObserver(String, StoreObserver)
+     * @see #addObserver(String, Observer)
      * @see #removeObserver(String)
-     * @see StoreObserver
+     * @see Observer
      * @see Trigger
      */
-    private Map<String, StoreObserver<T>> observers;
+    private Map<String, Observer<T>> observers;
 
     /**
      * Type of the stored elements.
@@ -168,18 +168,18 @@ public abstract class Store<T extends Data> {
     protected abstract void __store(T... data);
 
     /**
-     * Calls callbacks of {@link StoreObserver}s in {@link #observers}.
+     * Calls callbacks of {@link Observer}s in {@link #observers}.
      *
      * @param data the data that has been stored.
-     * @see StoreObserver
+     * @see Observer
      * @see Trigger
      * @see #store(Data[])
      * @see #observers
-     * @see #addObserver(String, StoreObserver)
+     * @see #addObserver(String, Observer)
      * @see #removeObserver(String)
      */
     protected void notifyObservers(T... data){
-        for (StoreObserver<T> observer:observers.values()){
+        for (Observer<T> observer:observers.values()){
             observer.onDataStored(this, data);
         }
     }
@@ -206,34 +206,54 @@ public abstract class Store<T extends Data> {
     }
 
     /**
-     * Adds a {@link StoreObserver} to the @{link #observers}.
+     * Adds a {@link Observer} to the @{link #observers}.
      *
      * @param key the key for the new <code>observer</code> to use for later removal.
-     * @param observer the {@link StoreObserver} to be added to the @{link Store}.
-     * @see StoreObserver
+     * @param observer the {@link Observer} to be added to the @{link Store}.
+     * @see Observer
      * @see Trigger
      * @see #observers
      * @see #removeObserver(String)
      * @see #notifyObservers(Data[])
      */
-    public void addObserver(String key, StoreObserver<T> observer){
+    public void addObserver(String key, Observer<T> observer){
         observers.put(key, observer);
     }
 
     /**
-     * Removes the {@link StoreObserver} identified by the given <code>key</code> from the
+     * Removes the {@link Observer} identified by the given <code>key</code> from the
      * {@link #observers}.
      *
      * @param key the key for the new <code>observer</code> to use for later removal.
-     * @return the removed {@link StoreObserver} or null if it is not found.
-     * @see StoreObserver
+     * @return the removed {@link Observer} or null if it is not found.
+     * @see Observer
      * @see Trigger
      * @see #observers
-     * @see #addObserver(String, StoreObserver)
+     * @see #addObserver(String, Observer)
      * @see #notifyObservers(Data[])
      */
     @Nullable
-    public StoreObserver<T> removeObserver(String key){
+    public Observer<T> removeObserver(String key){
         return observers.remove(key);
+    }
+
+    /**
+     * Simple interface for registering callbacks when a new element is added to a {@link Store}.
+     *
+     * @param <T> the type of {@link Data} in the {@link Store} that this {@link Observer} is
+     *           observing.
+     */
+    public interface Observer<T extends Data> {
+
+        /**
+         * Callback called after data is being added to the {@link Store}.
+         *
+         * @param store reference to the {@link Store} the <code>data</code> is being added to.
+         * @param data the data that has been added to the <code>store</code>.
+         * @see Store#addObserver(String, Observer)
+         * @see Store#removeObserver(String)
+         * @see Store#notifyObservers(Data[])
+         */
+        void onDataStored(Store<T> store, T... data);
     }
 }

@@ -3,14 +3,14 @@ package org.cloudbus.foggatewaylib;
 import androidx.annotation.Nullable;
 
 /**
- * Abstract implementation of a {@link StoreObserver} that is bound to an {@link ExecutionManager}.
+ * Abstract implementation of a {@link Store.Observer} that is bound to an {@link ExecutionManager}.
  *
  * @param <T> the type of {@link Data} in the {@link Store} that this {@link Trigger} is
  *           observing.
  *
  * @author Riccardo Mancini
  */
-public abstract class Trigger<T extends Data> implements StoreObserver<T> {
+public abstract class Trigger<T extends Data> implements Store.Observer<T> {
 
     /**
      * Type of {@link Data} in the {@link Store} that this {@link Trigger} is observing.
