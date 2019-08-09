@@ -12,6 +12,16 @@ import static org.cloudbus.foggatewaylib.camera.CameraUtils.byteArray2Bitmap;
 import static org.cloudbus.foggatewaylib.camera.CameraUtils.getExifOrientation;
 import static org.cloudbus.foggatewaylib.camera.CameraUtils.getcorrectRotationBitmap;
 
+/**
+ * Basic provider that converts an image (as a byte array) to a {@link Bitmap}.
+ * In case the image has information about orientation (either in {@link ImageData#orientation} or
+ * in its EXIF metadata, it will also be transformed accordingly.
+ *
+ * @see CameraUtils#byteArray2Bitmap(byte[])
+ * @see CameraUtils#getcorrectRotationBitmap(Bitmap, int)
+ *
+ * @author Riccardo Mancini
+ */
 public class BitmapProvider extends SequentialProvider<ImageData, GenericData> {
 
     public BitmapProvider(Class<ImageData> inputType,
