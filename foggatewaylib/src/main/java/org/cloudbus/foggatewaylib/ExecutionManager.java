@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import org.cloudbus.foggatewaylib.utils.MultiMap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -546,10 +547,10 @@ public class ExecutionManager{
     }
 
     /**
-     * Runs a {@link Provider} that produces the data identified by the given key. If more than one
-     * {@link Provider} is defined, the right {@link Chooser} will be queried to select one of
-     * those.
+     * Chooses a {@link Provider} to run in the given list. If more than one {@link Provider} is
+     * given, the right {@link Chooser} will be queried to select one of those.
      *
+     * @param providers the list of providers to choose from.
      * @param dataKey the key that identifies the data.
      * @param request_id the id of the request this execution belongs to.
      * @param input the input data
@@ -557,13 +558,11 @@ public class ExecutionManager{
      *                                    {@link Chooser}.
      * @throws ProviderForDataNotDefinedException if no provider was found that provides the given
      *                                            data.
-     * @see #addProvider(String, String, Provider)
-     * @see #removeProvider(String)
-     * @see #getProvider(String)
+     * @see #produceData(String, long, Data...) 
+     * @see #produceDataExcludeProviders(String, long, String[], Data...)
      */
-    @SuppressWarnings("unchecked")
-    public void produceData(String dataKey, long request_id, Data... input){
-        List<String> providers = new ArrayList<>(providersOfData.getAll(dataKey));
+    private void chooseProvider(List<String> providers, String dataKey, long request_id,
+                                Data... input){
         if (!providers.isEmpty()){
             if (providers.size() == 1){
                 runProvider(providers.get(0), request_id, input);
@@ -578,6 +577,58 @@ public class ExecutionManager{
                     request_id, input);
         } else
             throw new ProviderForDataNotDefinedException(dataKey);
+    }
+
+    /**
+     * Runs a {@link Provider} that produces the data identified by the given key. If more than one
+     * {@link Provider} is defined, the right {@link Chooser} will be queried to select one of
+     * those.
+     *
+     * @param dataKey the key that identifies the data.
+     * @param request_id the id of the request this execution belongs to.
+     * @param input the input data
+     * @throws ChooserNotDefinedException if there are multiple {@link Provider}s but no
+     *                                    {@link Chooser}.
+     * @throws ProviderForDataNotDefinedException if no provider was found that provides the given
+     *                                            data.
+     * @see #chooseProvider(List, String, long, Data...)
+     * @see #addProvider(String, String, Provider)
+     * @see #removeProvider(String)
+     * @see #getProvider(String)
+     * @see #produceDataExcludeProviders(String, long, String[], Data...)
+     */
+    @SuppressWarnings("unchecked")
+    public void produceData(String dataKey, long request_id, Data... input){
+        chooseProvider(new ArrayList<>(providersOfData.getAll(dataKey)),
+                dataKey, request_id, input);
+    }
+
+    /**
+     * Runs a {@link Provider} that produces the data identified by the given key excluding some of
+     * the {@link Provider}s. If more than one {@link Provider} is defined and has not been
+     * excluded, the right {@link Chooser} will be queried to select one of those.
+     *
+     * @param dataKey the key that identifies the data.
+     * @param request_id the id of the request this execution belongs to.
+     * @param excludedProviders providers that must not be run.
+     * @param input the input data
+     * @throws ChooserNotDefinedException if there are multiple {@link Provider}s but no
+     *                                    {@link Chooser}.
+     * @throws ProviderForDataNotDefinedException if no provider was found that provides the given
+     *                                            data.
+     * @see #chooseProvider(List, String, long, Data...)
+     * @see #addProvider(String, String, Provider)
+     * @see #removeProvider(String)
+     * @see #getProvider(String)
+     * @see #produceData(String, long, Data...)
+     */
+    @SuppressWarnings("unchecked")
+    public void produceDataExcludeProviders(String dataKey, long request_id,
+                                            String[] excludedProviders,
+                                            Data... input){
+        List<String> providers = new ArrayList<>(providersOfData.getAll(dataKey));
+        providers.removeAll(Arrays.asList(excludedProviders));
+        chooseProvider(providers, dataKey, request_id, input);
     }
 
     /**
