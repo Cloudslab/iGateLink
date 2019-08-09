@@ -159,19 +159,18 @@ public class SimpleHttpConnection {
         return url.toString();
     }
 
-    //TODO getStream() for common code between get() and getBytes()
-
     /**
-     * Makes a GET request to the server.
+     * Makes a GET request to the server, returning the response as an {@link InputStream}.
      *
-     * @return the response of the server as a {@link String}
+     * @return the response of the server as an {@link InputStream}.
      * @throws IOException in case of an HTTP error.
+     * @see #get()
      * @see #getBytes()
      */
-    public String get() throws IOException {
-        InputStream stream = null;
+    public InputStream getStream() throws IOException{
         HttpURLConnection connection = null;
         String result = null;
+
         try {
             connection = (HttpURLConnection) url.openConnection();
             connection.setReadTimeout(readTimeout);
@@ -183,60 +182,61 @@ public class SimpleHttpConnection {
                 throw new IOException("HTTP error code: " + responseCode);
             }
 
-            // Retrieve the response body as an InputStream.
-            stream = connection.getInputStream();
+            return connection.getInputStream();
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+    }
+
+    /**
+     * Makes a GET request to the server, returning the response as a {@link String}.
+     *
+     * @return the response of the server as a {@link String}.
+     * @throws IOException in case of an HTTP error.
+     * @see #getStream()
+     * @see #getBytes()
+     */
+    public String get() throws IOException {
+        InputStream stream = null;
+        String result = null;
+
+        try {
+            stream = getStream();
 
             if (stream != null) {
                 result = readStream(stream);
             }
         } finally {
-            // Close Stream and disconnect HTTPS connection.
             if (stream != null) {
                 stream.close();
-            }
-            if (connection != null) {
-                connection.disconnect();
             }
         }
         return result;
     }
 
     /**
-     * Makes a GET request to the server.
+     * Makes a GET request to the server, returning the response as a byte array.
      *
      * @return the response of the server as a byte array ({@code byte[]}).
      * @throws IOException in case of an HTTP error.
+     * @see #getStream()
      * @see #get()
      */
     public byte[] getBytes() throws IOException {
         InputStream stream = null;
-        HttpURLConnection connection = null;
         byte[] result = null;
+
         try {
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setReadTimeout(readTimeout);
-            connection.setConnectTimeout(connectionTimeout);
-            connection.setRequestMethod("GET");
-
-            int responseCode = connection.getResponseCode();
-            if (responseCode != HttpsURLConnection.HTTP_OK) {
-                throw new IOException("HTTP error code: " + responseCode);
-            }
-
-            // Retrieve the response body as an InputStream.
-            stream = connection.getInputStream();
+            stream = getStream();
 
             if (stream != null) {
-                // Converts Stream to String with max length of 500.
                 result = readByteStream(stream);
             }
         } finally {
-            // Close Stream and disconnect HTTPS connection.
             if (stream != null) {
                 stream.close();
-            }
-            if (connection != null) {
-                connection.disconnect();
             }
         }
         return result;
