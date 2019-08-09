@@ -11,19 +11,41 @@ import java.util.HashMap;
 
 import static org.cloudbus.foggatewaylib.camera.CameraUtils.getCameraInstance;
 
+/**
+ * Basic provider for taking photos using CameraAPI v1.
+ * Only one photo should be taken at a time for the same request (id).
+ *
+ * @see <a href="https://developer.android.com/guide/topics/media/camera">https://developer.android.com/guide/topics/media/camera</a>
+ *
+ * @author Riccardo Mancini
+ */
 public class CameraProvider extends Provider<VoidData, ImageData> {
     public static final String TAG = "CameraProvider";
 
     private Camera mCamera;
 
+    /**
+     * Maps the request id to the orientation of the phone at the moment the photo was taken.
+     */
     private HashMap<Long, Integer> orientations;
 
+    /**
+     * Default constructor.
+     */
     public CameraProvider(){
         super(VoidData.class, ImageData.class);
         orientations = new HashMap<>();
     }
 
-    public void takePicture(final long requestID){
+    /**
+     * Takes a picture (non-blocking).
+     * It also saves the orientation of the phone when the photo was taken.
+     * It publishes a progress of 0 as the start of the request.
+     *
+     * @param requestID the id of the request the taken photo belongs to.
+     * @see Camera#takePicture(Camera.ShutterCallback, Camera.PictureCallback, Camera.PictureCallback)
+     */
+    private void takePicture(final long requestID){
         if (mCamera != null){
             Log.d(TAG, "Taking picture");
             publishProgress(requestID, 0, "Taking picture");
@@ -57,6 +79,12 @@ public class CameraProvider extends Provider<VoidData, ImageData> {
         }
     }
 
+    /**
+     * Get the camera instance (either a new one or an old one).
+     *
+     * @return the instance of the default camera of the device.
+     * @see CameraUtils#getCameraInstance()
+     */
     public Camera getCamera(){
         if (mCamera == null)
             mCamera = getCameraInstance();
@@ -77,6 +105,11 @@ public class CameraProvider extends Provider<VoidData, ImageData> {
         }
     }
 
+    /**
+     * When this provider is run, a picture is asynchronously taken.
+     *
+     * @see #takePicture(long)
+     */
     @Override
     public void execute(long requestID, VoidData... input) {
         takePicture(requestID);
