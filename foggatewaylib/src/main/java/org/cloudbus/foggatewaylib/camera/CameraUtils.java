@@ -101,38 +101,41 @@ public class CameraUtils {
         Matrix matrix = new Matrix();
 
         switch (orientation) {
-            case 1:
+            case ExifInterface.ORIENTATION_UNDEFINED:
+            case ExifInterface.ORIENTATION_NORMAL:
                 break;
-            case 2: // Flip X
+            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL: // Flip X
                 matrix.postScale(-1, 1);
                 matrix.postTranslate(-width, 0);
                 break;
-            case 3: // PI rotation
+            case ExifInterface.ORIENTATION_ROTATE_180: // PI rotation
                 matrix.postTranslate(width, height);
                 matrix.postRotate(180);
                 break;
-            case 4: // Flip Y
+            case ExifInterface.ORIENTATION_FLIP_VERTICAL: // Flip Y
                 matrix.postScale(1, -1);
                 matrix.postTranslate(0, -height);
                 break;
-            case 5: // - PI/2 and Flip X
+            case ExifInterface.ORIENTATION_TRANSPOSE: // - PI/2 and Flip X
                 matrix.postRotate(-90);
                 matrix.postScale(-1, 1);
                 break;
-            case 6: // -PI/2 and -width
+            case ExifInterface.ORIENTATION_ROTATE_90: // -PI/2 and -width
                 matrix.postTranslate(height, 0);
                 matrix.postRotate(90);
                 break;
-            case 7: // PI/2 and Flip
+            case ExifInterface.ORIENTATION_TRANSVERSE: // PI/2 and Flip
                 matrix.postScale(-1, 1);
                 matrix.postTranslate(-height, 0);
                 matrix.postTranslate(0, width);
                 matrix.postRotate(270);
                 break;
-            case 8: // PI / 2
+            case ExifInterface.ORIENTATION_ROTATE_270: // PI / 2
                 matrix.postTranslate(0, width);
                 matrix.postRotate(270);
                 break;
+            default:
+                throw new IllegalArgumentException("Unrecognized orientation: " + orientation);
         }
 
         return matrix;
