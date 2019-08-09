@@ -136,9 +136,8 @@ public class MultiMap<K, V> {
         if (set == null){
             set = new HashSet<>();
             map.put(key, set);
-            return true;
-        } else
-            return set.add(value);
+        }
+        return set.add(value);
     }
 
     /**
