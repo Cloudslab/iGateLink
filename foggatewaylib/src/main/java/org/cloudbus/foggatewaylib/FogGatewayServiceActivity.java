@@ -51,12 +51,15 @@ public abstract class FogGatewayServiceActivity extends AppCompatActivity
 
     /**
      * @return the {@link ExecutionManager} in the {@link FogGatewayService} bound to this
-     *         activity.
+     *         activity or {@code null} if no service is bound.
      * @see FogGatewayService#getExecutionManager()
      */
     @Override
     public ExecutionManager getExecutionManager() {
-        return fogGatewayService.getExecutionManager();
+        if (fogGatewayService != null)
+            return fogGatewayService.getExecutionManager();
+        else
+            return null;
     }
 
     @Override
