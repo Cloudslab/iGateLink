@@ -7,7 +7,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreference;
 
-import org.cloudbus.foggatewaylib.ExecutionManagerHolder;
+import org.cloudbus.foggatewaylib.ExecutionManager;
 import org.cloudbus.foggatewaylib.FogGatewayService;
 import org.cloudbus.foggatewaylib.FogGatewayServiceActivity;
 import org.cloudbus.foggatewaylib.ForegroundService;
@@ -23,7 +23,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         PreferenceManager.getDefaultSharedPreferences(getActivity())
                 .edit()
                 .putBoolean(KEY_ENABLE_SERVICES,
-                        ((ExecutionManagerHolder) getActivity()).getExecutionManager() != null)
+                        ((ExecutionManager.Holder) getActivity()).getExecutionManager() != null)
                 .apply();
 
         setPreferencesFromResource(R.xml.preferences, rootKey);

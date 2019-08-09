@@ -22,7 +22,7 @@ import java.util.Map;
  */
 //TODO consider moving to another package
 public abstract class FogGatewayServiceActivity extends AppCompatActivity
-                                         implements ServiceConnection, ExecutionManagerHolder {
+                                         implements ServiceConnection, ExecutionManager.Holder {
 
     public static final String TAG = "FGServiceActivity";
 

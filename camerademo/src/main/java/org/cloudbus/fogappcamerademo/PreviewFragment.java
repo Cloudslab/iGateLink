@@ -21,7 +21,6 @@ import androidx.navigation.Navigation;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.cloudbus.foggatewaylib.ExecutionManager;
-import org.cloudbus.foggatewaylib.ExecutionManagerHolder;
 import org.cloudbus.foggatewaylib.camera.CameraPreview;
 import org.cloudbus.foggatewaylib.camera.CameraProvider;
 import org.cloudbus.foggatewaylib.camera.CameraUtils;
@@ -47,7 +46,7 @@ public class PreviewFragment extends Fragment {
         if (getActivity() != null && checkCameraHardware(getActivity())){
 
             ExecutionManager executionManager
-                    = ((ExecutionManagerHolder)getActivity()).getExecutionManager();
+                    = ((ExecutionManager.Holder)getActivity()).getExecutionManager();
             if (executionManager == null)
                 return;
             // Create an instance of Camera
@@ -148,7 +147,7 @@ public class PreviewFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (getActivity() != null
-                && ((ExecutionManagerHolder) getActivity()).getExecutionManager() == null){
+                && ((ExecutionManager.Holder) getActivity()).getExecutionManager() == null){
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             alertDialog = builder.setMessage("Service is not running")
                     .setNegativeButton("Back", new DialogInterface.OnClickListener() {

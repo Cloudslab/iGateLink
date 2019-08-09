@@ -16,7 +16,6 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.cloudbus.foggatewaylib.ExecutionManager;
-import org.cloudbus.foggatewaylib.ExecutionManagerHolder;
 import org.cloudbus.foggatewaylib.FogGatewayService;
 import org.cloudbus.foggatewaylib.FogGatewayServiceActivity;
 import org.cloudbus.foggatewaylib.GenericData;
@@ -92,7 +91,7 @@ public class ResultFragment extends Fragment {
             return;
 
         ExecutionManager executionManager
-                = ((ExecutionManagerHolder)getActivity()).getExecutionManager();
+                = ((ExecutionManager.Holder)getActivity()).getExecutionManager();
         if (executionManager != null){
             initExecutionManager(executionManager);
         } else{
@@ -117,7 +116,7 @@ public class ResultFragment extends Fragment {
             return;
 
         ExecutionManager executionManager
-                = ((ExecutionManagerHolder)getActivity()).getExecutionManager();
+                = ((ExecutionManager.Holder)getActivity()).getExecutionManager();
         if (executionManager != null){
             executionManager.removeUITrigger("inputUpdateUI");
             executionManager.removeUITrigger("outputUpdateUI");

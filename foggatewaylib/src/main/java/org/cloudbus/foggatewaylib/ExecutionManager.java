@@ -714,4 +714,14 @@ public class ExecutionManager{
                     " but type " + otherType.getName() + " was given.");
         }
     }
+
+    /**
+     * Simple interface for a class that holds an {@link ExecutionManager} reference.
+     *
+     * @see ExecutionManager
+     *
+     */
+    public interface Holder {
+        ExecutionManager getExecutionManager();
+    }
 }

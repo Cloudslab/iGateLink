@@ -11,7 +11,7 @@ import android.os.Bundle;
  * @author Riccardo Mancini
  */
 //TODO consider moving to another package
-public class FogGatewayService extends ForegroundService implements ExecutionManagerHolder{
+public class FogGatewayService extends ForegroundService implements ExecutionManager.Holder {
     public static final String TAG = "FogGatewayService";
 
     private ExecutionManager executionManager;
