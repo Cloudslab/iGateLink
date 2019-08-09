@@ -12,6 +12,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import org.cloudbus.foggatewaylib.DummyProvider;
 import org.cloudbus.foggatewaylib.ExecutionManager;
 import org.cloudbus.foggatewaylib.FogGatewayServiceActivity;
 import org.cloudbus.foggatewaylib.GenericData;
@@ -118,7 +119,7 @@ public class MainActivity extends FogGatewayServiceActivity
                 .addProvider(KEY_PROVIDER_OUTPUT, KEY_DATA_OUTPUT,
                         new EdgeLensProvider(4))
                 .addProvider(KEY_PROVIDER_DUMMY, KEY_DATA_OUTPUT,
-                        new DummyProvider<>(ImageData.class))
+                        new DummyProvider<>(1, "Done", ImageData.class))
                 .addProvider(KEY_PROVIDER_INPUT_BITMAP, KEY_DATA_INPUT_BITMAP,
                         new BitmapProvider(ImageData.class, GenericData.class))
                 .addProvider(KEY_PROVIDER_OUTPUT_BITMAP, KEY_DATA_OUTPUT_BITMAP,
