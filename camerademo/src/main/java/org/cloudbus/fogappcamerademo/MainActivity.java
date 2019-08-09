@@ -16,8 +16,11 @@ import org.cloudbus.foggatewaylib.DummyProvider;
 import org.cloudbus.foggatewaylib.ExecutionManager;
 import org.cloudbus.foggatewaylib.FogGatewayServiceActivity;
 import org.cloudbus.foggatewaylib.GenericData;
+import org.cloudbus.foggatewaylib.IndividualTrigger;
 import org.cloudbus.foggatewaylib.ProduceDataTrigger;
+import org.cloudbus.foggatewaylib.ProgressData;
 import org.cloudbus.foggatewaylib.RoundRobinChooser;
+import org.cloudbus.foggatewaylib.Store;
 import org.cloudbus.foggatewaylib.camera.BitmapProvider;
 import org.cloudbus.foggatewaylib.camera.CameraProvider;
 import org.cloudbus.foggatewaylib.camera.ImageData;
@@ -38,6 +41,7 @@ public class MainActivity extends FogGatewayServiceActivity
     public static final String KEY_TRIGGER_EXEC = "execTrigger";
     public static final String KEY_TRIGGER_BITMAP_OUTPUT = "bitmapOutputTrigger";
     public static final String KEY_TRIGGER_BITMAP_INPUT = "bitmapInputTrigger";
+    public static final String KEY_TRIGGER_FALLBACK = "fallbackTrigger";
 
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 1;
 
@@ -130,6 +134,25 @@ public class MainActivity extends FogGatewayServiceActivity
                         new ProduceDataTrigger<>(KEY_DATA_INPUT_BITMAP, ImageData.class))
                 .addTrigger(KEY_DATA_OUTPUT, KEY_TRIGGER_BITMAP_OUTPUT,
                         new ProduceDataTrigger<>(KEY_DATA_OUTPUT_BITMAP, ImageData.class))
+                .addTrigger(ExecutionManager.KEY_DATA_PROGRESS, KEY_TRIGGER_FALLBACK,
+                        new IndividualTrigger<ProgressData>(ProgressData.class) {
+                            @Override
+                            public void onNewData(Store store, ProgressData data) {
+                                if (data.getProgress() < 0){
+                                    if (data.getPublisher().equals(KEY_PROVIDER_OUTPUT)
+                                            || data.getPublisher().equals(KEY_PROVIDER_DUMMY)){
+                                        getExecutionManager().produceDataExcludeProviders(
+                                                KEY_DATA_OUTPUT,
+                                                data.getRequestID(),
+                                                new String[]{data.getPublisher()},
+                                                getExecutionManager().getStore(KEY_DATA_INPUT)
+                                                        .retrieveLast(data.getRequestID())
+                                        );
+
+                                    }
+                                }
+                            }
+                        })
                 .addChooser(KEY_DATA_OUTPUT, new RoundRobinChooser());
     }
 }
