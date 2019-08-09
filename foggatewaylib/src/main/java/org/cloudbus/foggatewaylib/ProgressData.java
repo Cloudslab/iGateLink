@@ -10,8 +10,8 @@ package org.cloudbus.foggatewaylib;
  */
 public class ProgressData extends Data {
     /**
-     * Positive number from 1 to 99 if progress is being made, zero if nothing has been
-     * done, negative if an error occurred, 100 if the execution of the request is complete.
+     * Positive number from 0 to 99 if request is being processed, negative if an error occurred,
+     * 100 if the execution of the request is complete.
      */
     private int progress;
 
