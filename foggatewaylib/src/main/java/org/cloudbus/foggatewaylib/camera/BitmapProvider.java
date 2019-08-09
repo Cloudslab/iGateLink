@@ -9,8 +9,8 @@ import org.cloudbus.foggatewaylib.GenericData;
 import org.cloudbus.foggatewaylib.SequentialProvider;
 
 import static org.cloudbus.foggatewaylib.camera.CameraUtils.byteArray2Bitmap;
+import static org.cloudbus.foggatewaylib.camera.CameraUtils.getCorrectRotationBitmap;
 import static org.cloudbus.foggatewaylib.camera.CameraUtils.getExifOrientation;
-import static org.cloudbus.foggatewaylib.camera.CameraUtils.getcorrectRotationBitmap;
 
 /**
  * Basic provider that converts an image (as a byte array) to a {@link Bitmap}.
@@ -18,7 +18,7 @@ import static org.cloudbus.foggatewaylib.camera.CameraUtils.getcorrectRotationBi
  * in its EXIF metadata, it will also be transformed accordingly.
  *
  * @see CameraUtils#byteArray2Bitmap(byte[])
- * @see CameraUtils#getcorrectRotationBitmap(Bitmap, int)
+ * @see CameraUtils#getCorrectRotationBitmap(Bitmap, int)
  *
  * @author Riccardo Mancini
  */
@@ -39,9 +39,9 @@ public class BitmapProvider extends SequentialProvider<ImageData, GenericData> {
             ImageData imageData = input[i];
             Bitmap bitmap = byteArray2Bitmap(imageData.getBytes());
             if (imageData.getOrientation() == Configuration.ORIENTATION_UNDEFINED){
-                bitmap = getcorrectRotationBitmap(bitmap, getExifOrientation(imageData.getBytes()));
+                bitmap = getCorrectRotationBitmap(bitmap, getExifOrientation(imageData.getBytes()));
             } else if (imageData.getOrientation() == Configuration.ORIENTATION_PORTRAIT) {
-                bitmap = getcorrectRotationBitmap(bitmap, ExifInterface.ORIENTATION_ROTATE_90);
+                bitmap = getCorrectRotationBitmap(bitmap, ExifInterface.ORIENTATION_ROTATE_90);
             }
             output[i] = new GenericData<>(bitmap);
         }

@@ -157,15 +157,15 @@ public class CameraUtils {
      * @return the Exif orientation flag if found, {@link ExifInterface#ORIENTATION_NORMAL}
      * otherwise.
      */
-    //TODO consider returning ORIENTATION_UNDEFINED as a default instead
     public static int getExifOrientation(byte[] bytes){
         InputStream inputStream = new ByteArrayInputStream(bytes);
-        int orientation = ExifInterface.ORIENTATION_NORMAL;
+        int orientation = ExifInterface.ORIENTATION_UNDEFINED;
 
         try {
 
             ExifInterface exif = new ExifInterface(inputStream);
-            orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                                               ExifInterface.ORIENTATION_NORMAL);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -177,18 +177,22 @@ public class CameraUtils {
     /**
      * Rotates the image depending on the source orientation.
      *
-     * @param sourceBitmap the source image
-     * @param orientation the Exif orientation flag
-     * @return the rotated image
+     * @param sourceBitmap the source image.
+     * @param orientation the Exif orientation flag.
+     * @return the rotated image.
      */
-    public static Bitmap getcorrectRotationBitmap(Bitmap sourceBitmap, int orientation){
-        Log.d("DEBUG", "width = " + sourceBitmap.getWidth() + ", height = " + sourceBitmap.getHeight()  + ", orientation = " + orientation);
+    public static Bitmap getCorrectRotationBitmap(Bitmap sourceBitmap, int orientation){
+        int w = sourceBitmap.getWidth();
+        int h = sourceBitmap.getHeight();
 
-        if (orientation != ExifInterface.ORIENTATION_NORMAL)
-            return Bitmap.createBitmap(sourceBitmap, 0, 0, sourceBitmap.getWidth(), sourceBitmap.getHeight(),
-                    getExifTransformation(orientation, sourceBitmap.getWidth(), sourceBitmap.getHeight()),
-                    true);
-        else
+        Log.d("DEBUG", "width = " + w + ", height = " + h + ", orientation = "
+                + orientation);
+
+        Matrix matrix = getExifTransformation(orientation, w, h);
+
+        if (matrix.isIdentity())
             return sourceBitmap;
+        else
+            return Bitmap.createBitmap(sourceBitmap, 0, 0, w, h, matrix, true);
     }
 }
