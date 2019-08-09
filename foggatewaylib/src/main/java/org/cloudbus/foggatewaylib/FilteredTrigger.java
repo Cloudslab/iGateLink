@@ -48,8 +48,8 @@ public class FilteredTrigger<T extends Data> extends Trigger<T> {
      * id as the one set in this instance, the {@link Trigger#onDataStored(Store, Data[])} callback
      * of the wrapped {@link Trigger} will be called.
      *
-     * @param store reference to the {@link Store} the <code>data</code> is being added to.
-     * @param data the data that has been added to the <code>store</code>.
+     * @param store reference to the {@link Store} the {@code data} is being added to.
+     * @param data the data that has been added to the {@code store}.
      */
     @Override
     public void onDataStored(Store<T> store, T... data) {

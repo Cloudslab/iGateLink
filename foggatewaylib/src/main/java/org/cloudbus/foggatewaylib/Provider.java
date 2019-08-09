@@ -15,9 +15,9 @@ import java.util.Arrays;
  * Please note that, unless differently specified, the provider will run on the main thread, thus
  * the use of an {@link AsyncProvider} is highly encouraged.
  * <p>
- * Inside the {@link ExecutionManager}, each provider is associated with an <code>outputKey</code>,
+ * Inside the {@link ExecutionManager}, each provider is associated with an {@code outputKey},
  * which identifies in which {@link Store} to store the output from this provider. In case of
- * multiple providers for the same <code>outputKey</code>, a {@link Chooser} must be defined
+ * multiple providers for the same {@code outputKey}, a {@link Chooser} must be defined
  * within the {@link ExecutionManager} to choose between them on a per-request basis.
  * Furthermore, every Provider is linked to the same progress {@link Store}, which is used to
  * publish the current progress of the requests, such as errors, intermediate steps, final
@@ -217,7 +217,7 @@ public abstract class Provider<T extends Data, S extends Data>{
 
     /**
      * Provides output for the given {@link Data} input.
-     * Input {@link Data} will be cast to <code>T</code> at runtime and passed to
+     * Input {@link Data} will be cast to {@code T} at runtime and passed to
      * {@link #execute(long, Data[])}
      *
      * @param requestID the request id the given data refers to.

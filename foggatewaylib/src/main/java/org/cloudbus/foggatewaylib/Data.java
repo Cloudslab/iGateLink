@@ -20,12 +20,12 @@ public class Data implements Comparable<Data>{
     private long request_id;
 
     /**
-     * Used for generating unique auto-incrementing <code>id</code>s using {@link #incrementID}.
+     * Used for generating unique auto-incrementing {@code id}s using {@link #incrementID}.
      */
     private static long NEXT_ID = 1;
 
     /**
-     * Generates unique auto-incrementing <code>id</code>s.
+     * Generates unique auto-incrementing {@code id}s.
      *
      * @return unique auto-incremented ID
      * @see #NEXT_ID
@@ -35,7 +35,7 @@ public class Data implements Comparable<Data>{
     }
 
     /**
-     * Constructor for auto-incrementing <code>id</code> and default <code>request_id</code> (0).
+     * Constructor for auto-incrementing {@code id} and default {@code request_id} (0).
      *
      * @see #incrementID()
      */
@@ -44,19 +44,19 @@ public class Data implements Comparable<Data>{
     }
 
     /**
-     * Constructor for user-defined <code>id</code> and default <code>request_id</code> (0).
+     * Constructor for user-defined {@code id} and default {@code request_id} (0).
      *
-     * @param id the <code>id</code> to be set in the object.
+     * @param id the {@code id} to be set in the object.
      */
     public Data(long id){
         this.id = id;
     }
 
     /**
-     * Constructor for setting <code>id</code> to <code>date</code> in milliseconds and default
-     * <code>request_id</code> (0).
+     * Constructor for setting {@code id} to {@code date} in milliseconds and default
+     * {@code request_id} (0).
      *
-     * @param date the <code>date</code> whose milliseconds will be the object <code>id</code>.
+     * @param date the {@code date} whose milliseconds will be the object {@code id}.
      * @see Date#getTime()
      */
     public Data(Date date){
@@ -64,10 +64,10 @@ public class Data implements Comparable<Data>{
     }
 
     /**
-     * Constructor for setting <code>id</code> and <code>request_id</code> to user-defined values.
+     * Constructor for setting {@code id} and {@code request_id} to user-defined values.
      *
-     * @param id the <code>id</code> to be set in the object.
-     * @param request_id the <code>id</code> to be set in the object.
+     * @param id the {@code id} to be set in the object.
+     * @param request_id the {@code id} to be set in the object.
      */
     public Data(long id, long request_id){
         this.id = id;
@@ -75,11 +75,11 @@ public class Data implements Comparable<Data>{
     }
 
     /**
-     * Constructor for setting <code>id</code> to <code>date</code> in milliseconds and
-     * <code>request_id</code> to user-defined value.
+     * Constructor for setting {@code id} to {@code date} in milliseconds and
+     * {@code request_id} to user-defined value.
      *
-     * @param date the <code>date</code> whose milliseconds will be the object <code>id</code>.
-     * @param request_id the <code>id</code> to be set in the object.
+     * @param date the {@code date} whose milliseconds will be the object {@code id}.
+     * @param request_id the {@code id} to be set in the object.
      * @see Date#getTime()
      */
     public Data(Date date, long request_id){
@@ -88,38 +88,38 @@ public class Data implements Comparable<Data>{
     }
 
     /**
-     * @return this object <code>id</code>.
+     * @return this object {@code id}.
      */
     public long getId() {
         return id;
     }
 
     /**
-     * @param id the new value for the object <code>id</code>.
+     * @param id the new value for the object {@code id}.
      */
     public void setId(long id) {
         this.id = id;
     }
 
     /**
-     * @return this object <code>request_id</code>.
+     * @return this object {@code request_id}.
      */
     public long getRequestID() {
         return request_id;
     }
 
     /**
-     * @param request_id the new value for the object <code>request_id</code>.
+     * @param request_id the new value for the object {@code request_id}.
      */
     public void setRequestID(long request_id) {
         this.request_id = request_id;
     }
 
     /**
-     * Comparable interface for sorting <code>Data</code> objects based on their
-     * <code>id</code>.
+     * Comparable interface for sorting {@code Data} objects based on their
+     * {@code id}.
      *
-     * @param other the other <code>Data</code> to be compared.
+     * @param other the other {@code Data} to be compared.
      * @return a negative integer, zero, or a positive integer as this object
      *         is less than, equal to, or greater than the specified object.
      */

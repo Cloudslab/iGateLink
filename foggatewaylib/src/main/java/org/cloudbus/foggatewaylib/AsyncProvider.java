@@ -74,7 +74,7 @@ public abstract class AsyncProvider<T extends Data, S extends Data> extends Prov
 
     /**
      * Callback that will be called in {@link ProviderAsyncTask#onPostExecute(Data[])} in case
-     * an error occurred, after having published an error progress with <code>progress=-1<code>.
+     * an error occurred, after having published an error progress with {@code progress=-1}.
      *
      * @param requestID the id of the request that is being serviced.
      * @param throwable the throwable that caused the error.

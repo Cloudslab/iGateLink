@@ -36,7 +36,7 @@ public class ExecutionManager{
     public static final String KEY_DATA_PROGRESS = "progressStore";
 
     /**
-     * Used for generating unique auto-incrementing <code>request_id</code>s using
+     * Used for generating unique auto-incrementing {@code request_id}s using
      * {@link #nextRequestID()}.
      *
      * @see #nextRequestID()
@@ -157,7 +157,7 @@ public class ExecutionManager{
     }
 
     /**
-     * Generates unique auto-incrementing <code>requestID</code>s.
+     * Generates unique auto-incrementing {@code requestID}s.
      *
      * @return unique auto-incremented request ID.
      * @see #NEXT_REQUEST_ID
@@ -202,8 +202,8 @@ public class ExecutionManager{
     }
 
     /**
-     * Adds a new {@link Trigger} identified by the given <code>triggerKey</code> that operates
-     * on the {@link Store} identified by the <code>dataKey</code> in the given map.
+     * Adds a new {@link Trigger} identified by the given {@code triggerKey} that operates
+     * on the {@link Store} identified by the {@code dataKey} in the given map.
      * In case another {@link Trigger} already exists for the given key, the addition will be
      * aborted.
      *
@@ -244,8 +244,8 @@ public class ExecutionManager{
     }
 
     /**
-     * Adds a new {@link Trigger} identified by the given <code>triggerKey</code> that operates
-     * on the {@link Store} identified by the <code>dataKey</code> in {@link #triggers} map.
+     * Adds a new {@link Trigger} identified by the given {@code triggerKey} that operates
+     * on the {@link Store} identified by the {@code dataKey} in {@link #triggers} map.
      * In case another {@link Trigger} already exists for the given key, the addition will be
      * aborted.
      *
@@ -263,8 +263,8 @@ public class ExecutionManager{
     }
 
     /**
-     * Adds a new {@link Trigger} identified by the given <code>triggerKey</code> that operates
-     * on the {@link Store} identified by the <code>dataKey</code> in {@link #UITriggers} map.
+     * Adds a new {@link Trigger} identified by the given {@code triggerKey} that operates
+     * on the {@link Store} identified by the {@code dataKey} in {@link #UITriggers} map.
      * In case another {@link Trigger} already exists for the given key, the addition will be
      * aborted.
      *
@@ -284,10 +284,10 @@ public class ExecutionManager{
     }
 
     /**
-     * Adds a new {@link Trigger} identified by the given <code>triggerKey</code> that is sensible
-     * only to new data from the request identified by the <code>requestID</code> and that operates
-     * on the {@link Store} identified by the <code>dataKey</code> in {@link #UITriggers} map.
-     * The <code>trigger</code> will be wrapped inside a {@link FilteredTrigger}.
+     * Adds a new {@link Trigger} identified by the given {@code triggerKey} that is sensible
+     * only to new data from the request identified by the {@code requestID} and that operates
+     * on the {@link Store} identified by the {@code dataKey} in {@link #UITriggers} map.
+     * The {@code trigger} will be wrapped inside a {@link FilteredTrigger}.
      * In case another {@link Trigger} already exists for the given key, the addition will be
      * aborted.
      *
@@ -311,7 +311,7 @@ public class ExecutionManager{
     }
 
     /**
-     * Removes the {@link Trigger} identified by the given <code>triggerKey</code> from the
+     * Removes the {@link Trigger} identified by the given {@code triggerKey} from the
      * given map.
      *
      * @param triggerKey the key of the {@link Trigger}.
@@ -343,7 +343,7 @@ public class ExecutionManager{
     }
 
     /**
-     * Removes the {@link Trigger} identified by the given <code>triggerKey</code> from the
+     * Removes the {@link Trigger} identified by the given {@code triggerKey} from the
      * {@link #triggers} map.
      *
      * @param triggerKey the key of the {@link Trigger}.
@@ -356,7 +356,7 @@ public class ExecutionManager{
     }
 
     /**
-     * Removes the {@link Trigger} identified by the given <code>triggerKey</code> from the
+     * Removes the {@link Trigger} identified by the given {@code triggerKey} from the
      * {@link #triggers} map.
      *
      * @param triggerKey the key of the {@link Trigger}.
@@ -369,7 +369,7 @@ public class ExecutionManager{
     }
 
     /**
-     * Removes the {@link Trigger} identified by the given <code>triggerKey</code> from the
+     * Removes the {@link Trigger} identified by the given {@code triggerKey} from the
      * {@link #UITriggers} map.
      *
      * @param triggerKey the key of the {@link Trigger}.
@@ -385,14 +385,14 @@ public class ExecutionManager{
 
     /**
      * Checks if a {@link Store} for the given key exists and if the data it constains is of the
-     * same type of <code>type</code>. If it does not exist and <code>autoCreate</code> is set to
+     * same type of {@code type}. If it does not exist and {@code autoCreate} is set to
      * true, then it will be created using a new unlimited {@link InMemoryStore}.
      *
      * @param key the key of the store to check.
      * @param type the type of the data we want to check against.
      * @param autoCreate if true, the store will be created if not found.
      * @throws StoreNotDefinedException thrown if no store is found.
-     * @throws TypeMismatchException thrown if <code>type</code> is not the same as the
+     * @throws TypeMismatchException thrown if {@code type} is not the same as the
      *                               {@link Store#getDataType()}'
      * @see #addStore(String, Store)
      * @see #addProvider(String, String, Provider)
@@ -460,9 +460,9 @@ public class ExecutionManager{
     }
 
     /**
-     * Adds a new {@link Provider} identified by the given <code>providerKey</code> that
-     * provides data identified by the key <code>outputKey</code>.
-     * If no {@link Store} is found for the given <code>outputKey</code>, a new one will be
+     * Adds a new {@link Provider} identified by the given {@code providerKey} that
+     * provides data identified by the key {@code outputKey}.
+     * If no {@link Store} is found for the given {@code outputKey}, a new one will be
      * created as in {@link #checkStore(String, Class, boolean)}.
      *
      * @param providerKey the key that identifies the {@link Provider}.
@@ -558,7 +558,7 @@ public class ExecutionManager{
      *                                    {@link Chooser}.
      * @throws ProviderForDataNotDefinedException if no provider was found that provides the given
      *                                            data.
-     * @see #produceData(String, long, Data...) 
+     * @see #produceData(String, long, Data...)
      * @see #produceDataExcludeProviders(String, long, String[], Data...)
      */
     private void chooseProvider(List<String> providers, String dataKey, long request_id,

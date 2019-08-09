@@ -20,8 +20,8 @@ public abstract class IndividualTrigger<T extends Data> extends Trigger<T> {
      * Callback called after data is being added to the {@link Store}.
      * It will be called once for every data added.
      *
-     * @param store reference to the {@link Store} the <code>data</code> is being added to.
-     * @param data the individual data that has been added to the <code>store</code>.
+     * @param store reference to the {@link Store} the {@code data} is being added to.
+     * @param data the individual data that has been added to the {@code store}.
      * @see #onDataStored(Store, Data[])
      */
     public abstract void onNewData(Store<T> store, T data);
@@ -30,8 +30,8 @@ public abstract class IndividualTrigger<T extends Data> extends Trigger<T> {
      * Callback called after data is being added to the {@link Store}.
      * It will be call {@link #onNewData(Store, Data)} for every new data.
      *
-     * @param store reference to the {@link Store} the <code>data</code> is being added to.
-     * @param data the  data that has been added to the <code>store</code>.
+     * @param store reference to the {@link Store} the {@code data} is being added to.
+     * @param data the  data that has been added to the {@code store}.
      * @see #onNewData(Store, Data)
      */
     @Override
