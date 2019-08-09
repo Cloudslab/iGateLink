@@ -195,9 +195,7 @@ public abstract class ForegroundService extends Service {
      *
      * @see #stopMe()
      */
-    public void onStop(){
-
-    }
+    public void onStop(){  }
 
     /**
      * Starts the service in the foreground.
@@ -313,15 +311,5 @@ public abstract class ForegroundService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return binder;
-    }
-
-    /**
-     * Calls {@link #onStop()} before being destroyed.
-     */
-    //TODO check whether onStop() is called twice when stopMe() is called
-    @Override
-    public final void onDestroy() {
-        super.onDestroy();
-        onStop();
     }
 }
