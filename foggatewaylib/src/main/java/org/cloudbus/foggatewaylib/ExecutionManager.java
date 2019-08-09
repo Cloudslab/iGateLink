@@ -488,6 +488,7 @@ public class ExecutionManager{
         providersOfData.put(outputKey, providerKey);
 
         provider.attach(this,
+                providerKey,
                 stores.get(outputKey),
                 stores.get(KEY_DATA_PROGRESS));
 

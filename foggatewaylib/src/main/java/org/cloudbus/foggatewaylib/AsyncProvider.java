@@ -210,7 +210,7 @@ public abstract class AsyncProvider<T extends Data, S extends Data> extends Prov
          */
         @Override
         public void publish(int progress, String message) {
-            publishProgress(new ProgressData(requestID, progress, message));
+            publishProgress(new ProgressData(getProviderKey(), requestID, progress, message));
         }
 
         /**

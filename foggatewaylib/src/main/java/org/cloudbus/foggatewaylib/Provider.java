@@ -47,6 +47,11 @@ public abstract class Provider<T extends Data, S extends Data>{
     private Class<S> outputType;
 
     /**
+     * Unique key for this provider.
+     */
+    private String providerKey;
+
+    /**
      * The {@link ExecutionManager} this provider is associated with.
      */
     private ExecutionManager executionManager;
@@ -81,16 +86,25 @@ public abstract class Provider<T extends Data, S extends Data>{
     public Class<S> getOutputType(){return outputType;}
 
     /**
+     * @return key for this provider in the {@link ExecutionManager}.
+     */
+    @Nullable
+    public String getProviderKey() {
+        return providerKey;
+    }
+
+    /**
      * Attaches this provider to the given {@link ExecutionManager} and @{link Store}s.
      *
      * @param executionManager the {@link ExecutionManager} this provider will be bound to.
+     * @param providerKey the key of this provider in the {@link ExecutionManager}.
      * @param outStore the {@link Store} to be used for storing the output of this provider.
      * @param progressStore the {@link Store} to be used for storing the progress of this provider.
      * @see #onAttach()
      * @see #detach()
      */
-    void attach(ExecutionManager executionManager, Store<S> outStore,
-                       Store<ProgressData> progressStore){
+    void attach(ExecutionManager executionManager, String providerKey, Store<S> outStore,
+                Store<ProgressData> progressStore){
         this.executionManager = executionManager;
         if (executionManager == null){
             Log.e(TAG, "executionManager is null");
@@ -98,6 +112,7 @@ public abstract class Provider<T extends Data, S extends Data>{
         }
         this.outStore = outStore;
         this.progressStore = progressStore;
+        this.providerKey = providerKey;
         onAttach();
     }
 
@@ -130,7 +145,7 @@ public abstract class Provider<T extends Data, S extends Data>{
      * @see ProgressData
      */
     protected void publishProgress(long requestID, int progress, String message){
-        progressStore.store(new ProgressData(requestID, progress, message));
+        progressStore.store(new ProgressData(providerKey, requestID, progress, message));
     }
 
     /**
