@@ -119,7 +119,7 @@ public class MainActivity extends FogGatewayServiceActivity
                 .addProvider(KEY_PROVIDER_OUTPUT, KEY_DATA_OUTPUT,
                         new EdgeLensProvider(4))
                 .addProvider(KEY_PROVIDER_DUMMY, KEY_DATA_OUTPUT,
-                        new DummyProvider<>(1, "Done", ImageData.class))
+                        new DummyProvider<>(100, "Done", ImageData.class))
                 .addProvider(KEY_PROVIDER_INPUT_BITMAP, KEY_DATA_INPUT_BITMAP,
                         new BitmapProvider(ImageData.class, GenericData.class))
                 .addProvider(KEY_PROVIDER_OUTPUT_BITMAP, KEY_DATA_OUTPUT_BITMAP,

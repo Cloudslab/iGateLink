@@ -205,7 +205,7 @@ public class ResultFragment extends Fragment {
                 progressBar.show();
                 progressText.setText(data.getMessage());
                 break;
-            case 1:
+            case 100:
                 progressBar.hide();
                 progressText.setText(data.getMessage());
                 break;

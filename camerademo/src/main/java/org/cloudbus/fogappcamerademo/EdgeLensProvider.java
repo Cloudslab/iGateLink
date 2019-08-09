@@ -95,7 +95,7 @@ public class EdgeLensProvider extends ThreadPoolProvider<ImageData, ImageData> {
 
         Log.d(TAG, "Output retrieved (length = " + output.getBytes().length + ")");
 
-        progressPublisher.publish(1, "Done");
+        progressPublisher.publish(100, "Done");
 
         return new ImageData[]{output};
     }
