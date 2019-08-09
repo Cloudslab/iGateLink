@@ -5,6 +5,13 @@ import android.util.Base64;
 import org.cloudbus.foggatewaylib.GenericData;
 import org.cloudbus.foggatewaylib.SequentialProvider;
 
+/**
+ * Basic provider that converts an image (as a byte array) to a Base64 String.
+ *
+ * @see Base64#encodeToString(byte[], int)
+ *
+ * @author Riccardo Mancini
+ */
 public class Base64Provider extends SequentialProvider<ImageData, GenericData> {
 
     public Base64Provider(Class<ImageData> inputType,
