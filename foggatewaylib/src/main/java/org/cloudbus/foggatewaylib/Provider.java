@@ -1,5 +1,7 @@
 package org.cloudbus.foggatewaylib;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -142,6 +144,7 @@ public abstract class Provider<T extends Data, S extends Data>{
      * @param progress refer to {@link ProgressData#progress}
      * @param message refer to {@link ProgressData#message}
      * @see #publishProgresses(long, ProgressData...)
+     * @see #publishProgressThreadSafe(long, int, String)
      * @see ProgressData
      */
     protected void publishProgress(long requestID, int progress, String message){
@@ -151,10 +154,37 @@ public abstract class Provider<T extends Data, S extends Data>{
     /**
      * Notifies about current progress in the execution of the request. The progress update must
      * refer to the whole request, of which this provider could be just an intermediate step.
+     * If called from a thread different from the main thread, it will execute in the main thread
+     * by using the main thread handler.
+     *
+     * @param requestID the request id this progress refers to.
+     * @param progress refer to {@link ProgressData#progress}
+     * @param message refer to {@link ProgressData#message}
+     * @see #publishProgresses(long, ProgressData...)
+     * @see #publishProgress(long, int, String)
+     * @see ProgressData
+     */
+    protected void publishProgressThreadSafe(final long requestID, final int progress,
+                                             final String message){
+        if (Looper.myLooper() == Looper.getMainLooper())
+            publishProgress(requestID, progress, message);
+        else
+            runInMainThread(new Runnable() {
+                @Override
+                public void run() {
+                    publishProgress(requestID, progress, message);
+                }
+            });
+    }
+
+    /**
+     * Notifies about current progress in the execution of the request. The progress update must
+     * refer to the whole request, of which this provider could be just an intermediate step.
      *
      * @param requestID the request id this progress refers to.
      * @param progressData the progress data to be stored.
      * @see #publishProgress(long, int, String)
+     * @see #publishProgressesThreadSafe(long, ProgressData...)
      * @see ProgressData
      */
     protected void publishProgresses(long requestID, ProgressData... progressData){
@@ -164,11 +194,37 @@ public abstract class Provider<T extends Data, S extends Data>{
     }
 
     /**
+     * Notifies about current progress in the execution of the request. The progress update must
+     * refer to the whole request, of which this provider could be just an intermediate step.
+     * If called from a thread different from the main thread, it will execute in the main thread
+     * by using the main thread handler.
+     *
+     * @param requestID the request id this progress refers to.
+     * @param progressData the progress data to be stored.
+     * @see #publishProgress(long, int, String)
+     * @see #publishProgresses(long, ProgressData...)
+     * @see ProgressData
+     */
+    protected void publishProgressesThreadSafe(final long requestID,
+                                               final ProgressData... progressData){
+        if (Looper.myLooper() == Looper.getMainLooper())
+            publishProgresses(requestID, progressData);
+        else
+            runInMainThread(new Runnable() {
+                @Override
+                public void run() {
+                    publishProgresses(requestID, progressData);
+                }
+            });
+    }
+
+    /**
      * Publishes the result of the execution in the {@link #outStore}.
      *
      * @param requestID the request id the data refers to.
      * @param data the data to be stored.
      * @see #publishResults(Data[])
+     * @see #publishResultsThreadSafe(long, Data[])
      */
     protected void publishResults(long requestID, S... data){
         for (S d:data)
@@ -178,12 +234,56 @@ public abstract class Provider<T extends Data, S extends Data>{
 
     /**
      * Publishes the result of the execution in the {@link #outStore}.
+     * If called from a thread different from the main thread, it will execute in the main thread
+     * by using the main thread handler.
+     *
+     * @param requestID the request id the data refers to.
+     * @param data the data to be stored.
+     * @see #publishResultsThreadSafe(Data[])
+     * @see #publishResults(long, Data[])
+     */
+    protected void publishResultsThreadSafe(final long requestID, final S... data){
+        if (Looper.myLooper() == Looper.getMainLooper())
+            publishResults(requestID, data);
+        else
+            runInMainThread(new Runnable() {
+                @Override
+                public void run() {
+                    publishResults(requestID, data);
+                }
+            });
+    }
+
+    /**
+     * Publishes the result of the execution in the {@link #outStore}.
      *
      * @param data the data to be stored.
-     * @see #publishResults(Data[])
+     * @see #publishResults(long, Data[])
+     * @see #publishResultsThreadSafe(Data[])
      */
     protected void publishResults(S... data){
         outStore.store(data);
+    }
+
+    /**
+     * Publishes the result of the execution in the {@link #outStore}.
+     * If called from a thread different from the main thread, it will execute in the main thread
+     * by using the main thread handler.
+     *
+     * @param data the data to be stored.
+     * @see #publishResultsThreadSafe(long, Data[])
+     * @see #publishResults(Data[])
+     */
+    protected void publishResultsThreadSafe(final S... data){
+        if (Looper.myLooper() == Looper.getMainLooper())
+            publishResults(data);
+        else
+            runInMainThread(new Runnable() {
+                @Override
+                public void run() {
+                    publishResults(data);
+                }
+            });
     }
 
     /**
@@ -228,5 +328,11 @@ public abstract class Provider<T extends Data, S extends Data>{
     public void executeCast(long requestID, Data... input){
         execute(requestID, Arrays.asList(input).toArray(
                 (T[]) Array.newInstance(getInputType(), input.length)));
+    }
+
+    protected void runInMainThread(Runnable runnable){
+        if (this.executionManager != null && this.executionManager.getContext() != null){
+           new Handler(this.executionManager.getContext().getMainLooper()).post(runnable);
+        }
     }
 }
