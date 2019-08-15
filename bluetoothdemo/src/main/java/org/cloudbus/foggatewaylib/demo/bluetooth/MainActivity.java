@@ -28,7 +28,7 @@ public class MainActivity extends FogGatewayServiceActivity
     public static final String KEY_DATA_OUTPUT = "output";
     public static final String KEY_PROVIDER_INPUT = "inputProvider";
     public static final String KEY_PROVIDER_OUTPUT = "outputProvider";
-    public static final String KEY_TRIGGER_EXEC = "execTrigger";
+    public static final String KEY_PROVIDER_LOCAL = "localProvider";
 
     public static final String[] PERMISSIONS = new String[]{
             Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -92,7 +92,10 @@ public class MainActivity extends FogGatewayServiceActivity
                 .addProvider(KEY_PROVIDER_INPUT, KEY_DATA_INPUT,
                         new BluetoothLeOximeterLeNotifyProvider())
                 .addProvider(KEY_PROVIDER_OUTPUT, KEY_DATA_OUTPUT,
-                        new HealthKeeperProvider());
+                        new HealthKeeperProvider())
+                .addProvider(KEY_PROVIDER_LOCAL, KEY_DATA_OUTPUT,
+                        new LocalProvider())
+                .addChooser(KEY_DATA_OUTPUT, new MyChooser());
     }
 
     @Override
