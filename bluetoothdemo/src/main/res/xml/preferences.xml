@@ -6,16 +6,19 @@
         app:key="fogbus_master_ip"
         app:title="FogBus Master IP"
         app:useSimpleSummaryProvider="true"/>
-
-    <androidx.preference.SwitchPreference
-        app:key="enable_services"
-        app:title="Enable services"
-        app:defaultValue="false"/>
+    <androidx.preference.Preference
+        app:key="configure_master"
+        app:title="Configure Master" />
 
     <androidx.preference.EditTextPreference
         app:key="bluetooth_scan_timeout"
         app:title="Bluetooth Scan Timeout (seconds)"
         app:useSimpleSummaryProvider="true"
         app:defaultValue="10"/>
+
+    <androidx.preference.SwitchPreference
+        app:key="enable_services"
+        app:title="Enable services"
+        app:defaultValue="false"/>
 
 </androidx.preference.PreferenceScreen>
