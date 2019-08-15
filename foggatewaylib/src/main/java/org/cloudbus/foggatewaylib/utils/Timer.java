@@ -1,5 +1,7 @@
 package org.cloudbus.foggatewaylib.utils;
 
+import android.os.Handler;
+
 import java.util.TimerTask;
 
 /**
@@ -14,6 +16,7 @@ public class Timer {
     private int delay;
     private int period;
     private Runnable runnable;
+    private Handler handler;
 
     /**
      * Constructor that creates a timer that will run the given {@link Runnable} every
@@ -56,9 +59,19 @@ public class Timer {
         timer = new java.util.Timer();
         TimerTask timerTask = new TimerTask() {
             public void run() {
-                runnable.run();
+                if (handler == null)
+                    runnable.run();
+                else
+                    handler.post(runnable);
             }
         };
         timer.schedule(timerTask, delay, period);
+    }
+
+    /**
+     * Sets the handler in which the Runnable shold run.
+     */
+    public void setHandler(Handler handler){
+        this.handler = handler;
     }
 }
