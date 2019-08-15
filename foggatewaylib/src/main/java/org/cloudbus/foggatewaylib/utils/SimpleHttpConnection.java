@@ -160,34 +160,19 @@ public class SimpleHttpConnection {
     }
 
     /**
-     * Makes a GET request to the server, returning the response as an {@link InputStream}.
+     * Sets up the connection (timeouts and method).
      *
+     * @param connection the connection
+     * @param method the method to be used: {@code "GET"} or {@code "POST"}.
      * @return the response of the server as an {@link InputStream}.
      * @throws IOException in case of an HTTP error.
      * @see #get()
      * @see #getBytes()
      */
-    public InputStream getStream() throws IOException{
-        HttpURLConnection connection = null;
-        String result = null;
-
-        try {
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setReadTimeout(readTimeout);
-            connection.setConnectTimeout(connectionTimeout);
-            connection.setRequestMethod("GET");
-
-            int responseCode = connection.getResponseCode();
-            if (responseCode != HttpsURLConnection.HTTP_OK) {
-                throw new IOException("HTTP error code: " + responseCode);
-            }
-
-            return connection.getInputStream();
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-        }
+    private void setupConnection(HttpURLConnection connection, String method) throws IOException{
+        connection.setReadTimeout(readTimeout);
+        connection.setConnectTimeout(connectionTimeout);
+        connection.setRequestMethod(method);
     }
 
     /**
@@ -195,20 +180,32 @@ public class SimpleHttpConnection {
      *
      * @return the response of the server as a {@link String}.
      * @throws IOException in case of an HTTP error.
-     * @see #getStream()
+     * @see #setupConnection(HttpURLConnection, String)
      * @see #getBytes()
      */
     public String get() throws IOException {
+        HttpURLConnection connection = null;
         InputStream stream = null;
         String result = null;
 
         try {
-            stream = getStream();
+            connection = (HttpURLConnection) url.openConnection();
+            setupConnection(connection, "GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode != HttpsURLConnection.HTTP_OK) {
+                throw new IOException("HTTP error code: " + responseCode);
+            }
+
+            stream = connection.getInputStream();
 
             if (stream != null) {
                 result = readStream(stream);
             }
         } finally {
+            if (connection != null){
+                connection.disconnect();
+            }
             if (stream != null) {
                 stream.close();
             }
@@ -221,20 +218,31 @@ public class SimpleHttpConnection {
      *
      * @return the response of the server as a byte array ({@code byte[]}).
      * @throws IOException in case of an HTTP error.
-     * @see #getStream()
+     * @see #setupConnection(HttpURLConnection, String)
      * @see #get()
      */
     public byte[] getBytes() throws IOException {
+        HttpURLConnection connection = null;
         InputStream stream = null;
         byte[] result = null;
 
         try {
-            stream = getStream();
+            connection = (HttpURLConnection) url.openConnection();
+            setupConnection(connection, "GET");
 
+            int responseCode = connection.getResponseCode();
+            if (responseCode != HttpsURLConnection.HTTP_OK) {
+                throw new IOException("HTTP error code: " + responseCode);
+            }
+
+            stream = connection.getInputStream();
             if (stream != null) {
                 result = readByteStream(stream);
             }
         } finally {
+            if (connection != null){
+                connection.disconnect();
+            }
             if (stream != null) {
                 stream.close();
             }
@@ -258,9 +266,7 @@ public class SimpleHttpConnection {
         String result = null;
         try {
             connection = (HttpURLConnection) url.openConnection();
-            connection.setReadTimeout(readTimeout);
-            connection.setConnectTimeout(connectionTimeout);
-            connection.setRequestMethod("POST");
+            setupConnection(connection, "POST");
 
             outputStream = connection.getOutputStream();
             outputStream.write(bytes);
