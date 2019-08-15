@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +26,6 @@ import org.cloudbus.foggatewaylib.bluetooth.SimpleBluetoothLeAdapter;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 
 /**
@@ -334,6 +332,6 @@ public class PairBluetoothFragment extends Fragment
      */
     public interface OnPairDevice {
         void onDevicePaired(BluetoothGatt gatt);
-        Set<Pair<UUID, UUID>>[] getRequirements();
+        Set<BluetoothLeHandler.ServiceCharacteristicPair>[] getRequirements();
     }
 }

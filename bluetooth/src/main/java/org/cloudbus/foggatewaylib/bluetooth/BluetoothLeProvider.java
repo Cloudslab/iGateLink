@@ -2,7 +2,6 @@ package org.cloudbus.foggatewaylib.bluetooth;
 
 import android.bluetooth.BluetoothGatt;
 import android.os.Build;
-import android.util.Pair;
 
 import androidx.annotation.RequiresApi;
 
@@ -74,7 +73,7 @@ public abstract class BluetoothLeProvider<T extends Data, S extends Data> extend
             getBluetoothLeHandler().setContext(null);
     }
 
-    public Pair<UUID, UUID> getHandledCharacteristic(){
-        return new Pair<>(service, characteristic);
+    public BluetoothLeHandler.ServiceCharacteristicPair getHandledCharacteristic(){
+        return new BluetoothLeHandler.ServiceCharacteristicPair(service, characteristic);
     }
 }

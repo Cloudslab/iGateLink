@@ -4,7 +4,6 @@ import android.Manifest;
 import android.bluetooth.BluetoothGatt;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Pair;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -15,12 +14,12 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import org.cloudbus.foggatewaylib.bluetooth.BluetoothLeHandler;
 import org.cloudbus.foggatewaylib.core.ExecutionManager;
 import org.cloudbus.foggatewaylib.service.FogGatewayServiceActivity;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 public class MainActivity extends FogGatewayServiceActivity
         implements PairBluetoothFragment.OnPairDevice {
@@ -101,10 +100,13 @@ public class MainActivity extends FogGatewayServiceActivity
     }
 
     @Override
-    public Set<Pair<UUID, UUID>>[] getRequirements() {
-        Pair<UUID, UUID> requirement = new Pair<>(BluetoothLeOximeterLeProvider.SERVICE_UUID,
-                                                  BluetoothLeOximeterLeProvider.CHARACTERISTIC_UUID);
-        Set<Pair<UUID, UUID>> set = new HashSet<>();
+    @SuppressWarnings("unchecked")
+    public Set<BluetoothLeHandler.ServiceCharacteristicPair>[] getRequirements() {
+        BluetoothLeHandler.ServiceCharacteristicPair requirement
+                = new BluetoothLeHandler.ServiceCharacteristicPair(
+                        BluetoothLeOximeterLeProvider.SERVICE_UUID,
+                        BluetoothLeOximeterLeProvider.CHARACTERISTIC_UUID);
+        Set<BluetoothLeHandler.ServiceCharacteristicPair> set = new HashSet<>();
         set.add(requirement);
 
         return new Set[]{set};
