@@ -32,4 +32,5 @@ ext{
     preference_version = "1.1.0-rc01"
     material_version = '1.1.0-alpha09'
     exif_version = "1.1.0-beta01"
+    recyclerview_version = "1.1.0-beta02"
 }
