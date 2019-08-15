@@ -10,6 +10,3 @@
 .attach*
 ExampleInstrumentedTest.java
 ExampleUnitTest.java
-gradle-wrapper.jar
-gradlew
-gradlew.bat
