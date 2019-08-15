@@ -47,6 +47,8 @@ public class HealthKeeperProvider extends SequentialProvider<OximeterData, Analy
     public AnalysisResultData[] getData(ProgressPublisher progressPublisher,
                                long requestID, OximeterData... input) throws Exception {
 
+        progressPublisher.publish(0, "Uploading data...");
+
         SimpleHttpConnection connection;
 
         if (input.length == 0)
@@ -73,8 +75,6 @@ public class HealthKeeperProvider extends SequentialProvider<OximeterData, Analy
 
 
         Log.d(TAG, "Starting execution...");
-
-        progressPublisher.publish(0, "Uploading data...");
 
         connection = new SimpleHttpConnection(masterIP, SESSION_URL, params);
         connection.setReadTimeout(10000);
