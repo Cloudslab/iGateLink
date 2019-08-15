@@ -90,7 +90,7 @@ public class MainActivity extends FogGatewayServiceActivity
     protected void initExecutionManager(ExecutionManager executionManager) {
         executionManager
                 .addProvider(KEY_PROVIDER_INPUT, KEY_DATA_INPUT,
-                        new BluetoothLeOximeterLeProvider())
+                        new BluetoothLeOximeterLeNotifyProvider())
                 .addProvider(KEY_PROVIDER_OUTPUT, KEY_DATA_OUTPUT,
                         new HealthKeeperProvider());
     }
@@ -104,8 +104,8 @@ public class MainActivity extends FogGatewayServiceActivity
     public Set<BluetoothLeHandler.ServiceCharacteristicPair>[] getRequirements() {
         BluetoothLeHandler.ServiceCharacteristicPair requirement
                 = new BluetoothLeHandler.ServiceCharacteristicPair(
-                        BluetoothLeOximeterLeProvider.SERVICE_UUID,
-                        BluetoothLeOximeterLeProvider.CHARACTERISTIC_UUID);
+                        BluetoothLeOximeterLeNotifyProvider.SERVICE_UUID,
+                        BluetoothLeOximeterLeNotifyProvider.CHARACTERISTIC_UUID);
         Set<BluetoothLeHandler.ServiceCharacteristicPair> set = new HashSet<>();
         set.add(requirement);
 

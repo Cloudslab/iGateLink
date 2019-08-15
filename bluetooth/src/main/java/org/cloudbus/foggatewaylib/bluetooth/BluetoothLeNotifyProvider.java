@@ -20,7 +20,7 @@ import java.util.UUID;
  *
  * @author Riccardo Mancini
  */
-public abstract class BluetoothLeNotifyLeProvider<T extends Data>
+public abstract class BluetoothLeNotifyProvider<T extends Data>
         extends BluetoothLeProvider<VoidData, T> {
 
     private BluetoothGattCallback callback = new BluetoothNotifyProviderGattCallback();
@@ -28,16 +28,16 @@ public abstract class BluetoothLeNotifyLeProvider<T extends Data>
     /**
      * Constructs a provider with the given parameters.
      */
-    public BluetoothLeNotifyLeProvider(BluetoothGatt gatt, UUID service, UUID characteristic,
-                                       Class<T> outputType) {
+    public BluetoothLeNotifyProvider(BluetoothGatt gatt, UUID service, UUID characteristic,
+                                     Class<T> outputType) {
         super(gatt, service, characteristic, VoidData.class, outputType);
     }
 
     /**
      * Constructs a provider with the given parameters that listens to all possible devices.
      */
-    public BluetoothLeNotifyLeProvider(UUID service, UUID characteristic,
-                                       Class<T> outputType) {
+    public BluetoothLeNotifyProvider(UUID service, UUID characteristic,
+                                     Class<T> outputType) {
         super(null, service, characteristic, VoidData.class, outputType);
     }
 
