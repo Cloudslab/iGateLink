@@ -39,6 +39,18 @@ The main components are:
     associated with that store are fired. For example, a `Trigger` could
     start a `Provider` with the recently stored `Data`.
 
+## Project Structure
+ * `bluetooth`: module for bluetooth integration.
+ * `bluetoothdemo`: demo application for bluetooth using 
+    [FogBus](https://github.com/Cloudslab/FogBus):
+ * `camera`: module for simple camera integration.
+ * `camerademo`: demo application for camera using 
+    [EdgeLens](https://github.com/Cloudslab/EdgeLens).
+ * `core`: module containing the library core.
+ * `service`: module for integrating the library with a Foreground 
+    Service.  
+    
+
 ___
 
 Copyright 2019 The Cloud Computing and Distributed Systems (CLOUDS) 
