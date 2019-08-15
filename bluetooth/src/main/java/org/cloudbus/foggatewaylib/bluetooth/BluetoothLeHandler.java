@@ -56,7 +56,7 @@ public class BluetoothLeHandler {
     /**
      * The {@link BluetoothGatt}s connected.
      */
-    private Set<BluetoothGatt> gatts = new HashSet<>();
+    private Map<BluetoothDevice, BluetoothGatt> gatts = new HashMap<>();
 
     /**
      * The provided callbacks associated with a {@link ServiceCharacteristicPair}.
@@ -144,8 +144,8 @@ public class BluetoothLeHandler {
      * NB: also {@link BluetoothGatt}s that are not yet connected can be returned.
      */
     @NonNull
-    public Set<BluetoothGatt> getGatts() {
-        return gatts;
+    public Collection<BluetoothGatt> getGatts() {
+        return gatts.values();
     }
 
     /**
@@ -160,9 +160,9 @@ public class BluetoothLeHandler {
         if (bluetoothLeAdapter == null)
             return devices;
 
-        for (BluetoothGatt gatt:gatts){
-            if (bluetoothLeAdapter.isDeviceConnected(gatt.getDevice()))
-                devices.add(gatt.getDevice());
+        for (BluetoothDevice device:gatts.keySet()){
+            if (bluetoothLeAdapter.isDeviceConnected(device))
+                devices.add(device);
         }
 
         return devices;
@@ -306,10 +306,15 @@ public class BluetoothLeHandler {
 
         BluetoothGatt gatt = device.connectGatt(context, true, mCallback);
 
-        if (gatt == null)
+        if (gatt == null) {
             return false;
+        }
 
-        gatts.add(gatt);
+        BluetoothGatt oldGATT = gatts.put(device, gatt);
+
+        if (oldGATT != null)
+            oldGATT.disconnect();
+
         gattRequirements.put(gatt, Arrays.asList(requirements));
         gattConnectCallbacks.put(gatt, connectionStateCallback);
         return true;
@@ -357,7 +362,7 @@ public class BluetoothLeHandler {
         Collection<BluetoothGatt> gattCollection;
 
         if (readGatt == null)
-            gattCollection = gatts;
+            gattCollection = gatts.values();
         else
             gattCollection = Collections.singletonList(readGatt);
 
@@ -394,7 +399,7 @@ public class BluetoothLeHandler {
         Collection<BluetoothGatt> gattCollection;
 
         if (writeGatt == null)
-            gattCollection = gatts;
+            gattCollection = gatts.values();
         else
             gattCollection = Collections.singletonList(writeGatt);
 
@@ -419,7 +424,7 @@ public class BluetoothLeHandler {
      * @see #enableNotification(BluetoothGatt, UUID, UUID, boolean)
      */
     public void enableNotifications(boolean enable){
-        for (BluetoothGatt gatt:gatts){
+        for (BluetoothGatt gatt:gatts.values()){
             enableNotifications(gatt, enable);
         }
     }
@@ -468,7 +473,7 @@ public class BluetoothLeHandler {
         Collection<BluetoothGatt> gattCollection;
 
         if (notifyGatt == null)
-            gattCollection = gatts;
+            gattCollection = gatts.values();
         else
             gattCollection = Collections.singletonList(notifyGatt);
 
@@ -636,7 +641,7 @@ public class BluetoothLeHandler {
      * Disconnects all GATT servers.
      */
     public void disconnectAll(){
-        for (BluetoothGatt gatt:gatts)
+        for (BluetoothGatt gatt:gatts.values())
             gatt.disconnect();
     }
 
@@ -644,7 +649,7 @@ public class BluetoothLeHandler {
      * Disconnecrs all GATT servers associated with the given {@link BluetoothDevice}.
      */
     public void disconnect(BluetoothDevice device){
-        for (BluetoothGatt gatt:gatts)
+        for (BluetoothGatt gatt:gatts.values())
             if (gatt.getDevice().equals(device))
                 gatt.disconnect();
     }
