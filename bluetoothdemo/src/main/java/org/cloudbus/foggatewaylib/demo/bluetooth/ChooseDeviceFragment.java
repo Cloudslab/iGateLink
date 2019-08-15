@@ -24,7 +24,7 @@ import org.cloudbus.foggatewaylib.bluetooth.BluetoothLeHandler;
  */
 public class ChooseDeviceFragment extends Fragment
         implements BluetoothDeviceListAdapter.OnItemClickListener {
-    public static final String TAG = "PairBluetoothFragment";
+    public static final String TAG = "ChooseDeviceFragment";
 
     private BluetoothLeHandler bluetoothLeHandler;
     private BluetoothDeviceListAdapter adapter;
