@@ -30,8 +30,6 @@
         </activity>
 
         <service android:name="org.cloudbus.foggatewaylib.service.FogGatewayService"/>
-<!--/        <service android:name="org.cloudbus.foggatewaylib.camera.CameraProviderder"/>-->
-
 
     </application>
 
