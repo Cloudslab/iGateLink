@@ -66,7 +66,7 @@ public class ChooseDeviceFragment extends Fragment
 
             for (BluetoothDevice device: bluetoothLeHandler.getConnectedDevices()){
                 adapter.updateItem(device,
-                        BluetoothDeviceListAdapter.MyItem.STATUS_CONNECTED,
+                        BluetoothDeviceListAdapter.Device.STATUS_CONNECTED,
                         null);
             }
         }
@@ -80,7 +80,7 @@ public class ChooseDeviceFragment extends Fragment
 
     @Override
     public void onItemClick(BluetoothDeviceListAdapter adapter,
-                            BluetoothDeviceListAdapter.MyItem item) {
+                            BluetoothDeviceListAdapter.Device item) {
         if (getActivity() == null)
             return;
 

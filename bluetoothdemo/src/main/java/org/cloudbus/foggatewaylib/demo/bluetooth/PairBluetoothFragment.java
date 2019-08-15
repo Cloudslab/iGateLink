@@ -128,7 +128,7 @@ public class PairBluetoothFragment extends Fragment
                         connectTo(bluetoothDevice);
                     } else {
                         adapter.updateItem(bluetoothDevice,
-                                BluetoothDeviceListAdapter.MyItem.STATUS_DISCONNECTED,
+                                BluetoothDeviceListAdapter.Device.STATUS_DISCONNECTED,
                                 null);
                     }
                 }
@@ -155,7 +155,7 @@ public class PairBluetoothFragment extends Fragment
 
             for (BluetoothDevice device: bluetoothLeHandler.getConnectedDevices()){
                 adapter.updateItem(device,
-                        BluetoothDeviceListAdapter.MyItem.STATUS_CONNECTED,
+                        BluetoothDeviceListAdapter.Device.STATUS_CONNECTED,
                         null);
             }
         }
@@ -192,17 +192,17 @@ public class PairBluetoothFragment extends Fragment
 
     @Override
     public void onItemClick(BluetoothDeviceListAdapter adapter,
-                            BluetoothDeviceListAdapter.MyItem item) {
+                            BluetoothDeviceListAdapter.Device item) {
         switch (item.status){
-            case BluetoothDeviceListAdapter.MyItem.STATUS_CONNECTED:
+            case BluetoothDeviceListAdapter.Device.STATUS_CONNECTED:
                 disconnectFrom(item.device);
-            case BluetoothDeviceListAdapter.MyItem.STATUS_ERROR:
-            case BluetoothDeviceListAdapter.MyItem.STATUS_DISCONNECTED:
+            case BluetoothDeviceListAdapter.Device.STATUS_ERROR:
+            case BluetoothDeviceListAdapter.Device.STATUS_DISCONNECTED:
                 connectTo(item.device);
                 break;
 
-            case BluetoothDeviceListAdapter.MyItem.STATUS_CONNECTING:
-            case BluetoothDeviceListAdapter.MyItem.STATUS_DISCONNECTING:
+            case BluetoothDeviceListAdapter.Device.STATUS_CONNECTING:
+            case BluetoothDeviceListAdapter.Device.STATUS_DISCONNECTING:
             default:
                 break;
         }
@@ -216,7 +216,7 @@ public class PairBluetoothFragment extends Fragment
                     mListener.getRequirements());
 
             adapter.updateItem(device,
-                    BluetoothDeviceListAdapter.MyItem.STATUS_CONNECTING,
+                    BluetoothDeviceListAdapter.Device.STATUS_CONNECTING,
                     null);
         }
     }
@@ -228,7 +228,7 @@ public class PairBluetoothFragment extends Fragment
             bluetoothLeHandler.disconnect(device);
 
             adapter.updateItem(device,
-                    BluetoothDeviceListAdapter.MyItem.STATUS_DISCONNECTING,
+                    BluetoothDeviceListAdapter.Device.STATUS_DISCONNECTING,
                     null);
         }
     }
@@ -247,7 +247,7 @@ public class PairBluetoothFragment extends Fragment
                     @Override
                     public void run() {
                         adapter.updateItem(gatt.getDevice(),
-                                BluetoothDeviceListAdapter.MyItem.STATUS_CONNECTED,
+                                BluetoothDeviceListAdapter.Device.STATUS_CONNECTED,
                                 null);
                     }
                 });
@@ -261,7 +261,7 @@ public class PairBluetoothFragment extends Fragment
                     @Override
                     public void run() {
                         adapter.updateItem(gatt.getDevice(),
-                                BluetoothDeviceListAdapter.MyItem.STATUS_DISCONNECTED,
+                                BluetoothDeviceListAdapter.Device.STATUS_DISCONNECTED,
                                 null);
                     }
                 });
@@ -274,7 +274,7 @@ public class PairBluetoothFragment extends Fragment
                         String text = "Error connecting to bluetooth device.";
 
                         adapter.updateItem(gatt.getDevice(),
-                                BluetoothDeviceListAdapter.MyItem.STATUS_ERROR,
+                                BluetoothDeviceListAdapter.Device.STATUS_ERROR,
                                 text);
                     }
                 });
@@ -290,7 +290,7 @@ public class PairBluetoothFragment extends Fragment
                     public void run() {
                         String text = "Device is not of the required type.";
                         adapter.updateItem(gatt.getDevice(),
-                                BluetoothDeviceListAdapter.MyItem.STATUS_ERROR,
+                                BluetoothDeviceListAdapter.Device.STATUS_ERROR,
                                 text);
                     }
                 });

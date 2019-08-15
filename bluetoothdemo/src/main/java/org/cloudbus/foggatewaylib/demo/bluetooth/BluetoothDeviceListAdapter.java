@@ -19,7 +19,7 @@ import java.util.List;
 public class BluetoothDeviceListAdapter
          extends RecyclerView.Adapter<BluetoothDeviceListAdapter.MyViewHolder> {
 
-    private List<MyItem> mDataset = new ArrayList<>();
+    private List<Device> mDataset = new ArrayList<>();
     private OnItemClickListener listener;
 
     // Provide a reference to the views for each data item
@@ -43,7 +43,7 @@ public class BluetoothDeviceListAdapter
         }
     }
 
-    public static class MyItem implements Comparable<MyItem>{
+    public static class Device implements Comparable<Device>{
         public static final int STATUS_CONNECTING = 0;
         public static final int STATUS_CONNECTED = 1;
         public static final int STATUS_DISCONNECTING = 2;
@@ -54,14 +54,14 @@ public class BluetoothDeviceListAdapter
         public int status;
         public String error;
 
-        public MyItem(BluetoothDevice device, int status, String error) {
+        public Device(BluetoothDevice device, int status, String error) {
             this.device = device;
             this.status = status;
             this.error = error;
         }
 
         @Override
-        public int compareTo(MyItem o) {
+        public int compareTo(Device o) {
             if (status != o.status)
                 return status - o.status;
             if (device.getName() != null && o.device.getName() != null){
@@ -79,24 +79,24 @@ public class BluetoothDeviceListAdapter
 
         @Override
         public boolean equals(@Nullable Object obj) {
-            if (obj instanceof MyItem){
-                return ((MyItem)obj).device.equals(device);
+            if (obj instanceof Device){
+                return ((Device)obj).device.equals(device);
             } else
                 return false;
         }
     }
 
     public interface OnItemClickListener{
-        void onItemClick(BluetoothDeviceListAdapter adapter, MyItem item);
+        void onItemClick(BluetoothDeviceListAdapter adapter, Device item);
     }
 
     private class OnClickListener implements View.OnClickListener{
         private BluetoothDeviceListAdapter adapter;
-        private MyItem item;
+        private Device item;
         private OnItemClickListener listener;
 
         public OnClickListener(OnItemClickListener listener,
-                               BluetoothDeviceListAdapter adapter, MyItem item){
+                               BluetoothDeviceListAdapter adapter, Device item){
             this.adapter = adapter;
             this.item = item;
             this.listener = listener;
@@ -130,7 +130,7 @@ public class BluetoothDeviceListAdapter
     public void onBindViewHolder(MyViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        MyItem item = getItem(position);
+        Device item = getItem(position);
 
         if (item.device.getName() != null) {
             holder.deviceName.setText(item.device.getName());
@@ -138,7 +138,7 @@ public class BluetoothDeviceListAdapter
             holder.deviceName.setText(item.device.getAddress());
         }
 
-        if (item.status != MyItem.STATUS_ERROR){
+        if (item.status != Device.STATUS_ERROR){
             if (item.device.getName() != null) {
                 holder.deviceAddress.setText(item.device.getAddress());
             } else{
@@ -149,20 +149,20 @@ public class BluetoothDeviceListAdapter
         }
 
         switch (item.status){
-            case MyItem.STATUS_CONNECTED:
-            case MyItem.STATUS_DISCONNECTING:
+            case Device.STATUS_CONNECTED:
+            case Device.STATUS_DISCONNECTING:
                 holder.image.setImageResource(R.drawable.ic_bluetooth_connected_blue_24dp);
                 break;
-            case MyItem.STATUS_CONNECTING:
-            case MyItem.STATUS_DISCONNECTED:
+            case Device.STATUS_CONNECTING:
+            case Device.STATUS_DISCONNECTED:
                 holder.image.setImageResource(R.drawable.ic_bluetooth_gray_24dp);
                 break;
-            case MyItem.STATUS_ERROR:
+            case Device.STATUS_ERROR:
                 holder.image.setImageResource(R.drawable.ic_bluetooth_disabled_red_24dp);
                 break;
         }
 
-        if (item.status == MyItem.STATUS_CONNECTING || item.status == MyItem.STATUS_DISCONNECTING){
+        if (item.status == Device.STATUS_CONNECTING || item.status == Device.STATUS_DISCONNECTING){
             holder.progressBar.setVisibility(View.VISIBLE);
         } else{
             holder.progressBar.setVisibility(View.INVISIBLE);
@@ -172,7 +172,7 @@ public class BluetoothDeviceListAdapter
                 new OnClickListener(listener, this, item));
     }
 
-    private MyItem getItem(int position){
+    private Device getItem(int position){
         return mDataset.get(position);
     }
 
@@ -183,13 +183,13 @@ public class BluetoothDeviceListAdapter
     }
 
     public void updateItem(BluetoothDevice device, int status, String error){
-        MyItem item = new MyItem(device, status, error);
+        Device item = new Device(device, status, error);
         int oldIndex = mDataset.indexOf(item);
         if (oldIndex >= 0){
-            MyItem oldItem = getItem(oldIndex);
+            Device oldItem = getItem(oldIndex);
             if (oldItem.status == item.status)
                 return;
-            if (oldItem.status == MyItem.STATUS_ERROR && item.status == MyItem.STATUS_DISCONNECTED)
+            if (oldItem.status == Device.STATUS_ERROR && item.status == Device.STATUS_DISCONNECTED)
                 return;
 
             mDataset.remove(oldIndex);
@@ -206,7 +206,7 @@ public class BluetoothDeviceListAdapter
         }
     }
 
-    private int insertInCorrectOrder(MyItem item){
+    private int insertInCorrectOrder(Device item){
         int position = Collections.binarySearch(mDataset, item);
         if (position < 0){
             position = -position - 1;
