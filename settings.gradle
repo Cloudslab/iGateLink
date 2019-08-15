@@ -1,1 +1,1 @@
-include ':camerademo', ':foggatewaylib', ':fogappbluetoothdemo'
+include ':camerademo', ':core', ':bluetoothdemo', ':bluetooth', ':camera', ':service'

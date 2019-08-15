@@ -6,7 +6,7 @@
     app:startDestination="@id/settingsFragment">
     <fragment
         android:id="@+id/previewFragment"
-        android:name="org.cloudbus.fogappcamerademo.PreviewFragment"
+        android:name="org.cloudbus.foggatewaylib.demo.camera.PreviewFragment"
         android:label="fragment_preview"
         tools:layout="@layout/fragment_preview" >
         <action
@@ -15,11 +15,11 @@
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="org.cloudbus.fogappcamerademo.SettingsFragment"
+        android:name="org.cloudbus.foggatewaylib.demo.camera.SettingsFragment"
         android:label="fragment_settings" />
     <fragment
         android:id="@+id/resultFragment"
-        android:name="org.cloudbus.fogappcamerademo.ResultFragment"
+        android:name="org.cloudbus.foggatewaylib.demo.camera.ResultFragment"
         android:label="ResultFragment"
         tools:layout="@layout/fragment_result">
         <argument
