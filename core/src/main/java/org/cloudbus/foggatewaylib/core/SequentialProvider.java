@@ -21,4 +21,11 @@ public abstract class SequentialProvider<T extends Data, S extends Data>
         super(inputType, outputType);
         setExecutor(Executors.newSingleThreadExecutor());
     }
+
+    /**
+     * Returns {@code true} if there are no tasks that don't have completed execution.
+     */
+    public boolean isFree(){
+        return getPendingTasks() == 0;
+    }
 }

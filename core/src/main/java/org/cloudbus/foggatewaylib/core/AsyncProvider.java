@@ -17,6 +17,8 @@ import java.util.concurrent.Executor;
 public abstract class AsyncProvider<T extends Data, S extends Data> extends Provider<T, S> {
     private static final String TAG = "AsyncProvider";
 
+    private int pendingTasks;
+
     /**
      * The {@link Executor} backing the {@link AsyncTask} instances.
      */
@@ -58,7 +60,7 @@ public abstract class AsyncProvider<T extends Data, S extends Data> extends Prov
      * @param requestID the id of the request that is being serviced.
      * @see ProviderAsyncTask#onPreExecute()
      */
-    public void onPreExecute(long requestID){}
+    public void onPreExecute(long requestID){ }
 
     /**
      * Callback that will be called in {@link ProviderAsyncTask#onPostExecute(Data[])}
@@ -117,6 +119,13 @@ public abstract class AsyncProvider<T extends Data, S extends Data> extends Prov
     }
 
     /**
+     * Returns the number of tasks that have been submitted but have not completed yet.
+     */
+    public int getPendingTasks() {
+        return pendingTasks;
+    }
+
+    /**
      * {@link AsyncTask} implementation using the callbacks defined in the upper class.
      *
      * @see #onPreExecute(long)
@@ -153,6 +162,7 @@ public abstract class AsyncProvider<T extends Data, S extends Data> extends Prov
         protected void onPreExecute() {
             super.onPreExecute();
             AsyncProvider.this.onPreExecute(requestID);
+            pendingTasks++;
         }
 
         /**
@@ -198,6 +208,7 @@ public abstract class AsyncProvider<T extends Data, S extends Data> extends Prov
                         "An error occurred: " + throwable.getMessage());
                 onPostExecuteError(requestID, throwable);
             }
+            pendingTasks--;
         }
 
         /**
