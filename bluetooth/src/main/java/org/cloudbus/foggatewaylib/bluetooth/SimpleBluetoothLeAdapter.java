@@ -5,10 +5,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
-import android.os.Build;
 import android.os.Handler;
-
-import androidx.annotation.RequiresApi;
 
 /**
  * Simple Bluetooth Low Energy adapter.
@@ -17,7 +14,6 @@ import androidx.annotation.RequiresApi;
  *
  * @author Riccardo Mancini
  */
-@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class SimpleBluetoothLeAdapter {
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothManager bluetoothManager;

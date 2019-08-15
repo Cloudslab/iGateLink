@@ -1,16 +1,12 @@
 package org.cloudbus.foggatewaylib.bluetooth;
 
 import android.bluetooth.BluetoothGatt;
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
 
 import org.cloudbus.foggatewaylib.core.Data;
 import org.cloudbus.foggatewaylib.core.Provider;
 
 import java.util.UUID;
 
-@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 public abstract class BluetoothLeProvider<T extends Data, S extends Data> extends Provider<T, S> {
 
     private BluetoothLeHandler bluetoothLeHandler;

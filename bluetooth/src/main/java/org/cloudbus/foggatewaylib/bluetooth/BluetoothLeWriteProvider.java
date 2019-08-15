@@ -3,16 +3,12 @@ package org.cloudbus.foggatewaylib.bluetooth;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
 
 import org.cloudbus.foggatewaylib.core.Data;
 import org.cloudbus.foggatewaylib.core.VoidData;
 
 import java.util.UUID;
 
-@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 public abstract class BluetoothLeWriteProvider<T extends Data>
         extends BluetoothLeProvider<T, VoidData> {
 
