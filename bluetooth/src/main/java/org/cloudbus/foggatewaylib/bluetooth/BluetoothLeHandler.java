@@ -339,7 +339,8 @@ public class BluetoothLeHandler {
     /**
      * Reads the given service-characteristic pair from the given device.
      *
-     * @param readGatt the GATT server to read from.
+     * @param readGatt the GATT server to read from or {@code null} if all connected GATT servers
+     *                 should be checked.
      * @param readService the {@link BluetoothGattService} to read from or
      *                    {@code null} if all services must be checked.
      * @param readCharacteristic the {@link BluetoothGattCharacteristic} fto read from or
@@ -374,7 +375,8 @@ public class BluetoothLeHandler {
     /**
      * Writes the given value to the given service-characteristic pair in the given device.
      *
-     * @param writeGatt the GATT server to write to.
+     * @param writeGatt the GATT server to write to or {@code null} if all connected GATT servers
+     *                  should be checked.
      * @param writeService the {@link BluetoothGattService} to write to or
      *                    {@code null} if all services must be checked.
      * @param writeCharacteristic the {@link BluetoothGattCharacteristic} to write to or
@@ -445,7 +447,8 @@ public class BluetoothLeHandler {
     /**
      * Enables/disables notifications in the given device and service-characteristic pair.
      *
-     * @param notifyGatt the GATT server in which notifications must be enabled/disabled.
+     * @param notifyGatt the GATT server in which notifications must be enabled/disabled or
+     *                   {@code null} if all connected GATT servers should be checked.
      * @param notifyService the {@link BluetoothGattService} in which notifications must be
      *                      enabled/disabled or {@code null} if all services must be checked.
      * @param notifyCharacteristic the {@link BluetoothGattCharacteristic} in which notifications
