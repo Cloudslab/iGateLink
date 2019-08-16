@@ -1,5 +1,7 @@
 package org.cloudbus.foggatewaylib.demo.bluetooth;
 
+import android.preference.PreferenceManager;
+
 import org.cloudbus.foggatewaylib.core.Chooser;
 import org.cloudbus.foggatewaylib.core.RoundRobinChooser;
 
@@ -9,13 +11,14 @@ import java.util.List;
 public class MyChooser extends Chooser {
     
     private RoundRobinChooser roundRobinChooser = new RoundRobinChooser();
+    private boolean localExecutionEnabled = false;
     
     @Override
     public String chooseProvider(String... providers) {
         if (contains(providers, MainActivity.KEY_PROVIDER_LOCAL)){
             LocalProvider localProvider = (LocalProvider) getExecutionManager()
                     .getProvider(MainActivity.KEY_PROVIDER_LOCAL);
-            if (providers.length == 1 || localProvider.isFree())
+            if (localExecutionEnabled && (providers.length == 1 || localProvider.isFree()))
                 return MainActivity.KEY_PROVIDER_LOCAL;
             else
                 return roundRobinChooser.chooseProvider(remove(providers,
@@ -39,5 +42,13 @@ public class MyChooser extends Chooser {
                 resList.add(e);
         }
         return resList.toArray(new String[]{});
+    }
+
+    @Override
+    public void onAttach() {
+        super.onAttach();
+        localExecutionEnabled = PreferenceManager
+                .getDefaultSharedPreferences(getExecutionManager().getContext())
+                .getBoolean("enable_local_execution", false);
     }
 }
