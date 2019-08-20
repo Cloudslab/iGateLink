@@ -1,8 +1,14 @@
 package org.cloudbus.foggatewaylib.demo.bluetooth;
 
+import android.preference.PreferenceManager;
+
 import org.cloudbus.foggatewaylib.core.SequentialProvider;
 
 public class LocalProvider extends SequentialProvider<OximeterData, AnalysisResultData> {
+
+    public static final int DEFAULT_SLEEP_SEC = 5;
+
+    private int sleep = DEFAULT_SLEEP_SEC * 1000;
 
     public LocalProvider() {
         super(OximeterData.class, AnalysisResultData.class);
@@ -69,10 +75,25 @@ public class LocalProvider extends SequentialProvider<OximeterData, AnalysisResu
             result.AHSeverity = "Highly Severe";
         }
 
-        Thread.sleep(5000); //debug
+        if (sleep > 0)
+            Thread.sleep(sleep);
 
         progressPublisher.publish(100, "Done");
 
         return new AnalysisResultData[]{result};
+    }
+
+    @Override
+    public void onAttach() {
+        super.onAttach();
+        String sleepStr = PreferenceManager
+                .getDefaultSharedPreferences(getExecutionManager().getContext())
+                .getString("debug_sleep", Integer.toString(DEFAULT_SLEEP_SEC));
+
+        try{
+            sleep = Integer.parseInt(sleepStr) * 1000;
+        } catch (NumberFormatException e){
+            sleep = DEFAULT_SLEEP_SEC * 1000;
+        }
     }
 }

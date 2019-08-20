@@ -21,6 +21,13 @@
         app:title="Enable Local Execution"
         app:defaultValue="false"/>
 
+    <androidx.preference.EditTextPreference
+        app:key="debug_sleep"
+        app:dependency="enable_local_execution"
+        app:title="Sleep in local executor (seconds)"
+        app:useSimpleSummaryProvider="true"
+        app:defaultValue="5"/>
+
     <androidx.preference.SwitchPreference
         app:key="enable_services"
         app:title="Enable services"
