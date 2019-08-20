@@ -3,6 +3,7 @@ package org.cloudbus.foggatewaylib.core.utils;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,6 +14,8 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -51,7 +54,7 @@ public class SimpleHttpConnection {
      * @throws MalformedURLException refer to {@link #makeUrl(String, String, boolean, Pair[])}.
      * @see #makeUrl(String, String, boolean, Pair[])
      */
-    public SimpleHttpConnection(String domain, String page, Pair<String, String>... parameters)
+    public SimpleHttpConnection(String domain, String page, Map<String, String> parameters)
             throws MalformedURLException{
         this(makeUrl(domain, page, false, parameters));
     }
@@ -346,20 +349,21 @@ public class SimpleHttpConnection {
     }
 
     /**
-     * Builds an URL from domain, page and optional key-value parameters.
+     * Builds an URL from domain, page and key-value parameters.
      * The URL is built as follows:
      * http[s]://$domain/$page[?$key1=$val1&$key2=$val2&...&$keyN=$valN]
      *
      * @param domain the domain of the server.
      * @param page the page to request from the server.
      * @param ssl {@code true} if ssl should be enabled, false otherwise.
-     * @param parameters key-value pairs for the parameters (optional).
+     * @param parameters key-value map for the parameters or null if there are no parameters.
      * @return the built URL.
      * @throws MalformedURLException refer to {@link URL#URL(String)}.
      * @see URL#URL(String)
+     * @see #makeUrl(String, String, boolean)
      */
     private static URL makeUrl(String domain, String page, boolean ssl,
-                        Pair<String, String>... parameters) throws MalformedURLException {
+                        @Nullable Map<String, String> parameters) throws MalformedURLException {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("http");
         if (ssl)
@@ -367,17 +371,37 @@ public class SimpleHttpConnection {
         stringBuilder.append("://");
         stringBuilder.append(domain);
         stringBuilder.append(page);
-        if (parameters.length > 0){
+        if (parameters != null && !parameters.isEmpty()){
             stringBuilder.append('?');
-            for (int i = 0; i < parameters.length; i++){
-                Pair<String, String> param = parameters[i];
-                stringBuilder.append(param.first);
+            Iterator<String> i = parameters.keySet().iterator();
+            while (i.hasNext()){
+                String key = i.next();
+                String value = parameters.get(key);
+                stringBuilder.append(key);
                 stringBuilder.append('=');
-                stringBuilder.append(param.second);
-                if (i < parameters.length - 1)
+                stringBuilder.append(value);
+                if (i.hasNext())
                     stringBuilder.append('&');
             }
         }
         return new URL(stringBuilder.toString());
+    }
+
+    /**
+     * Builds an URL from domain and page.
+     * The URL is built as follows:
+     * http[s]://$domain/$page
+     *
+     * @param domain the domain of the server.
+     * @param page the page to request from the server.
+     * @param ssl {@code true} if ssl should be enabled, false otherwise.
+     * @return the built URL.
+     * @throws MalformedURLException refer to {@link URL#URL(String)}.
+     * @see URL#URL(String)
+     * @see #makeUrl(String, String, boolean, Map)
+     */
+    private static URL makeUrl(String domain, String page, boolean ssl)
+            throws MalformedURLException {
+        return makeUrl(domain, page, ssl, null);
     }
 }

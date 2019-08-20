@@ -2,7 +2,6 @@ package org.cloudbus.foggatewaylib.demo.bluetooth;
 
 import android.text.TextUtils;
 import android.util.Log;
-import android.util.Pair;
 
 import androidx.preference.PreferenceManager;
 
@@ -10,7 +9,9 @@ import org.cloudbus.foggatewaylib.core.SequentialProvider;
 import org.cloudbus.foggatewaylib.core.utils.SimpleHttpConnection;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,12 +68,10 @@ public class HealthKeeperProvider extends SequentialProvider<OximeterData, Analy
         String bpmCSV = TextUtils.join(",", bpmList);
         String spo2CSV = TextUtils.join(",", spo2List);
 
-        Pair<String, String>[] params = new Pair[]{
-                new Pair<>("data1", spo2CSV),
-                new Pair<>("data2", bpmCSV),
-                new Pair<>("analyze", "analyze")
-        };
-
+        Map<String, String> params = new HashMap<>();
+        params.put("data1", spo2CSV);
+        params.put("data2", bpmCSV);
+        params.put("analyze", "analyze");
 
         Log.d(TAG, "Starting execution...");
 
