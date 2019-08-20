@@ -22,6 +22,7 @@ import java.util.Map;
  *
  * @author Riccardo Mancini
  */
+//TODO add Fragment class for simpler integration with this activity
 public abstract class FogGatewayServiceActivity extends AppCompatActivity
                                          implements ServiceConnection, ExecutionManager.Holder {
 
