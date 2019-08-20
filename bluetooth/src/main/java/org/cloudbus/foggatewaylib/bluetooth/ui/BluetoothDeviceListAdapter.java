@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+//TODO documentation
 public class BluetoothDeviceListAdapter
          extends RecyclerView.Adapter<BluetoothDeviceListAdapter.MyViewHolder> {
 

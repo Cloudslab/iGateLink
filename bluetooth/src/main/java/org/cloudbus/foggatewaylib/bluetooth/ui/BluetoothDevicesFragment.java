@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
  * Use the {@link ChooseDeviceFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
+//TODO documentation
 public abstract class BluetoothDevicesFragment extends Fragment
         implements BluetoothDeviceListAdapter.OnItemClickListener {
 

@@ -35,6 +35,7 @@ import java.util.Set;
  * Use the {@link PairBluetoothFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
+//TODO documentation
 public class PairBluetoothLeFragment extends BluetoothDevicesFragment {
     public static final String TAG = "PairBluetoothLeFragment";
 
