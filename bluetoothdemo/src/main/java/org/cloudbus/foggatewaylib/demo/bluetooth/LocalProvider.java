@@ -25,7 +25,7 @@ public class LocalProvider extends SequentialProvider<OximeterData, AnalysisResu
         OximeterData previous = null;
         int count = 0;
         for (OximeterData d:input){
-            if (d.getBPM() != -1 && d.getSpO2() != 127){
+            if (d.getBPM() != -1 && d.getSpO2() != -1){
                 if (d.getSpO2() <= 88 && (previous == null || previous.getSpO2() > 88)){
                     result.AHI++;
                 }

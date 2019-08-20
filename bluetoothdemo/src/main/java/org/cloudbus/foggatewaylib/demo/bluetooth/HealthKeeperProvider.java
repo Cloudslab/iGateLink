@@ -50,7 +50,7 @@ public class HealthKeeperProvider extends FogBusProvider<OximeterData, AnalysisR
         List<String> spo2List = new ArrayList<>();
 
         for (OximeterData d:input){
-            if (d.getBPM() != -1 && d.getSpO2() != 127){
+            if (d.getBPM() != -1 && d.getSpO2() != -1){
                 bpmList.add(String.valueOf(d.getBPM()));
                 spo2List.add(String.valueOf(d.getSpO2()));
             }

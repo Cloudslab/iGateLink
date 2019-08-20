@@ -224,7 +224,7 @@ public class ResultFragment extends Fragment {
                     public void onNewData(Store store, OximeterData data) {
                         double x = (data.getId()-time)/1000d;
 
-                        if (data.getBPM() != -1 ){
+                        if (data.getBPM() != -1){
                             try {
                                 seriesBPM.appendData(
                                         new DataPoint(x, data.getBPM()),
@@ -237,7 +237,7 @@ public class ResultFragment extends Fragment {
                         } else{
                             textBPM.setText("-");
                         }
-                        if (data.getSpO2() != 127){
+                        if (data.getSpO2() != -1){
                             try{
                                 seriesSpO2.appendData(
                                         new DataPoint(x, data.getSpO2()),
@@ -250,7 +250,7 @@ public class ResultFragment extends Fragment {
                         } else{
                             textSpO2.setText("-");
                         }
-                        if (data.getPI() != 0.0d){
+                        if (data.getPI()  != -1f){
                             textPI.setText(String.valueOf(data.getPI()));
                         } else{
                             textPI.setText("-");
