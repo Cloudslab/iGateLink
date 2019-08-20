@@ -1,12 +1,8 @@
 package org.cloudbus.foggatewaylib.demo.bluetooth;
 
-import android.text.TextUtils;
-import android.util.Log;
-
 import androidx.preference.PreferenceManager;
 
-import org.cloudbus.foggatewaylib.core.SequentialProvider;
-import org.cloudbus.foggatewaylib.core.utils.SimpleHttpConnection;
+import org.cloudbus.foggatewaylib.fogbus.FogBusProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +11,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class HealthKeeperProvider extends SequentialProvider<OximeterData, AnalysisResultData> {
+public class HealthKeeperProvider extends FogBusProvider<OximeterData, AnalysisResultData> {
     public static final String TAG = "HealthKeeperProvider";
 
     public static final String SESSION_URL = "/HealthKeeper/RPi/Master/session.php";
@@ -29,61 +25,53 @@ public class HealthKeeperProvider extends SequentialProvider<OximeterData, Analy
             "<br/>Average Heart Rate : ([0-9.]+)[ \n]+" +
             "<br/>Diagnosis : (.+?)<br/>");
 
-    private String masterIP;
-
     public HealthKeeperProvider() {
-        super(OximeterData.class, AnalysisResultData.class);
+        super(true, OximeterData.class, AnalysisResultData.class);
     }
 
     @Override
-    public void onAttach() {
-        super.onAttach();
-        masterIP = PreferenceManager
+    protected String getMasterIP() {
+        return PreferenceManager
                 .getDefaultSharedPreferences(getExecutionManager().getContext())
                 .getString("fogbus_master_ip", "");
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public AnalysisResultData[] getData(ProgressPublisher progressPublisher,
-                               long requestID, OximeterData... input) throws Exception {
+    protected String getSessionUrl() {
+        return SESSION_URL;
+    }
 
+    @Override
+    protected Map<Integer, List<String>> serializeData(ProgressPublisher progressPublisher,
+                                                       OximeterData... input) {
         progressPublisher.publish(0, "Uploading data...");
 
-        SimpleHttpConnection connection;
-
-        if (input.length == 0)
-            throw new Exception("Input array is empty.");
-
-        List<Integer> bpmList = new ArrayList<>();
-        List<Integer> spo2List = new ArrayList<>();
+        List<String> bpmList = new ArrayList<>();
+        List<String> spo2List = new ArrayList<>();
 
         for (OximeterData d:input){
             if (d.getBPM() != -1 && d.getSpO2() != 127){
-                bpmList.add(d.getBPM());
-                spo2List.add(d.getSpO2());
+                bpmList.add(String.valueOf(d.getBPM()));
+                spo2List.add(String.valueOf(d.getSpO2()));
             }
         }
 
-        String bpmCSV = TextUtils.join(",", bpmList);
-        String spo2CSV = TextUtils.join(",", spo2List);
+        Map<Integer, List<String>> result = new HashMap<>();
+        result.put(1, spo2List);
+        result.put(2, bpmList);
+        return result;
+    }
 
-        Map<String, String> params = new HashMap<>();
-        params.put("data1", spo2CSV);
-        params.put("data2", bpmCSV);
-        params.put("analyze", "analyze");
-
-        Log.d(TAG, "Starting execution...");
-
-        connection = new SimpleHttpConnection(masterIP, SESSION_URL, params);
-        connection.setReadTimeout(10000);
-        String result = connection.get();
+    @Override
+    protected AnalysisResultData[] parseOutput(ProgressPublisher progressPublisher,
+                                               String result, long requestID)
+                throws Exception{
         Matcher matcher = pattern.matcher(result);
         if (!matcher.find())
             throw new Exception("Output pattern does not match");
 
         AnalysisResultData output = new AnalysisResultData();
-        output.setRequestID(input[0].getRequestID());
+        output.setRequestID(requestID);
 
         output.AHI = Integer.valueOf(matcher.group(1));
         output.minSpO2 = Integer.valueOf(matcher.group(2));

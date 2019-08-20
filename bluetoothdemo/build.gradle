@@ -43,6 +43,7 @@ dependencies {
     implementation project(':core')
     implementation project(':bluetooth')
     implementation project(':service')
+    implementation project(':fogbus')
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment:$rootProject.nav_version"
