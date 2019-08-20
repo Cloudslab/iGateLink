@@ -15,6 +15,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.cloudbus.foggatewaylib.bluetooth.BluetoothLeHandler;
+import org.cloudbus.foggatewaylib.bluetooth.ui.PairBluetoothLeFragment;
 import org.cloudbus.foggatewaylib.core.ExecutionManager;
 import org.cloudbus.foggatewaylib.service.FogGatewayServiceActivity;
 
@@ -22,7 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class MainActivity extends FogGatewayServiceActivity
-        implements PairBluetoothFragment.OnPairDevice {
+        implements PairBluetoothLeFragment.OnPairDevice {
 
     public static final String KEY_DATA_INPUT = "input";
     public static final String KEY_DATA_OUTPUT = "output";

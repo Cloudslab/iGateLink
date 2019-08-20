@@ -1,4 +1,4 @@
-package org.cloudbus.foggatewaylib.demo.bluetooth;
+package org.cloudbus.foggatewaylib.bluetooth.ui;
 
 import android.bluetooth.BluetoothDevice;
 import android.view.LayoutInflater;
@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
+
+import org.cloudbus.foggatewaylib.bluetooth.R;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -120,7 +122,7 @@ public class BluetoothDeviceListAdapter
                                                      int viewType) {
         // create a new view
         LinearLayout linearLayout = (LinearLayout) LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_pair_bluetooth_item, parent, false);
+                .inflate(R.layout.bluetooth_item, parent, false);
         MyViewHolder vh = new MyViewHolder(linearLayout);
         return vh;
     }

@@ -1,4 +1,4 @@
-package org.cloudbus.foggatewaylib.demo.bluetooth;
+package org.cloudbus.foggatewaylib.bluetooth.ui;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -15,13 +15,12 @@ import android.view.ViewGroup;
 
 import androidx.core.widget.ContentLoadingProgressBar;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.cloudbus.foggatewaylib.bluetooth.BluetoothLeHandler;
 import org.cloudbus.foggatewaylib.bluetooth.BluetoothUtils;
+import org.cloudbus.foggatewaylib.bluetooth.R;
 import org.cloudbus.foggatewaylib.bluetooth.SimpleBluetoothLeAdapter;
 
 import java.util.HashSet;
@@ -36,17 +35,12 @@ import java.util.Set;
  * Use the {@link PairBluetoothFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-//TODO decouple common bluetooth UI code from application-specific code
-public class PairBluetoothFragment extends Fragment
-        implements BluetoothDeviceListAdapter.OnItemClickListener {
-    public static final String TAG = "PairBluetoothFragment";
+public class PairBluetoothLeFragment extends BluetoothDevicesFragment {
+    public static final String TAG = "PairBluetoothLeFragment";
 
     private OnPairDevice mListener;
     private BluetoothLeHandler bluetoothLeHandler;
-    private BluetoothDeviceListAdapter adapter;
     private SimpleBluetoothLeAdapter bluetoothLeAdapter;
-    private RecyclerView.LayoutManager layoutManager;
-    private RecyclerView recyclerView;
     private BluetoothGattConnectCallback connectCallback = new BluetoothGattConnectCallback();
     private Set<String> rememberedDevices;
     private FloatingActionButton fab;
@@ -55,8 +49,8 @@ public class PairBluetoothFragment extends Fragment
     private int timeout;
 
 
-    public PairBluetoothFragment() {
-        // Required empty public constructor
+    public PairBluetoothLeFragment() {
+        super(R.layout.fragment_pair_bluetooth, R.id.list);
     }
 
     @Override
@@ -67,17 +61,7 @@ public class PairBluetoothFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_pair_bluetooth, container, false);
-        recyclerView = rootView.findViewById(R.id.list);
-
-        recyclerView.setHasFixedSize(true);
-
-        adapter = new BluetoothDeviceListAdapter(this);
-        recyclerView.setAdapter(adapter);
-
-
-        layoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(layoutManager);
+        View rootView = super.onCreateView(inflater, container, savedInstanceState);
 
         fab = rootView.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -87,7 +71,7 @@ public class PairBluetoothFragment extends Fragment
                     if(bluetoothLeAdapter.isScanning())
                         bluetoothLeAdapter.stopScan();
                     else{
-                        adapter.clear();
+                        clearAdapter();
                         bluetoothLeAdapter.startScan();
                     }
                 }
@@ -128,7 +112,7 @@ public class PairBluetoothFragment extends Fragment
                             && rememberedDevices.contains(bluetoothDevice.getAddress())){
                         connectTo(bluetoothDevice);
                     } else {
-                        adapter.updateItem(bluetoothDevice,
+                        updateItem(bluetoothDevice,
                                 BluetoothDeviceListAdapter.Device.STATUS_DISCONNECTED,
                                 null);
                     }
@@ -155,7 +139,7 @@ public class PairBluetoothFragment extends Fragment
                     .getStringSet("remembered_devices", new HashSet<String>());
 
             for (BluetoothDevice device: bluetoothLeHandler.getConnectedDevices()){
-                adapter.updateItem(device,
+                updateItem(device,
                         BluetoothDeviceListAdapter.Device.STATUS_CONNECTED,
                         null);
             }
@@ -216,7 +200,7 @@ public class PairBluetoothFragment extends Fragment
             bluetoothLeHandler.connectGatt(device, connectCallback,
                     mListener.getRequirements());
 
-            adapter.updateItem(device,
+            updateItem(device,
                     BluetoothDeviceListAdapter.Device.STATUS_CONNECTING,
                     null);
         }
@@ -228,7 +212,7 @@ public class PairBluetoothFragment extends Fragment
                 bluetoothLeHandler.setContext(getContext());
             bluetoothLeHandler.disconnect(device);
 
-            adapter.updateItem(device,
+            updateItem(device,
                     BluetoothDeviceListAdapter.Device.STATUS_DISCONNECTING,
                     null);
         }
@@ -239,7 +223,7 @@ public class PairBluetoothFragment extends Fragment
         public void onConnectionStateChange(final BluetoothGatt gatt, final int status, int newState) {
             Log.d(TAG, "Received onConnectionStateChange");
 
-            if (adapter == null || getActivity() == null) {
+            if (getAdapter() == null || getActivity() == null) {
                 return;
             }
 
@@ -247,7 +231,7 @@ public class PairBluetoothFragment extends Fragment
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        adapter.updateItem(gatt.getDevice(),
+                        updateItem(gatt.getDevice(),
                                 BluetoothDeviceListAdapter.Device.STATUS_CONNECTED,
                                 null);
                     }
@@ -261,7 +245,7 @@ public class PairBluetoothFragment extends Fragment
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        adapter.updateItem(gatt.getDevice(),
+                        updateItem(gatt.getDevice(),
                                 BluetoothDeviceListAdapter.Device.STATUS_DISCONNECTED,
                                 null);
                     }
@@ -274,7 +258,7 @@ public class PairBluetoothFragment extends Fragment
                     public void run() {
                         String text = "Error connecting to bluetooth device.";
 
-                        adapter.updateItem(gatt.getDevice(),
+                        updateItem(gatt.getDevice(),
                                 BluetoothDeviceListAdapter.Device.STATUS_ERROR,
                                 text);
                     }
@@ -290,7 +274,7 @@ public class PairBluetoothFragment extends Fragment
                     @Override
                     public void run() {
                         String text = "Device is not of the required type.";
-                        adapter.updateItem(gatt.getDevice(),
+                        updateItem(gatt.getDevice(),
                                 BluetoothDeviceListAdapter.Device.STATUS_ERROR,
                                 text);
                     }

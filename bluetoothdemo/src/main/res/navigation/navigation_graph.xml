@@ -25,7 +25,7 @@
     </fragment>
     <fragment
         android:id="@+id/pairBluetoothFragment"
-        android:name="org.cloudbus.foggatewaylib.demo.bluetooth.PairBluetoothFragment"
+        android:name="org.cloudbus.foggatewaylib.bluetooth.ui.PairBluetoothLeFragment"
         android:label="fragment_pair_bluetooth"
         tools:layout="@layout/fragment_pair_bluetooth" />
 </navigation>
