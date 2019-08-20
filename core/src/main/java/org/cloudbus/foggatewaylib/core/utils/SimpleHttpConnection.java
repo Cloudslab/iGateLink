@@ -1,7 +1,5 @@
 package org.cloudbus.foggatewaylib.core.utils;
 
-import android.util.Pair;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -46,17 +44,31 @@ public class SimpleHttpConnection {
 
     /**
      * Constructor that initializes a new request to the url built using
-     * {@link #makeUrl(String, String, boolean, Pair[])}.
+     * {@link #makeUrl(String, String, boolean, Map)}.
      *
      * @param domain the domain of the web server.
      * @param page the page to request from the web server.
      * @param parameters additional GET parameters.
-     * @throws MalformedURLException refer to {@link #makeUrl(String, String, boolean, Pair[])}.
-     * @see #makeUrl(String, String, boolean, Pair[])
+     * @throws MalformedURLException refer to {@link #makeUrl(String, String, boolean, Map)}.
+     * @see #makeUrl(String, String, boolean, Map)
      */
     public SimpleHttpConnection(String domain, String page, Map<String, String> parameters)
             throws MalformedURLException{
         this(makeUrl(domain, page, false, parameters));
+    }
+
+    /**
+     * Constructor that initializes a new request to the url built using
+     * {@link #makeUrl(String, String, boolean)}.
+     *
+     * @param domain the domain of the web server.
+     * @param page the page to request from the web server.
+     * @throws MalformedURLException refer to {@link #makeUrl(String, String, boolean)}.
+     * @see #makeUrl(String, String, boolean)
+     */
+    public SimpleHttpConnection(String domain, String page)
+            throws MalformedURLException{
+        this(makeUrl(domain, page, false));
     }
 
     /**

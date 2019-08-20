@@ -2,7 +2,6 @@ package org.cloudbus.foggatewaylib.demo.camera;
 
 import android.content.res.Configuration;
 import android.util.Log;
-import android.util.Pair;
 
 import androidx.preference.PreferenceManager;
 
@@ -11,6 +10,8 @@ import org.cloudbus.foggatewaylib.core.ThreadPoolProvider;
 import org.cloudbus.foggatewaylib.core.utils.SimpleHttpConnection;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EdgeLensProvider extends ThreadPoolProvider<ImageData, ImageData> {
     public static final String TAG = "EdgeLensProvider";
@@ -73,8 +74,9 @@ public class EdgeLensProvider extends ThreadPoolProvider<ImageData, ImageData> {
             throw new IOException("Error in file transfer.");
 
         if (cloud){
-            execConnection = new SimpleHttpConnection(workerIP, EXEC_URL,
-                    new Pair<>("cloud", "true"));
+            Map<String, String> params = new HashMap<>();
+            params.put("cloud", "true");
+            execConnection = new SimpleHttpConnection(workerIP, EXEC_URL, params);
         } else{
             execConnection = new SimpleHttpConnection(workerIP, EXEC_URL);
         }
