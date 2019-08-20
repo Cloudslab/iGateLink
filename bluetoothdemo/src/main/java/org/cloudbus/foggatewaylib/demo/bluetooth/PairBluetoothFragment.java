@@ -36,6 +36,7 @@ import java.util.Set;
  * Use the {@link PairBluetoothFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
+//TODO decouple common bluetooth UI code from application-specific code
 public class PairBluetoothFragment extends Fragment
         implements BluetoothDeviceListAdapter.OnItemClickListener {
     public static final String TAG = "PairBluetoothFragment";
