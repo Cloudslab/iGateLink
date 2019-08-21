@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,18 +19,35 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-//TODO documentation
+/**
+ * Adapter for a simple {@link RecyclerView} list containing bluetooth devices.
+ * A {@link BluetoothDevice} can be added or updated using
+ * {@link #updateItem(BluetoothDevice, int, String)} and passing the device itself, its status
+ * and an optional error message.
+ *
+ * @author Riccardo Mancini
+ */
 public class BluetoothDeviceListAdapter
          extends RecyclerView.Adapter<BluetoothDeviceListAdapter.MyViewHolder> {
 
+    /**
+     * Backing list for the items.
+     */
     private List<Device> mDataset = new ArrayList<>();
+
+    /**
+     * Custom listener for clicks on items.
+     */
     private OnItemClickListener listener;
 
-    // Provide a reference to the views for each data item
-    // Complex data items may need more than one view per item, and
-    // you provide access to all the views for a data item in a view holder
+    /**
+     * Class that contains all the {@link View}s in the list item root view needed to be
+     * accessed in {@link #onBindViewHolder(MyViewHolder, int)}
+     *
+     * @see #onCreateViewHolder(ViewGroup, int)
+     * @see #onBindViewHolder(MyViewHolder, int)
+     */
     public static class MyViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
         public LinearLayout linearLayout;
         public TextView deviceName;
         public TextView deviceAddress;
@@ -46,6 +64,9 @@ public class BluetoothDeviceListAdapter
         }
     }
 
+    /**
+     * Class representing the device.
+     */
     public static class Device implements Comparable<Device>{
         public static final int STATUS_CONNECTING = 0;
         public static final int STATUS_CONNECTED = 1;
@@ -57,12 +78,36 @@ public class BluetoothDeviceListAdapter
         public int status;
         public String error;
 
-        public Device(BluetoothDevice device, int status, String error) {
+        /**
+         * Constructs a new {@link Device}.
+         *
+         * @param device the device itself.
+         * @param status the device status. Must be one of: <ul>
+         *                  <li>{@link #STATUS_CONNECTING}</li>
+         *                  <li>{@link #STATUS_CONNECTED}</li>
+         *                  <li>{@link #STATUS_DISCONNECTING}</li>
+         *                  <li>{@link #STATUS_ERROR}</li>
+         *                  <li>{@link #STATUS_DISCONNECTED}</li>
+         *                </ul>
+         * @param error an optional error message.
+         * @see #STATUS_CONNECTING
+         * @see #STATUS_CONNECTED
+         * @see #STATUS_DISCONNECTING
+         * @see #STATUS_ERROR
+         * @see #STATUS_DISCONNECTED
+         */
+        public Device(@NonNull BluetoothDevice device, int status, @Nullable String error) {
             this.device = device;
             this.status = status;
             this.error = error;
         }
 
+        /**
+         * Compares devices such that resulting ordering is by: first, status code (thus order is
+         * connecting, connected, disconnecting, error, disconnected); second, devices with a
+         * name are shown before devices without one; third, alphabetically by name (if present)
+         * or by address.
+         */
         @Override
         public int compareTo(Device o) {
             if (status != o.status)
@@ -80,6 +125,9 @@ public class BluetoothDeviceListAdapter
             return device.getAddress().compareTo(o.device.getAddress());
         }
 
+        /**
+         * Returns {@code true} if {@link BluetoothDevice} is the same, {@code false} otherwise.
+         */
         @Override
         public boolean equals(@Nullable Object obj) {
             if (obj instanceof Device){
@@ -89,10 +137,16 @@ public class BluetoothDeviceListAdapter
         }
     }
 
+    /**
+     * Interface to handle clicks on the list items.
+     */
     public interface OnItemClickListener{
         void onItemClick(BluetoothDeviceListAdapter adapter, Device item);
     }
 
+    /**
+     * Inner click listener on list item root views.
+     */
     private class OnClickListener implements View.OnClickListener{
         private BluetoothDeviceListAdapter adapter;
         private Device item;
@@ -112,27 +166,44 @@ public class BluetoothDeviceListAdapter
         }
     }
 
-    // Provide a suitable constructor (depends on the kind of dataset)
+    /**
+     * Constructs an adapter with the given {@code listener}.
+     */
     public BluetoothDeviceListAdapter(OnItemClickListener listener) {
         this.listener = listener;
     }
 
-    // Create new views (invoked by the layout manager)
+    /**
+     * Constructs an adapter with no listener.
+     *
+     * @see #setOnItemClickListener(OnItemClickListener)
+     */
+    public BluetoothDeviceListAdapter() {
+        this.listener = listener;
+    }
+
+    /**
+     * Inflates the view and returns a {@link MyViewHolder} instance.
+     * Do not call directly.
+     *
+     * @see RecyclerView.Adapter#onCreateViewHolder(ViewGroup, int)
+     */
     @Override
     public BluetoothDeviceListAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent,
                                                      int viewType) {
-        // create a new view
         LinearLayout linearLayout = (LinearLayout) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.bluetooth_item, parent, false);
         MyViewHolder vh = new MyViewHolder(linearLayout);
         return vh;
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
+    /**
+     * Replace the contents of a view with the item at the given {@code position}.
+     * Do not call directly (invoked by the layout manager).
+     */
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        // - get element from your dataset at this position
-        // - replace the contents of the view with that element
+
         Device item = getItem(position);
 
         if (item.device.getName() != null) {
@@ -175,17 +246,33 @@ public class BluetoothDeviceListAdapter
                 new OnClickListener(listener, this, item));
     }
 
+    /**
+     * Returns item at given position.
+     */
     private Device getItem(int position){
         return mDataset.get(position);
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
+    /**
+     * Returns the number of items (invoked by the layout manager).
+     */
     @Override
     public int getItemCount() {
         return mDataset.size();
     }
 
-    public void updateItem(BluetoothDevice device, int status, String error){
+    /**
+     * Updates or adds a new item to the list.
+     * Changes to the backing list are automatically notified to the adapter (no need to call
+     * {@link #notifyDataSetChanged()}.
+     * If an item becomes {@link Device#STATUS_DISCONNECTED} from {@link Device#STATUS_ERROR},
+     * its change is ignored in order to keep showing the error to the user.
+     *
+     * @param device the device to be added or updated.
+     * @param status its new status (see {@link Device}).
+     * @param error optional error message.
+     */
+    public void updateItem(@NonNull BluetoothDevice device, int status, @Nullable String error){
         Device item = new Device(device, status, error);
         int oldIndex = mDataset.indexOf(item);
         if (oldIndex >= 0){
@@ -209,6 +296,13 @@ public class BluetoothDeviceListAdapter
         }
     }
 
+    /**
+     * Returns the position at which the item should be inserted in the {@link #mDataset} to keep
+     * the ascending order.
+     *
+     * @param item the item to be added in the list
+     * @return the position or {@code -1} if the item is already inside the list.
+     */
     private int insertInCorrectOrder(Device item){
         int position = Collections.binarySearch(mDataset, item);
         if (position < 0){
@@ -219,10 +313,16 @@ public class BluetoothDeviceListAdapter
         return -1;
     }
 
+    /**
+     * Sets a new listener for clicks on items.
+     */
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
     }
 
+    /**
+     * Removes all
+     */
     public void clear(){
         mDataset.clear();
         notifyDataSetChanged();
