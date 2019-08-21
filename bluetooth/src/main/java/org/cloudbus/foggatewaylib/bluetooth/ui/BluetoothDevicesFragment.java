@@ -15,14 +15,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link OnPairDevice} interface
- * to handle interaction events.
- * Use the {@link ChooseDeviceFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * A simple {@link Fragment} that holds a list of bluetooth devices.
+ *
+ * NB: an empty constructor is required when extending this class.
+ *
+ * @see BluetoothDeviceListAdapter
+ *
+ * @author Riccardo Mancini
  */
-//TODO documentation
 public abstract class BluetoothDevicesFragment extends Fragment
         implements BluetoothDeviceListAdapter.OnItemClickListener {
 
@@ -36,16 +36,24 @@ public abstract class BluetoothDevicesFragment extends Fragment
     @IdRes
     private int listID;
 
+    /**
+     * Constructs a new fragment with the given layout ID and list ID.
+     * NB: an empty constructor is required when extending this class.
+     *
+     * @param layout the resource id for the layout to be inflated.
+     * @param listID the rsource id for the list within the specified layout.
+     */
     public BluetoothDevicesFragment(@LayoutRes int layout, @IdRes int listID) {
         this.layout = layout;
         this.listID = listID;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
+    /**
+     * Inflates the view and initializes the {@link #recyclerView} and {@link #adapter}.
+     * Override this method to add additional views.
+     *
+     * @see Fragment#onCreateView(LayoutInflater, ViewGroup, Bundle)
+     */
     @Override
     @CallSuper
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,14 +71,27 @@ public abstract class BluetoothDevicesFragment extends Fragment
         return rootView;
     }
 
+    /**
+     * Returns the adapter used for the device list.
+     */
     protected BluetoothDeviceListAdapter getAdapter() {
         return adapter;
     }
 
+    /**
+     * Updates or adds a new device.
+     *
+     * @see BluetoothDeviceListAdapter#updateItem(BluetoothDevice, int, String)
+     */
     protected void updateItem(BluetoothDevice device, int status, String error) {
         adapter.updateItem(device, status, error);
     }
 
+    /**
+     * Removes all devices.
+     *
+     * @see BluetoothDeviceListAdapter#clear()
+     */
     protected void clearAdapter() {
         adapter.clear();
     }
