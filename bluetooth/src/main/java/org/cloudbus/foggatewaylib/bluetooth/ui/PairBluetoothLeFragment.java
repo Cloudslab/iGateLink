@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.core.widget.ContentLoadingProgressBar;
-import androidx.fragment.app.Fragment;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -28,14 +27,12 @@ import java.util.Set;
 
 
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link OnPairDevice} interface
- * to handle interaction events.
- * Use the {@link PairBluetoothFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * A fragment that handles the pairing to Bluetooth LE devices.
+ * An {@link android.app.Activity} using this fragment MUST implement the {@link OnPairDevice}
+ * interface.
+ *
+ * @author Riccardo Mancini
  */
-//TODO documentation
 public class PairBluetoothLeFragment extends BluetoothDevicesFragment {
     public static final String TAG = "PairBluetoothLeFragment";
 
@@ -49,16 +46,52 @@ public class PairBluetoothLeFragment extends BluetoothDevicesFragment {
 
     private int timeout;
 
+    /**
+     * Called when a new device is found, it connects to it if it is in the
+     * {@link #rememberedDevices} list, otherwise it just adds it to the list view.
+     */
+    private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
+        @Override
+        public void onLeScan(BluetoothDevice bluetoothDevice, int i, byte[] bytes) {
+            if (rememberedDevices != null
+                    && rememberedDevices.contains(bluetoothDevice.getAddress())){
+                connectTo(bluetoothDevice);
+            } else {
+                updateItem(bluetoothDevice,
+                        BluetoothDeviceListAdapter.Device.STATUS_DISCONNECTED,
+                        null);
+            }
+        }
+    };
 
+    /**
+     * Called when scan is started or stopped, updates the views.
+     */
+    private SimpleBluetoothLeAdapter.OnScanStartStopListener mScanStartStopListener
+            = new SimpleBluetoothLeAdapter.OnScanStartStopListener() {
+                        @Override
+                        public void onScanStart() {
+                            fab.setImageResource(R.drawable.ic_stop_white_24dp);
+                            progressBar.show();
+                        }
+
+                        @Override
+                        public void onScanStop() {
+                            fab.setImageResource(R.drawable.ic_refresh_white_24dp);
+                            progressBar.hide();
+                        }
+                    };
+
+    /**
+     * Default constructor.
+     */
     public PairBluetoothLeFragment() {
         super(R.layout.fragment_pair_bluetooth, R.id.list);
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
+    /**
+     * Creates the view and sets the references to the views.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -85,6 +118,9 @@ public class PairBluetoothLeFragment extends BluetoothDevicesFragment {
         return rootView;
     }
 
+    /**
+     * Initializes {@link #bluetoothLeAdapter} and {@link #bluetoothLeHandler}.
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -106,34 +142,9 @@ public class PairBluetoothLeFragment extends BluetoothDevicesFragment {
                 BluetoothUtils.askEnableBluetooth(getActivity(), 2);
             }
 
-            bluetoothLeAdapter.setLeScanCallback(new BluetoothAdapter.LeScanCallback() {
-                @Override
-                public void onLeScan(BluetoothDevice bluetoothDevice, int i, byte[] bytes) {
-                    if (rememberedDevices != null
-                            && rememberedDevices.contains(bluetoothDevice.getAddress())){
-                        connectTo(bluetoothDevice);
-                    } else {
-                        updateItem(bluetoothDevice,
-                                BluetoothDeviceListAdapter.Device.STATUS_DISCONNECTED,
-                                null);
-                    }
-                }
-            });
+            bluetoothLeAdapter.setLeScanCallback(mLeScanCallback);
 
-            bluetoothLeAdapter.setOnScanStartStopListener(
-                    new SimpleBluetoothLeAdapter.OnScanStartStopListener() {
-                        @Override
-                        public void onScanStart() {
-                            fab.setImageResource(R.drawable.ic_stop_white_24dp);
-                            progressBar.show();
-                        }
-
-                        @Override
-                        public void onScanStop() {
-                            fab.setImageResource(R.drawable.ic_refresh_white_24dp);
-                            progressBar.hide();
-                        }
-                    });
+            bluetoothLeAdapter.setOnScanStartStopListener(mScanStartStopListener);
             bluetoothLeAdapter.startScan();
 
             rememberedDevices = PreferenceManager.getDefaultSharedPreferences(getContext())
@@ -147,6 +158,10 @@ public class PairBluetoothLeFragment extends BluetoothDevicesFragment {
         }
     }
 
+    /**
+     * Removes callbacks, stops scan and dereferences {@link #bluetoothLeAdapter} and
+     * {@link #bluetoothLeHandler}.
+     */
     @Override
     public void onPause() {
         super.onPause();
@@ -155,9 +170,14 @@ public class PairBluetoothLeFragment extends BluetoothDevicesFragment {
         this.bluetoothLeHandler = null;
 
         bluetoothLeAdapter.stopScan();
+        bluetoothLeAdapter.setLeScanCallback(null);
+        bluetoothLeAdapter.setOnScanStartStopListener(null);
         this.bluetoothLeAdapter = null;
     }
 
+    /**
+     * Sets the reference to the {@link OnPairDevice} interface.
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -170,12 +190,18 @@ public class PairBluetoothLeFragment extends BluetoothDevicesFragment {
 
     }
 
+    /**
+     * Removes reference to the {@link OnPairDevice} interface.
+     */
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
     }
 
+    /**
+     * Connects/disconnects to/from device when the corresponding list item is clicked.
+     */
     @Override
     public void onItemClick(BluetoothDeviceListAdapter adapter,
                             BluetoothDeviceListAdapter.Device item) {
@@ -194,6 +220,9 @@ public class PairBluetoothLeFragment extends BluetoothDevicesFragment {
         }
     }
 
+    /**
+     * Connects to the {@code device}.
+     */
     private void connectTo(BluetoothDevice device){
         if (bluetoothLeHandler != null && getContext() != null){
             if (bluetoothLeHandler.getContext() == null)
@@ -207,6 +236,9 @@ public class PairBluetoothLeFragment extends BluetoothDevicesFragment {
         }
     }
 
+    /**
+     * Disconnects from the {@code device}.
+     */
     private void disconnectFrom(BluetoothDevice device){
         if (bluetoothLeHandler != null && getContext() != null){
             if (bluetoothLeHandler.getContext() == null)
@@ -219,6 +251,9 @@ public class PairBluetoothLeFragment extends BluetoothDevicesFragment {
         }
     }
 
+    /**
+     * Internal callback for handling new-device connections and disconnections.
+     */
     private class BluetoothGattConnectCallback extends BluetoothGattCallback{
         @Override
         public void onConnectionStateChange(final BluetoothGatt gatt, final int status, int newState) {
@@ -284,6 +319,9 @@ public class PairBluetoothLeFragment extends BluetoothDevicesFragment {
         }
     }
 
+    /**
+     * Saves the device in a {@link android.preference.Preference}.
+     */
     private void rememberDevice(String address){
         if (getContext() == null)
             return;
@@ -295,6 +333,9 @@ public class PairBluetoothLeFragment extends BluetoothDevicesFragment {
         prefs.edit().putStringSet("remembered_devices", rememberedDevices).apply();
     }
 
+    /**
+     * Removes the given device address from the {@link android.preference.Preference}.
+     */
     private void forgetDevice(String address){
         if (getContext() == null)
             return;
@@ -307,17 +348,22 @@ public class PairBluetoothLeFragment extends BluetoothDevicesFragment {
     }
 
     /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
+     * Interface to be implemented by the {@link android.app.Activity} in which this fragment runs.
      */
     public interface OnPairDevice {
+        /**
+         * Called when a device has been paired.
+         *
+         * @param gatt the GATT server that has been connected.
+         */
         void onDevicePaired(BluetoothGatt gatt);
+
+        /**
+         * Returns the array of the requirements that connected devices must satisfy.
+         * Please refer to the link below.
+         *
+         * @see BluetoothLeHandler#connectGatt(BluetoothDevice, BluetoothGattCallback, Set[])
+         */
         Set<BluetoothLeHandler.ServiceCharacteristicPair>[] getRequirements();
     }
 }
