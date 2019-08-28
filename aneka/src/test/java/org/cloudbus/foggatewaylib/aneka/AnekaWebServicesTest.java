@@ -1,5 +1,6 @@
 package org.cloudbus.foggatewaylib.aneka;
 
+import org.cloudbus.foggatewaylib.aneka.ftp.SimpleFTPClient;
 import org.cloudbus.foggatewaylib.aneka.wsdl.ApplicationResult;
 import org.cloudbus.foggatewaylib.aneka.wsdl.ArrayOfFile;
 import org.cloudbus.foggatewaylib.aneka.wsdl.ArrayOfTaskItem;
@@ -10,6 +11,7 @@ import org.cloudbus.foggatewaylib.aneka.wsdl.TaskItem;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.Random;
 import java.util.UUID;
 
 import static org.cloudbus.foggatewaylib.aneka.wsdl.JobStatus.STATUS_COMPLETED;
@@ -263,4 +265,124 @@ public class AnekaWebServicesTest {
             }
         }
     }
+
+
+    @Test
+    public void test4() {
+        AnekaWebServices services = new AnekaWebServices(Credentials.URL, true);
+        String myid = UUID.randomUUID().toString();
+
+        System.out.println(myid);
+
+        try {
+            boolean check;
+            check = services.authenticateUser(Credentials.USERNAME, Credentials.PASSWORD);
+
+            assert check;
+
+            StorageBucket bucket = new FTPStorageBucket(
+                    "FTP",
+                    Credentials.USERNAME,
+                    Credentials.PASSWORD,
+                    Credentials.LOCAL_IP,
+                    9094);
+
+            StorageBucket remoteBucket = new FTPStorageBucket(
+                    "FTP",
+                    Credentials.USERNAME,
+                    Credentials.PASSWORD,
+                    Credentials.HOST,
+                    9094);
+
+            ArrayOfFile sharedFiles = WSDLBuilder.buildArrayOfFile(
+                    "FTP",
+                    "",
+                    "",
+                    new String[]{"Yolo.zip"}
+            );
+
+            SimpleFTPClient ftpClient = new SimpleFTPClient(
+                    Credentials.USERNAME,
+                    Credentials.PASSWORD,
+                    Credentials.HOST,
+                    21);
+
+            String folder = "/" + myid;
+            String inputPath = folder + "/input.txt";
+            String outputPath = folder + "/output.txt";
+            String mString = getRandomString(256);
+
+            assert ftpClient.connect();
+            assert ftpClient.mkdir(folder);
+            assert ftpClient.putString(inputPath, mString);
+
+            String applicationId = services.createApplicationWait(APP_NAME, sharedFiles, bucket);
+
+            assert applicationId != null;
+
+            try {
+                ApplicationResult result = services.queryApplication(applicationId);
+
+                assert result.getCreatedDateTime().before(new Date());
+                assert result.getDisplayName().equals(APP_NAME);
+                assert result.isUseFileTransfer();
+                assert result.getJobs().getJobResult().length == 0;
+                assert result.getFinishedDateTime() == null;
+
+                ArrayOfFile inputFiles = WSDLBuilder.buildArrayOfFile(
+                        "FTP",
+                        inputPath,
+                        "input.txt");
+
+                ArrayOfFile outputFiles = WSDLBuilder.buildArrayOfFile(
+                        "FTP",
+                        outputPath,
+                        "output.txt");
+
+                CopyTaskItem copyTaskItem = new CopyTaskItem();
+                copyTaskItem.setSource("input.txt");
+                copyTaskItem.setTarget("output.txt");
+
+                ArrayOfTaskItem tasks = new ArrayOfTaskItem();
+                tasks.setTaskItem(new TaskItem[]{copyTaskItem});
+
+                Job job = new Job();
+                job.setInputFiles(inputFiles);
+                job.setOutputFiles(outputFiles);
+                job.setTasks(tasks);
+                job.setReservationId(myid);
+
+                String jobId = services.submitJobWait(applicationId, job);
+
+                assert jobId != null;
+
+                String termination_status = services.waitJobTermination(applicationId, jobId);
+
+                assertEquals(STATUS_COMPLETED, termination_status);
+
+                String outString = ftpClient.getString(outputPath);
+
+                assertEquals(mString, outString);
+
+            } finally {
+                boolean deleted = services.abortApplication(applicationId);
+                assert deleted;
+            }
+        } finally {
+            if (services.getError() != null) {
+                System.out.println(services.getError());
+            }
+        }
+    }
+    private static final String ALLOWED_CHARACTERS ="0123456789qwertyuiopasdfghjklzxcvbnm";
+
+    private static String getRandomString(final int sizeOfRandomString)
+    {
+        final Random random=new Random();
+        final StringBuilder sb=new StringBuilder(sizeOfRandomString);
+        for(int i=0;i<sizeOfRandomString;++i)
+            sb.append(ALLOWED_CHARACTERS.charAt(random.nextInt(ALLOWED_CHARACTERS.length())));
+        return sb.toString();
+    }
+
 }

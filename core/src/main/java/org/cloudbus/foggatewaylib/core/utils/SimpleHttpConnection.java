@@ -3,12 +3,9 @@ package org.cloudbus.foggatewaylib.core.utils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -215,7 +212,7 @@ public class SimpleHttpConnection {
             stream = connection.getInputStream();
 
             if (stream != null) {
-                result = readStream(stream);
+                result = StreamReader.readStream(stream, maxReadSize);
             }
         } finally {
             if (connection != null){
@@ -252,7 +249,7 @@ public class SimpleHttpConnection {
 
             stream = connection.getInputStream();
             if (stream != null) {
-                result = readByteStream(stream);
+                result = StreamReader.readByteStream(stream, maxReadSize);
             }
         } finally {
             if (connection != null){
@@ -296,7 +293,7 @@ public class SimpleHttpConnection {
 
             if (inputStream != null) {
                 // Converts Stream to String with max length of 500.
-                result = readStream(inputStream);
+                result = StreamReader.readStream(inputStream, maxReadSize);
             }
         } finally {
             // Close Stream and disconnect HTTPS connection.
@@ -310,55 +307,7 @@ public class SimpleHttpConnection {
         return result;
     }
 
-    /**
-     * Converts the contents of an InputStream to a {@link String} up to a maximum of
-     * {@link #maxReadSize}.
-     *
-     * @param stream the input stream.
-     * @return the converted {@code stream} as a {@link String}.
-     * @see #setMaxReadSize(int)
-     * @see #readByteStream(InputStream)
-     */
-    private String readStream(InputStream stream)
-            throws IOException {
-        Reader reader = new InputStreamReader(stream, "UTF-8");
-        char[] rawBuffer = new char[maxReadSize];
-        int readSize;
-        StringBuilder builder = new StringBuilder();
-        while (((readSize = reader.read(rawBuffer)) != -1) && maxReadSize > 0) {
-            if (readSize > maxReadSize) {
-                readSize = maxReadSize;
-            }
-            builder.append(rawBuffer, 0, readSize);
-            maxReadSize -= readSize;
-        }
-        return builder.toString();
-    }
 
-    /**
-     * Converts the contents of an InputStream to a byte array ({@code byte[]}) up to a maximum
-     * of {@link #maxReadSize}.
-     *
-     * @param stream the input stream.
-     * @return the converted {@code stream} as a {@code byte[]}.
-     * @see #setMaxReadSize(int)
-     * @see #readStream(InputStream)
-     */
-    private byte[] readByteStream(InputStream stream)
-            throws IOException {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-
-        byte[] buffer = new byte[maxReadSize];
-        int len;
-
-        // read bytes from the input stream and store them in buffer
-        while ((len = stream.read(buffer)) != -1) {
-            // write bytes from the buffer into output stream
-            os.write(buffer, 0, len);
-        }
-
-        return os.toByteArray();
-    }
 
     /**
      * Builds an URL from domain, page and key-value parameters.

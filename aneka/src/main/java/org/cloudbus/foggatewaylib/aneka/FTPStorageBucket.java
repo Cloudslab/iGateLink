@@ -50,4 +50,20 @@ public class FTPStorageBucket extends StorageBucket {
                 super.fillProperty(index, property);
         }
     }
+
+    public String getUser() {
+        return user;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public int getPort() {
+        return port;
+    }
 }
