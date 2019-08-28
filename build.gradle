@@ -18,7 +18,6 @@ allprojects {
     repositories {
         google()
         jcenter()
-        
     }
 }
 
@@ -33,4 +32,5 @@ ext{
     material_version = '1.1.0-alpha09'
     exif_version = "1.1.0-beta01"
     recyclerview_version = '1.1.0-beta03'
+    commons_net_version = '3.6'
 }
