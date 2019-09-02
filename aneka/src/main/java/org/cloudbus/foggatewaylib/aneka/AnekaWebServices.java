@@ -48,8 +48,9 @@ public class AnekaWebServices {
     private TaskService service;
     private UserCredential mUserCredential;
     private String error;
+    private String defaultApplicationId;
 
-    private int timeout = 5000;
+    private int requestTimeout = 5000;
     private int jobTimeout = 60000;
     private int pollingPeriod = 500;
 
@@ -118,9 +119,12 @@ public class AnekaWebServices {
         try {
              response = service.createApplication(createApplicationParams);
              dumpError(response.getCreateApplicationResult());
-             if (response.getCreateApplicationResult().isSuccess())
-                 return response.getCreateApplicationResult().getApplicationId();
-             else
+             if (response.getCreateApplicationResult().isSuccess()){
+                 String applicationId = response.getCreateApplicationResult().getApplicationId();
+                 if (defaultApplicationId == null)
+                     defaultApplicationId = applicationId;
+                 return applicationId;
+             } else
                  return null;
         } catch (IOException|XmlPullParserException e) {
             e.printStackTrace();
@@ -151,6 +155,11 @@ public class AnekaWebServices {
     }
 
     @Nullable
+    public ApplicationResult queryApplication(){
+        return queryApplication(defaultApplicationId);
+    }
+
+    @Nullable
     public String queryApplicationStatus(String applicationId){
         QueryApplicationStatusResponse response;
 
@@ -175,6 +184,11 @@ public class AnekaWebServices {
     }
 
     @Nullable
+    public String queryApplicationStatus(){
+        return queryApplicationStatus(defaultApplicationId);
+    }
+
+    @Nullable
     public boolean abortApplication(String applicationId){
         AbortApplicationResponse response;
 
@@ -195,8 +209,13 @@ public class AnekaWebServices {
         }
     }
 
+    @Nullable
+    public boolean abortApplication(){
+        return abortApplication(defaultApplicationId);
+    }
+
     public boolean waitApplicationCreation(String applicationId){
-        long stopTime = new Date().getTime() + timeout;
+        long stopTime = new Date().getTime() + requestTimeout;
         while(true){
             String status = queryApplicationStatus(applicationId);
             if (status == null)
@@ -209,7 +228,7 @@ public class AnekaWebServices {
 
                 case "NULL":
                 case ApplicationStatus.STATUS_UNSUBMITTED:
-                    if (timeout > 0 && new Date(stopTime).before(new Date())){
+                    if (requestTimeout > 0 && new Date(stopTime).before(new Date())){
                         error = "Timeout";
                         return false;
                     } else
@@ -233,6 +252,10 @@ public class AnekaWebServices {
                 }
             }
         }
+    }
+
+    public boolean waitApplicationCreation(){
+        return waitApplicationCreation(defaultApplicationId);
     }
 
     @Nullable
@@ -293,12 +316,17 @@ public class AnekaWebServices {
     }
 
     @Nullable
+    public String[] submitJobs(Job... jobs) {
+        return submitJobs(defaultApplicationId, jobs);
+    }
+
+    @Nullable
     public String[] submitJobsWait(String applicationId, Job... jobs) {
-        long stopTime = new Date().getTime() + timeout;
+        long stopTime = new Date().getTime() + requestTimeout;
         try{
             String [] result;
             while ((result = __submitJobs(applicationId, jobs)) == null) {
-                if (timeout > 0 && new Date(stopTime).before(new Date())){
+                if (requestTimeout > 0 && new Date(stopTime).before(new Date())){
                     error = "Timeout";
                     return null;
                 }
@@ -318,6 +346,11 @@ public class AnekaWebServices {
             dumpError(e);
             return null;
         }
+    }
+
+    @Nullable
+    public String[] submitJobsWait(Job... jobs) {
+        return submitJobsWait(defaultApplicationId, jobs);
     }
 
     @Nullable
@@ -346,6 +379,11 @@ public class AnekaWebServices {
     }
 
     @Nullable
+    public JobResult queryJob(String jobId) {
+        return queryJob(defaultApplicationId, jobId);
+    }
+
+    @Nullable
     public String queryJobStatus(String applicationId, String jobId){
         QueryJobStatusResponse response;
 
@@ -370,6 +408,11 @@ public class AnekaWebServices {
         }
     }
 
+    @Nullable
+    public String queryJobStatus(String jobId) {
+        return queryJobStatus(defaultApplicationId, jobId);
+    }
+
     public boolean abortJob(String applicationId, String jobId){
         AbortJobResponse response;
 
@@ -391,12 +434,22 @@ public class AnekaWebServices {
     }
 
     @Nullable
+    public boolean abortJob(String jobId) {
+        return abortJob(defaultApplicationId, jobId);
+    }
+
+    @Nullable
     public String submitJob(String applicationId, Job job){
         String[] ids = submitJobs(applicationId, job);
         if (ids != null && ids.length > 0)
             return ids[0];
         else
             return null;
+    }
+
+    @Nullable
+    public String submitJob(Job job){
+        return submitJob(defaultApplicationId, job);
     }
 
     @Nullable
@@ -408,6 +461,10 @@ public class AnekaWebServices {
             return null;
     }
 
+    @Nullable
+    public String submitJobWait(Job job){
+        return submitJobWait(defaultApplicationId, job);
+    }
 
     public String waitJobTermination(String applicationId, String jobId){
         long stopTime = new Date().getTime() + jobTimeout;
@@ -448,6 +505,11 @@ public class AnekaWebServices {
         }
     }
 
+    @Nullable
+    public String waitJobTermination(String jobId){
+        return waitJobTermination(defaultApplicationId, jobId);
+    }
+
     private void dumpError(Result result){
         if (result != null && result.getError() != null){
             error = result.getError().getMessage();
@@ -462,5 +524,53 @@ public class AnekaWebServices {
 
     public String getError() {
         return error;
+    }
+
+    public UserCredential getUserCredential() {
+        return mUserCredential;
+    }
+
+    public void setUserCredential(UserCredential mUserCredential) {
+        this.mUserCredential = mUserCredential;
+    }
+
+    public String getDefaultApplicationId() {
+        return defaultApplicationId;
+    }
+
+    public void setDefaultApplicationId(String defaultApplicationId) {
+        this.defaultApplicationId = defaultApplicationId;
+    }
+
+    public int getRequestTimeout() {
+        return requestTimeout;
+    }
+
+    public void setRequestTimeout(int requestTimeout) {
+        this.requestTimeout = requestTimeout;
+    }
+
+    public int getJobTimeout() {
+        return jobTimeout;
+    }
+
+    public void setJobTimeout(int jobTimeout) {
+        this.jobTimeout = jobTimeout;
+    }
+
+    public int getPollingPeriod() {
+        return pollingPeriod;
+    }
+
+    public void setPollingPeriod(int pollingPeriod) {
+        this.pollingPeriod = pollingPeriod;
+    }
+
+    public boolean isLoggedIn(){
+        return mUserCredential != null;
+    }
+
+    public boolean hasValidDefaultApplication(){
+        return defaultApplicationId != null;
     }
 }

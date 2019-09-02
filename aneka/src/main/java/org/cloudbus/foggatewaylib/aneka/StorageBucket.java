@@ -51,4 +51,12 @@ public class StorageBucket {
         propertyGroup.setNameProperty(name);
         return propertyGroup;
     }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

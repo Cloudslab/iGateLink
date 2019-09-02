@@ -85,15 +85,13 @@ public class AnekaWebServicesTest {
                     "InputFTP",
                     Credentials.USERNAME,
                     Credentials.PASSWORD,
-                    Credentials.LOCAL_IP,
-                    9094);
+                    Credentials.HOST);
 
             StorageBucket bucketOut = new FTPStorageBucket(
                     "OutputFTP",
                     Credentials.USERNAME,
                     Credentials.PASSWORD,
-                    Credentials.LOCAL_IP,
-                    9094);
+                    Credentials.HOST);
 
             String applicationId = services.createApplicationWait(APP_NAME, bucketIn, bucketOut);
 
@@ -169,8 +167,7 @@ public class AnekaWebServicesTest {
                     "FTP",
                     Credentials.USERNAME,
                     Credentials.PASSWORD,
-                    Credentials.LOCAL_IP,
-                    9094);
+                    Credentials.HOST);
 
             ArrayOfFile sharedFiles = WSDLBuilder.buildArrayOfFile(
                     "FTP",
@@ -178,33 +175,6 @@ public class AnekaWebServicesTest {
                     "",
                     new String[]{"Yolo.zip"}
             );
-
-//            ArrayOfFile sharedFiles = WSDLBuilder.buildArrayOfFile(
-//                    "FTP",
-//                    "/Yolo/",
-//                    "",
-//                    new String[]{
-////                            "common/__init__.py",
-////                            "common/utils.py",
-////                            "common/data_transforms.py",
-////                            "common/coco_dataset.py",
-////                            "params.py",
-////                            "test_images.py",
-////                            "nets/model_main.py",
-////                            "nets/yolo_loss.py",
-////                            "nets/backbone/darknet.py",
-////                            "nets/backbone/__init__.py",
-////                            "nets/__init__.py",
-//                            "data/coco.names",
-////                            "training/params.py",
-////                            "training/training.py",
-////                            "evaluate/params.py",
-////                            "evaluate/eval_coco.py",
-////                            "evaluate/coco_index2category.json",
-////                            "evaluate/eval.py",
-////                            "weights/official_yolov3_weights_pytorch.pth",
-//                    }
-//            );
 
             String applicationId = services.createApplicationWait(APP_NAME, sharedFiles, bucket);
 
@@ -230,14 +200,12 @@ public class AnekaWebServicesTest {
                         "output/0_0.jpg");
 
                 ExecuteTaskItem unzipTask = WSDLBuilder.buildExecuteTaskItem(
-                        "C:\\Program Files\\7-Zip\\7z.exe",
+                        "7z",
                         "x", "-tzip", "Yolo.zip", "-y");
 
                 ExecuteTaskItem executeTask = WSDLBuilder.buildExecuteTaskItem(
                         "python",
                         "test_images.py", "params.py");
-
-//                ExecuteTaskItem executeTask = WSDLBuilder.buildExecuteTaskItem("dir");
 
                 ArrayOfTaskItem tasks = new ArrayOfTaskItem();
                 tasks.setTaskItem(new TaskItem[]{unzipTask, executeTask});
@@ -266,6 +234,82 @@ public class AnekaWebServicesTest {
         }
     }
 
+    @Test
+    public void testPython() {
+        AnekaWebServices services = new AnekaWebServices(Credentials.URL, true);
+        String myid = UUID.randomUUID().toString();
+
+        System.out.println(myid);
+
+        try {
+            boolean check;
+            check = services.authenticateUser(Credentials.USERNAME, Credentials.PASSWORD);
+
+            assert check;
+
+            FTPStorageBucket bucket = new FTPStorageBucket(
+                    "FTP",
+                    Credentials.USERNAME,
+                    Credentials.PASSWORD,
+                    Credentials.HOST);
+
+            String applicationId = services.createApplicationWait(APP_NAME, bucket);
+
+            assert applicationId != null;
+
+            try {
+                ApplicationResult result = services.queryApplication(applicationId);
+
+                assert result.getCreatedDateTime().before(new Date());
+                assert result.getDisplayName().equals(APP_NAME);
+                assert result.isUseFileTransfer();
+                assert result.getJobs().getJobResult().length == 0;
+                assert result.getFinishedDateTime() == null;
+
+
+                ArrayOfFile outputFiles = WSDLBuilder.buildArrayOfFile(
+                        "FTP",
+                        "/" + myid + "/output.txt",
+                        "std.out");
+
+                ExecuteTaskItem executeTask = WSDLBuilder.buildExecuteTaskItem(
+                        "python",
+                        "--version");
+
+                ArrayOfTaskItem tasks = new ArrayOfTaskItem();
+                tasks.setTaskItem(new TaskItem[]{executeTask});
+
+                Job job = new Job();
+                job.setOutputFiles(outputFiles);
+                job.setTasks(tasks);
+                job.setReservationId(myid);
+
+                String jobId = services.submitJobWait(applicationId, job);
+
+                assert jobId != null;
+
+                String termination_status = services.waitJobTermination(applicationId, jobId);
+
+                assertEquals(STATUS_COMPLETED, termination_status);
+
+                SimpleFTPClient ftpClient = new SimpleFTPClient(bucket);
+                String out = ftpClient.getString("/" + myid + "/output.txt");
+
+                System.out.println(out);
+
+                assert out.contains("Python");
+
+            } finally {
+                boolean deleted = services.abortApplication(applicationId);
+                assert deleted;
+            }
+        } finally {
+            if (services.getError() != null) {
+                System.out.println(services.getError());
+            }
+        }
+    }
+
 
     @Test
     public void test4() {
@@ -280,32 +324,13 @@ public class AnekaWebServicesTest {
 
             assert check;
 
-            StorageBucket bucket = new FTPStorageBucket(
+            FTPStorageBucket bucket = new FTPStorageBucket(
                     "FTP",
                     Credentials.USERNAME,
                     Credentials.PASSWORD,
-                    Credentials.LOCAL_IP,
-                    9094);
+                    Credentials.HOST);
 
-            StorageBucket remoteBucket = new FTPStorageBucket(
-                    "FTP",
-                    Credentials.USERNAME,
-                    Credentials.PASSWORD,
-                    Credentials.HOST,
-                    9094);
-
-            ArrayOfFile sharedFiles = WSDLBuilder.buildArrayOfFile(
-                    "FTP",
-                    "",
-                    "",
-                    new String[]{"Yolo.zip"}
-            );
-
-            SimpleFTPClient ftpClient = new SimpleFTPClient(
-                    Credentials.USERNAME,
-                    Credentials.PASSWORD,
-                    Credentials.HOST,
-                    21);
+            SimpleFTPClient ftpClient = new SimpleFTPClient(bucket);
 
             String folder = "/" + myid;
             String inputPath = folder + "/input.txt";
@@ -316,7 +341,7 @@ public class AnekaWebServicesTest {
             assert ftpClient.mkdir(folder);
             assert ftpClient.putString(inputPath, mString);
 
-            String applicationId = services.createApplicationWait(APP_NAME, sharedFiles, bucket);
+            String applicationId = services.createApplicationWait(APP_NAME, bucket);
 
             assert applicationId != null;
 

@@ -1,10 +1,11 @@
 package org.cloudbus.foggatewaylib.aneka;
 
-import android.text.TextUtils;
-
 import org.cloudbus.foggatewaylib.aneka.wsdl.ArrayOfFile;
+import org.cloudbus.foggatewaylib.aneka.wsdl.ArrayOfTaskItem;
 import org.cloudbus.foggatewaylib.aneka.wsdl.ExecuteTaskItem;
 import org.cloudbus.foggatewaylib.aneka.wsdl.File;
+import org.cloudbus.foggatewaylib.aneka.wsdl.TaskItem;
+import org.cloudbus.foggatewaylib.core.utils.StringUtils;
 
 public class WSDLBuilder {
     public static ArrayOfFile buildArrayOfFile(String storageBucketId, String path,
@@ -63,10 +64,16 @@ public class WSDLBuilder {
     }
 
     public static ExecuteTaskItem buildExecuteTaskItem(String cmd, String... args){
-        String arguments = TextUtils.join(" ", args);
+        String arguments = StringUtils.join(" ", args);
         ExecuteTaskItem executeTaskItem = new ExecuteTaskItem();
         executeTaskItem.setCommand(cmd);
         executeTaskItem.setArguments(arguments);
         return executeTaskItem;
+    }
+
+    public static ArrayOfTaskItem buildArrayOfTaskItem(TaskItem... taskItems){
+        ArrayOfTaskItem arrayOfTaskItem = new ArrayOfTaskItem();
+        arrayOfTaskItem.setTaskItem(taskItems);
+        return arrayOfTaskItem;
     }
 }
