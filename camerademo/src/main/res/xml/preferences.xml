@@ -1,15 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.preference.PreferenceScreen
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <androidx.preference.EditTextPreference
-        app:key="fogbus_master_ip"
-        app:title="FogBus Master IP"
-        app:useSimpleSummaryProvider="true"/>
-
     <androidx.preference.SwitchPreference
         app:key="enable_services"
         app:title="Enable services"
         app:defaultValue="false"/>
+
+    <androidx.preference.SwitchPreference
+        app:key="enable_fogbus"
+        app:title="Enable FogBus Execution"
+        app:defaultValue="false"/>
+
+    <androidx.preference.EditTextPreference
+        app:key="fogbus_master_ip"
+        app:title="FogBus Master IP"
+        app:useSimpleSummaryProvider="true"
+        app:dependency="enable_fogbus" />
+
+    <androidx.preference.SwitchPreference
+        app:key="enable_aneka"
+        app:title="Enable Aneka Execution"
+        app:defaultValue="false"/>
+
+    <androidx.preference.EditTextPreference
+        app:key="aneka_master_ip"
+        app:title="Aneka Master IP"
+        app:useSimpleSummaryProvider="true"
+        app:dependency="enable_aneka" />
+
+    <androidx.preference.EditTextPreference
+        app:key="aneka_username"
+        app:title="Aneka Username"
+        app:useSimpleSummaryProvider="true"
+        app:dependency="enable_aneka" />
+
+    <androidx.preference.EditTextPreference
+        app:key="aneka_password"
+        app:title="Aneka Password"
+        app:useSimpleSummaryProvider="true"
+        app:dependency="enable_aneka" />
 
 </androidx.preference.PreferenceScreen>

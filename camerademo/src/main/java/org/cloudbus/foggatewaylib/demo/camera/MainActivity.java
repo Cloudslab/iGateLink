@@ -1,8 +1,10 @@
 package org.cloudbus.foggatewaylib.demo.camera;
 
 import android.Manifest;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -15,9 +17,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import org.cloudbus.foggatewaylib.camera.BitmapProvider;
 import org.cloudbus.foggatewaylib.camera.CameraProvider;
 import org.cloudbus.foggatewaylib.camera.ImageData;
-import org.cloudbus.foggatewaylib.core.DummyProvider;
 import org.cloudbus.foggatewaylib.core.ExecutionManager;
 import org.cloudbus.foggatewaylib.core.GenericData;
+import org.cloudbus.foggatewaylib.core.InMemoryStore;
 import org.cloudbus.foggatewaylib.core.IndividualTrigger;
 import org.cloudbus.foggatewaylib.core.ProduceDataTrigger;
 import org.cloudbus.foggatewaylib.core.ProgressData;
@@ -35,7 +37,8 @@ public class MainActivity extends FogGatewayServiceActivity
     public static final String KEY_DATA_OUTPUT_BITMAP = "outputBitmap";
     public static final String KEY_PROVIDER_INPUT = "inputProvider";
     public static final String KEY_PROVIDER_INPUT_BITMAP = "inputProviderBitmap";
-    public static final String KEY_PROVIDER_OUTPUT = "outputProvider";
+    public static final String KEY_PROVIDER_FOGBUS = "fogbusProvider";
+    public static final String KEY_PROVIDER_ANEKA = "anekaProvider";
     public static final String KEY_PROVIDER_DUMMY = "dummyProvider";
     public static final String KEY_PROVIDER_OUTPUT_BITMAP = "outputProviderBitmap";
     public static final String KEY_TRIGGER_EXEC = "execTrigger";
@@ -118,12 +121,9 @@ public class MainActivity extends FogGatewayServiceActivity
 
     protected void initExecutionManager(ExecutionManager executionManager) {
         executionManager
+                .addStore(KEY_DATA_OUTPUT, new InMemoryStore<>(ImageData.class))
                 .addProvider(KEY_PROVIDER_INPUT, KEY_DATA_INPUT,
                         new CameraProvider())
-                .addProvider(KEY_PROVIDER_OUTPUT, KEY_DATA_OUTPUT,
-                        new EdgeLensProvider(4))
-                .addProvider(KEY_PROVIDER_DUMMY, KEY_DATA_OUTPUT,
-                        new DummyProvider<>(100, "Done", ImageData.class))
                 .addProvider(KEY_PROVIDER_INPUT_BITMAP, KEY_DATA_INPUT_BITMAP,
                         new BitmapProvider(ImageData.class, GenericData.class))
                 .addProvider(KEY_PROVIDER_OUTPUT_BITMAP, KEY_DATA_OUTPUT_BITMAP,
@@ -139,7 +139,7 @@ public class MainActivity extends FogGatewayServiceActivity
                             @Override
                             public void onNewData(Store store, ProgressData data) {
                                 if (data.getProgress() < 0){
-                                    if (data.getPublisher().equals(KEY_PROVIDER_OUTPUT)
+                                    if (data.getPublisher().equals(KEY_PROVIDER_FOGBUS)
                                             || data.getPublisher().equals(KEY_PROVIDER_DUMMY)){
                                         getExecutionManager().produceDataExcludeProviders(
                                                 KEY_DATA_OUTPUT,
@@ -154,5 +154,20 @@ public class MainActivity extends FogGatewayServiceActivity
                             }
                         })
                 .addChooser(KEY_DATA_OUTPUT, new RoundRobinChooser());
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        if (prefs.getBoolean("enable_fogbus", false)){
+            executionManager.addProvider(KEY_PROVIDER_FOGBUS, KEY_DATA_OUTPUT,
+                    new EdgeLensProvider(4));
+        } else{
+            executionManager.removeProvider(KEY_PROVIDER_FOGBUS);
+        }
+
+        if (prefs.getBoolean("enable_aneka", false)){
+            executionManager.addProvider(KEY_PROVIDER_ANEKA, KEY_DATA_OUTPUT,
+                    new SimpleAnekaProvider());
+        } else{
+            executionManager.removeProvider(KEY_PROVIDER_ANEKA);
+        }
     }
 }

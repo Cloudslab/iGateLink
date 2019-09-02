@@ -42,6 +42,7 @@ dependencies {
     implementation project(':core')
     implementation project(':camera')
     implementation project(':service')
+    implementation project(':aneka')
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment:$rootProject.nav_version"

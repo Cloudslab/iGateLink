@@ -48,5 +48,26 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 }
             });
         }
+
+        SwitchPreference enableAnekaPreference = findPreference("enable_aneka");
+        if (enableAnekaPreference != null){
+            enableAnekaPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    if (getActivity() == null)
+                        return false;
+
+                    if ((boolean) newValue) {
+                        FogGatewayService.start(getActivity(), MainActivity.class);
+                        ForegroundService.bind(getActivity(),
+                                (FogGatewayServiceActivity) getActivity(),
+                                FogGatewayService.class);
+                    } else {
+                        FogGatewayService.stop(getActivity());
+                    }
+                    return true;
+                }
+            });
+        }
     }
 }
