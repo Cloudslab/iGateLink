@@ -1,8 +1,5 @@
 package org.cloudbus.foggatewaylib.core;
 
-import android.content.Context;
-import android.util.Log;
-
 import androidx.annotation.Nullable;
 
 import org.cloudbus.foggatewaylib.utils.MultiMap;
@@ -111,21 +108,9 @@ public class ExecutionManager{
     private Map<String, Chooser> choosers;
 
     /**
-     * Context in which the {@link ExecutionManager} is running.
-     *
-     * @see #ExecutionManager(Context)
-     * @see #getContext()
-     */
-    private Context context;
-
-    /**
      * Default constructor.
-     * It sets the {@link #context}, initializes all the maps and creates the {@link ProgressData}
-     * {@link Store}.
+     * It initializes all the maps and creates the {@link ProgressData} {@link Store}.
      *
-     * @param context the {@link Context} in which {@link ExecutionManager} is running.
-     *
-     * @see #context
      * @see #stores
      * @see #providers
      * @see #providersOfData
@@ -134,11 +119,7 @@ public class ExecutionManager{
      * @see #UITriggers
      * @see #KEY_DATA_PROGRESS
      */
-    public ExecutionManager(Context context){
-        super();
-
-        this.context = context;
-
+    public ExecutionManager(){
         stores = new HashMap<>();
         providers = new HashMap<>();
         providersOfData = new MultiMap<>();
@@ -147,13 +128,6 @@ public class ExecutionManager{
         UITriggers = new HashMap<>();
 
         addStore(KEY_DATA_PROGRESS, new InMemoryStore<>(ProgressData.class));
-    }
-
-    /**
-     * @return the {@link Context} in which {@link ExecutionManager} is running.
-     */
-    public Context getContext() {
-        return context;
     }
 
     /**
@@ -180,7 +154,6 @@ public class ExecutionManager{
     public ExecutionManager addStore(String key, Store store){
 
         if (stores.containsKey(key)){
-            Log.w(TAG, "Store " + key + " already exists");
             return this;
         }
         stores.put(key, store);
@@ -223,7 +196,6 @@ public class ExecutionManager{
                                                Trigger trigger,
                                                Map<String, String> map){
         if (map.containsKey(triggerKey)){
-            Log.w(TAG, "IndividualTrigger " + triggerKey + " already exists");
             return this;
         }
 
@@ -429,7 +401,6 @@ public class ExecutionManager{
     public ExecutionManager addChooser(String outputKey,
                                        Chooser chooser){
         if (choosers.containsKey(outputKey)){
-            Log.w(TAG, "Chooser for data " + outputKey + " already exists");
             return this;
         }
 
@@ -479,7 +450,6 @@ public class ExecutionManager{
     public ExecutionManager addProvider(String providerKey, String outputKey,
                                         Provider provider){
         if (providers.containsKey(providerKey)){
-            Log.w(TAG, "Provider " + providerKey + " already exists");
             return this;
         }
 

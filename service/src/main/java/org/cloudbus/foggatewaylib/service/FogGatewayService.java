@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import org.cloudbus.foggatewaylib.core.AndroidExecutionManager;
 import org.cloudbus.foggatewaylib.core.ExecutionManager;
 
 /**
@@ -15,7 +16,7 @@ import org.cloudbus.foggatewaylib.core.ExecutionManager;
 public class FogGatewayService extends ForegroundService implements ExecutionManager.Holder {
     public static final String TAG = "FogGatewayService";
 
-    private ExecutionManager executionManager;
+    private AndroidExecutionManager executionManager;
 
     /**
      * Constructor that initializes the executionManager.
@@ -25,7 +26,7 @@ public class FogGatewayService extends ForegroundService implements ExecutionMan
      */
     public FogGatewayService(){
         super();
-        executionManager = new ExecutionManager(this);
+        executionManager = new AndroidExecutionManager(this);
     }
 
     /**

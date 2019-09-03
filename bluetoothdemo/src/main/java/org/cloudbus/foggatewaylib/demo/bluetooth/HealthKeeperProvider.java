@@ -32,7 +32,7 @@ public class HealthKeeperProvider extends FogBusProvider<OximeterData, AnalysisR
     @Override
     protected String getMasterIP() {
         return PreferenceManager
-                .getDefaultSharedPreferences(getExecutionManager().getContext())
+                .getDefaultSharedPreferences(getContext())
                 .getString("fogbus_master_ip", "");
     }
 

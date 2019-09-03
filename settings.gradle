@@ -1,1 +1,1 @@
-include ':camerademo', ':core', ':bluetoothdemo', ':bluetooth', ':camera', ':service', ':fogbus', ':aneka', ':aneka-wsdl', ':utils'
+include ':camerademo', ':core', ':bluetoothdemo', ':bluetooth', ':camera', ':service', ':fogbus', ':aneka', ':aneka-wsdl', ':core-java', ':utils', ':utils-java'

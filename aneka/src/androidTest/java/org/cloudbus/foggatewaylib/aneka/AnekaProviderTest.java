@@ -10,6 +10,7 @@ import com.manjrasoft.aneka.ArrayOfFile;
 import com.manjrasoft.aneka.ArrayOfTaskItem;
 
 import org.apache.commons.net.ftp.FTP;
+import org.cloudbus.foggatewaylib.core.AndroidExecutionManager;
 import org.cloudbus.foggatewaylib.core.ExecutionManager;
 import org.cloudbus.foggatewaylib.core.GenericData;
 import org.cloudbus.foggatewaylib.core.IndividualTrigger;
@@ -33,7 +34,7 @@ public class AnekaProviderTest {
 
         final String inputString = getRandomString(256);
 
-        ExecutionManager executionManager = new ExecutionManager(appContext);
+        AndroidExecutionManager executionManager = new AndroidExecutionManager(appContext);
 
         executionManager.addProvider("ANEKA", "OUTPUT", anekaProvider);
 

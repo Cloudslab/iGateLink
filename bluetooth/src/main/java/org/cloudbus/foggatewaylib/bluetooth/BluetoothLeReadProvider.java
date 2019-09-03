@@ -79,7 +79,7 @@ public abstract class BluetoothLeReadProvider<T extends Data>
         if (status == BluetoothGatt.GATT_SUCCESS){
             T output = readCharacteristic(gatt, characteristic);
             if (output != null)
-                publishResultsThreadSafe(output);
+                publishResults(output);
         }
     }
 

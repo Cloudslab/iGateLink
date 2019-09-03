@@ -2,6 +2,7 @@ package org.cloudbus.foggatewaylib.demo.bluetooth;
 
 import android.preference.PreferenceManager;
 
+import org.cloudbus.foggatewaylib.core.AndroidExecutionManager;
 import org.cloudbus.foggatewaylib.core.Chooser;
 import org.cloudbus.foggatewaylib.core.RoundRobinChooser;
 
@@ -48,7 +49,8 @@ public class MyChooser extends Chooser {
     public void onAttach() {
         super.onAttach();
         localExecutionEnabled = PreferenceManager
-                .getDefaultSharedPreferences(getExecutionManager().getContext())
+                .getDefaultSharedPreferences(
+                        ((AndroidExecutionManager)getExecutionManager()).getContext())
                 .getBoolean("enable_local_execution", false);
     }
 }

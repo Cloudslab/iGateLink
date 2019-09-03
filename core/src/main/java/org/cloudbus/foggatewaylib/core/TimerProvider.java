@@ -1,7 +1,5 @@
 package org.cloudbus.foggatewaylib.core;
 
-import android.util.Log;
-
 import org.cloudbus.foggatewaylib.utils.Timer;
 
 /**
@@ -42,7 +40,7 @@ public abstract class TimerProvider<T extends Data, S extends Data>
         super(inputType, outputType);
 
         if (period <= 0) {
-            Log.e(TAG, "No period was set");
+            throw new IllegalArgumentException("period must be > 0");
         } else {
             timer = new Timer(new Runnable() {
                 @Override

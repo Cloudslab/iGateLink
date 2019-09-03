@@ -42,7 +42,7 @@ class SimpleAnekaProvider extends AnekaProvider<ImageData, ImageData> {
         if (getExecutionManager() == null)
             return;
 
-        Context context = getExecutionManager().getContext();
+        Context context = getContext();
         if (context == null)
             return;
 

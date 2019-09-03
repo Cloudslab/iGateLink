@@ -31,7 +31,7 @@ public class EdgeLensProvider extends ThreadPoolProvider<ImageData, ImageData> {
     public void onAttach() {
         super.onAttach();
         masterIP = PreferenceManager
-                .getDefaultSharedPreferences(getExecutionManager().getContext())
+                .getDefaultSharedPreferences(getContext())
                 .getString("fogbus_master_ip", "");
     }
 

@@ -87,7 +87,7 @@ public class LocalProvider extends SequentialProvider<OximeterData, AnalysisResu
     public void onAttach() {
         super.onAttach();
         String sleepStr = PreferenceManager
-                .getDefaultSharedPreferences(getExecutionManager().getContext())
+                .getDefaultSharedPreferences(getContext())
                 .getString("debug_sleep", Integer.toString(DEFAULT_SLEEP_SEC));
 
         try{

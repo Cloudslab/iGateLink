@@ -3,8 +3,7 @@ package org.cloudbus.foggatewaylib.camera;
 import android.hardware.Camera;
 import android.util.Log;
 
-import org.cloudbus.foggatewaylib.core.ExecutionManager;
-import org.cloudbus.foggatewaylib.core.Provider;
+import org.cloudbus.foggatewaylib.core.AndroidProvider;
 import org.cloudbus.foggatewaylib.core.VoidData;
 
 import java.util.HashMap;
@@ -19,7 +18,7 @@ import static org.cloudbus.foggatewaylib.camera.CameraUtils.getCameraInstance;
  *
  * @author Riccardo Mancini
  */
-public class CameraProvider extends Provider<VoidData, ImageData> {
+public class CameraProvider extends AndroidProvider<VoidData, ImageData> {
     public static final String TAG = "CameraProvider";
 
     private Camera mCamera;
@@ -61,10 +60,9 @@ public class CameraProvider extends Provider<VoidData, ImageData> {
 
                 @Override
                 public void onShutter() {
-                    ExecutionManager executionManager = getExecutionManager();
                     int orientation;
-                    if (executionManager != null) {
-                        orientation = executionManager.getContext().getResources()
+                    if (getContext() != null) {
+                        orientation = getContext().getResources()
                                 .getConfiguration().orientation;
                     }
                     else {

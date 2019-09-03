@@ -9,8 +9,6 @@ import static org.junit.Assert.assertArrayEquals;
 
 public class SortedDataListTest {
 
-
-
     @Test
     public void sublistFrom_isCorrect() {
         int[] array = new int[]{10, 11, 12};

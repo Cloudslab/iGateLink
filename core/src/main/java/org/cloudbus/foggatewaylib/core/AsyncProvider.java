@@ -14,7 +14,7 @@ import java.util.concurrent.Executor;
  *
  * @author Riccardo Mancini
  */
-public abstract class AsyncProvider<T extends Data, S extends Data> extends Provider<T, S> {
+public abstract class AsyncProvider<T extends Data, S extends Data> extends AndroidProvider<T, S> {
     private static final String TAG = "AsyncProvider";
 
     private int pendingTasks;

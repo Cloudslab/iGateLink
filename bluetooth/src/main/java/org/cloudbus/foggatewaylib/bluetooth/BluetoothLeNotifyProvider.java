@@ -75,7 +75,7 @@ public abstract class BluetoothLeNotifyProvider<T extends Data>
                         BluetoothGattCharacteristic characteristic){
         T output = readCharacteristic(gatt, characteristic);
         if (output != null)
-            publishResultsThreadSafe(output);
+            publishResults(output);
     }
 
     /**

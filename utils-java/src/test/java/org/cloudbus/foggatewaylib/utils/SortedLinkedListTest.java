@@ -1,10 +1,9 @@
 package org.cloudbus.foggatewaylib.utils;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
-
-import static org.junit.Assert.assertArrayEquals;
 
 public class SortedLinkedListTest {
     @Test
@@ -26,7 +25,7 @@ public class SortedLinkedListTest {
         int[] outArray = new int[array.length];
         for (int i = 0; i < outArray.length; i++)
             outArray[i] = intList[i];
-        assertArrayEquals(array, outArray);
+        Assert.assertArrayEquals(array, outArray);
     }
 
     @Test
@@ -64,6 +63,6 @@ public class SortedLinkedListTest {
         int[] outArray = new int[array.length];
         for (int i = 0; i < outArray.length; i++)
             outArray[i] = intList[i];
-        assertArrayEquals(array, outArray);
+        Assert.assertArrayEquals(array, outArray);
     }
 }

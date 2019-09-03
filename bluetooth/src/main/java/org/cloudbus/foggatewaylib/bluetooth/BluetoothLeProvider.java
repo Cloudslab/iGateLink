@@ -2,8 +2,8 @@ package org.cloudbus.foggatewaylib.bluetooth;
 
 import android.bluetooth.BluetoothGatt;
 
+import org.cloudbus.foggatewaylib.core.AndroidProvider;
 import org.cloudbus.foggatewaylib.core.Data;
-import org.cloudbus.foggatewaylib.core.Provider;
 
 import java.util.UUID;
 
@@ -15,7 +15,8 @@ import java.util.UUID;
  *
  * @author Riccardo Mancini
  */
-public abstract class BluetoothLeProvider<T extends Data, S extends Data> extends Provider<T, S> {
+public abstract class BluetoothLeProvider<T extends Data, S extends Data>
+        extends AndroidProvider<T, S> {
 
     private BluetoothLeHandler bluetoothLeHandler;
 
@@ -104,7 +105,7 @@ public abstract class BluetoothLeProvider<T extends Data, S extends Data> extend
     @Override
     public void onAttach() {
         if (incrementAttachedBluetoothProviders() == 1)
-            getBluetoothLeHandler().setContext(getExecutionManager().getContext());
+            getBluetoothLeHandler().setContext(getContext());
     }
 
     /**
