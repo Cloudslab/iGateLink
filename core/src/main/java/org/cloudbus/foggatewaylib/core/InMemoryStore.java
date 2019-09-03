@@ -1,7 +1,5 @@
 package org.cloudbus.foggatewaylib.core;
 
-import org.cloudbus.foggatewaylib.core.utils.SortedLinkedList;
-
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,12 +27,12 @@ public class InMemoryStore<E extends Data> extends Store<E> {
     /**
      * List that stores all the data in this {@link InMemoryStore}.
      */
-    private SortedLinkedList<E> dataList = new SortedLinkedList<>();
+    private SortedDataList<E> dataList = new SortedDataList<>();
 
     /**
      * Lists that link all the data of the same request.
      */
-    private Map<Long, SortedLinkedList<E>> dataRequestMap = new HashMap<>();
+    private Map<Long, SortedDataList<E>> dataRequestMap = new HashMap<>();
 
     /**
      * Maximum number of elements.
@@ -85,7 +83,7 @@ public class InMemoryStore<E extends Data> extends Store<E> {
     @Override
     @SuppressWarnings("unchecked")
     public E[] retrieveLastN(int N, long requestID) {
-        SortedLinkedList<E> requestList = dataRequestMap.get(requestID);
+        SortedDataList<E> requestList = dataRequestMap.get(requestID);
         if (requestList == null){
             return (E[]) Array.newInstance(getDataType());
         }
@@ -111,7 +109,7 @@ public class InMemoryStore<E extends Data> extends Store<E> {
      */
     @Override
     public E retrieveLast(long requestID) {
-        SortedLinkedList<E> requestList = dataRequestMap.get(requestID);
+        SortedDataList<E> requestList = dataRequestMap.get(requestID);
         if (requestList == null){
             return null;
         }
@@ -135,7 +133,7 @@ public class InMemoryStore<E extends Data> extends Store<E> {
     @Override
     @SuppressWarnings("unchecked")
     public E[] retrieveInterval(long from, long to, long requestID) {
-        SortedLinkedList<E> requestList = dataRequestMap.get(requestID);
+        SortedDataList<E> requestList = dataRequestMap.get(requestID);
         if (requestList == null){
             return (E[]) Array.newInstance(getDataType());
         }
@@ -162,9 +160,9 @@ public class InMemoryStore<E extends Data> extends Store<E> {
         List<E> newData = Arrays.asList(data);
         dataList.addAll(newData);
 
-        SortedLinkedList<E> requestList = dataRequestMap.get(data[0].getRequestID());
+        SortedDataList<E> requestList = dataRequestMap.get(data[0].getRequestID());
         if (requestList == null){
-            requestList = new SortedLinkedList<>();
+            requestList = new SortedDataList<>();
             dataRequestMap.put(data[0].getRequestID(), requestList);
         }
         requestList.addAll(newData);
@@ -172,7 +170,7 @@ public class InMemoryStore<E extends Data> extends Store<E> {
         if (maxElements != 0 && dataList.size() > maxElements){
             for (int i = 0; i < dataList.size() - maxElements; i++){
                 E removedE = dataList.removeLast();
-                SortedLinkedList<E> listRemoved = dataRequestMap.get(removedE.getRequestID());
+                SortedDataList<E> listRemoved = dataRequestMap.get(removedE.getRequestID());
                 listRemoved.removeLast();
             }
         }

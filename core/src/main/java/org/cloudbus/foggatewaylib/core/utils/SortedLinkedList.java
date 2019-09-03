@@ -3,8 +3,6 @@ package org.cloudbus.foggatewaylib.core.utils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import org.cloudbus.foggatewaylib.core.Data;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,12 +14,11 @@ import java.util.NoSuchElementException;
 
 /**
  * Implementation of a sorted linked list, based on the {@link LinkedList}.
- * Elements are sorted by their {@link Data#id}.
+ * Elements are sorted in ascending order according to their {@link Comparable} interface.
  * Despite the name, this class does not have the {@link List} interface since some methods would
  * not make sense. Anyways, some more advanced methods are present from {@link java.util.Deque},
  * like {@link #getFirst()}, {@link #getLast()}, {@link #removeFirst()}, {@link #removeLast()},
- * and other methods from {@link List}, like {@link #descendingIterator()},
- * {@link #subList(Data, Data)}.
+ * and other methods from {@link List}, like {@link #descendingIterator()}.
  * {@code null} elements are not allowed.
  *
  * @param <E> the type of the elements
@@ -29,8 +26,8 @@ import java.util.NoSuchElementException;
  *
  * @author Riccardo Mancini
  */
-public class SortedLinkedList<E extends Data> implements Collection<E> {
-    private LinkedList<E> list;
+public class SortedLinkedList<E extends Comparable> implements Collection<E> {
+    protected LinkedList<E> list;
 
     /**
      * Default constructor that creates an empty list.
@@ -78,7 +75,7 @@ public class SortedLinkedList<E extends Data> implements Collection<E> {
      * @see LinkedList#listIterator()
      */
     @SuppressWarnings("unchecked")
-    private ListIterator<E> findPosition(@Nullable Object o) {
+    protected ListIterator<E> findPosition(@Nullable Object o) {
         if (o == null)
             return null;
 
@@ -86,49 +83,28 @@ public class SortedLinkedList<E extends Data> implements Collection<E> {
             return list.listIterator();
 
         E e = (E) o;
-        long id = e.getId();
-        long lastId = list.getLast().getId();
-        long firstId = list.getFirst().getId();
 
-        if (id > lastId) {
+        if (e.compareTo(list.getLast()) > 0) {
             return list.listIterator(list.size());
         }
-        if (id < firstId) {
+        if (e.compareTo(list.getFirst()) < 0) {
             return list.listIterator(0);
         }
 
-        ListIterator<E> iter;
-        boolean asc;
-        if ((lastId + firstId) / 2 > id) {
-            iter = list.listIterator();
-            asc = true;
-        } else {
-            iter = list.listIterator(list.size() - 1);
-            asc = false;
-        }
+        ListIterator<E> iter = list.listIterator(list.size() - 1);
 
         while (true) {
-            Data el;
+            E el;
 
-            if (asc)
-                el = iter.next();
-            else
-                el = iter.previous();
+            el = iter.previous();
 
             if (el == null)
                 throw new RuntimeException("Insert position not found, wtf?");
 
-            long elId = el.getId();
-
-            if (elId == id){
-                if (asc)
-                    iter.previous();
+            if (el.compareTo(e) == 0){
                 return iter;
-            } else if (!asc && elId < id) {
+            } else if (el.compareTo(e) < 0) {
                 iter.next();
-                return iter;
-            } else if (asc && elId > id) {
-                iter.previous();
                 return iter;
             }
         }
@@ -145,7 +121,7 @@ public class SortedLinkedList<E extends Data> implements Collection<E> {
      *         {@code null}.
      * @see #findPosition(Object)
      */
-    private int indexOfInsertion(@Nullable Object o) {
+    protected int indexOfInsertion(@Nullable Object o) {
         ListIterator<E> iterator = findPosition(o);
         if (iterator != null)
             return iterator.nextIndex();
@@ -162,12 +138,12 @@ public class SortedLinkedList<E extends Data> implements Collection<E> {
      * @return the index of the element or {@code -1} if the element was not found.
      * @see #findPosition(Object)
      */
-    private int indexOf(@Nullable Object o) {
+    protected int indexOf(@Nullable Object o) {
         int i = indexOfInsertion(o);
 
         if (i < 0 || i >= list.size()) {
             return -1;
-        } else if (list.get(i).getId() == ((Data) o).getId())
+        } else if (list.get(i).equals(o))
             return i;
         else
             return -1;
@@ -270,7 +246,7 @@ public class SortedLinkedList<E extends Data> implements Collection<E> {
     @SuppressWarnings("unchecked")
     public boolean remove(@Nullable Object o) {
         ListIterator<E> iterator = findPosition(o);
-        if (iterator != null && iterator.next().getId() == ((E)o).getId()){
+        if (iterator != null && iterator.next().equals(o)){
             iterator.remove();
             return true;
         }
@@ -309,13 +285,10 @@ public class SortedLinkedList<E extends Data> implements Collection<E> {
         if (list.isEmpty())
             return list.addAll(newList);
 
-        long lastId = list.getLast().getId();
-        long firstId = list.getFirst().getId();
-
-        if (newList.get(0).getId() > lastId) {
+        if (newList.get(0).compareTo(list.getLast()) > 0) {
             return list.addAll(newList);
         }
-        if (newList.get(newList.size() - 1).getId() < firstId) {
+        if (newList.get(newList.size() - 1).compareTo(list.getFirst()) < 0) {
             ListIterator<E> iterator = newList.listIterator(newList.size());
             while (iterator.hasPrevious()){
                 list.addFirst(iterator.previous());
@@ -332,9 +305,8 @@ public class SortedLinkedList<E extends Data> implements Collection<E> {
                 continue;
             }
 
-            long id = e.getId();
             while (true) {
-                Data el;
+                E el;
 
                 if (iter.hasNext())
                     el = iter.next();
@@ -343,9 +315,7 @@ public class SortedLinkedList<E extends Data> implements Collection<E> {
                     break;
                 }
 
-                long elId = el.getId();
-
-                if (elId >= id){
+                if (el.compareTo(e) >= 0){
                     iter.previous();
                     iter.add(e);
                     break;
@@ -393,7 +363,7 @@ public class SortedLinkedList<E extends Data> implements Collection<E> {
     }
 
     /**
-     * Gets the last element in the list (higher {@link Data#id}).
+     * Gets the last element in the list.
      *
      * @return last element or {@code null} if the list is empty
      */
@@ -407,7 +377,7 @@ public class SortedLinkedList<E extends Data> implements Collection<E> {
     }
 
     /**
-     * Gets the first element in the list (lower {@link Data#id}).
+     * Gets the first element in the list.
      *
      * @return first element or {@code null} if the list is empty
      */
@@ -421,7 +391,7 @@ public class SortedLinkedList<E extends Data> implements Collection<E> {
     }
 
     /**
-     * Removes the first element in the list (lower {@link Data#id}).
+     * Removes the first element in the list.
      *
      * @return removed element or {@code null} if the list is empty
      */
@@ -435,7 +405,7 @@ public class SortedLinkedList<E extends Data> implements Collection<E> {
     }
 
     /**
-     * Removes the last element in the list (higher {@link Data#id}).
+     * Removes the last element in the list.
      *
      * @return removed element or {@code null} if the list is empty
      */
@@ -447,70 +417,4 @@ public class SortedLinkedList<E extends Data> implements Collection<E> {
             return null;
         }
     }
-
-    /**
-     * Returns a sublist with all the elements with {@link Data#id} between {@code from} (included)
-     * and {@code to} (excluded).
-     *
-     * @param from lower bound (included)
-     * @param to upper bound (excluded)
-     * @return the sublist.
-     * @see LinkedList#subList(int, int)
-     * @see #subList(Data, Data)
-     * @see #subList(long)
-     * @see #subList(Data)
-     */
-    public List<E> subList(long from, long to) {
-        return subList(new Data(from), new Data(to));
-    }
-
-    /**
-     * Returns a sublist with all the elements with {@link Data#id} between {@code from} (included)
-     * and {@code to} (excluded).
-     *
-     * @param from lower bound (included)
-     * @param to upper bound (excluded)
-     * @return the sublist.
-     * @see LinkedList#subList(int, int)
-     * @see #subList(long, long)
-     * @see #subList(long)
-     * @see #subList(Data)
-     */
-    public List<E> subList(Data from, Data to) {
-        int indexFrom = indexOfInsertion(from);
-        int indexTo = indexOfInsertion(to);
-
-        return list.subList(indexFrom, indexTo);
-    }
-
-    /**
-     * Returns a sublist with all the elements with {@link Data#id} higher than or equal to
-     * {@code from} (included).
-     *
-     * @param from lower bound (included)
-     * @return the sublist.
-     * @see LinkedList#subList(int, int)
-     * @see #subList(long, long)
-     * @see #subList(Data, Data)
-     * @see #subList(Data)
-     */
-    public List<E> subList(long from) {
-        return subList(new Data(from));
-    }
-
-    /**
-     * Returns a sublist with all the elements with {@link Data#id} higher than or equal to
-     * {@code from} (included).
-     *
-     * @param from lower bound (included)
-     * @return the sublist.
-     * @see LinkedList#subList(int, int)
-     * @see #subList(long, long)
-     * @see #subList(Data, Data)
-     * @see #subList(long)
-     */
-    public List<E> subList(Data from) {
-        return subList(from, new Data(Long.MAX_VALUE));
-    }
-
 }

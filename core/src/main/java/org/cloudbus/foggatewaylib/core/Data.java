@@ -1,5 +1,7 @@
 package org.cloudbus.foggatewaylib.core;
 
+import androidx.annotation.Nullable;
+
 import java.util.Date;
 
 /**
@@ -132,5 +134,13 @@ public class Data implements Comparable<Data>{
             return -1;
         else
             return 0;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj instanceof Data)
+            return this.id == ((Data) obj).getId();
+        else
+            return super.equals(obj);
     }
 }
