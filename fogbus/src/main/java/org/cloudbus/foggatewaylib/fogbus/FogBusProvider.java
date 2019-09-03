@@ -4,7 +4,7 @@ import android.text.TextUtils;
 
 import org.cloudbus.foggatewaylib.core.Data;
 import org.cloudbus.foggatewaylib.core.SequentialProvider;
-import org.cloudbus.foggatewaylib.core.utils.SimpleHttpConnection;
+import org.cloudbus.foggatewaylib.utils.SimpleHttpConnection;
 
 import java.util.HashMap;
 import java.util.List;

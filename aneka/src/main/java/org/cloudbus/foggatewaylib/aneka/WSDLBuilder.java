@@ -6,7 +6,7 @@ import com.manjrasoft.aneka.ExecuteTaskItem;
 import com.manjrasoft.aneka.File;
 import com.manjrasoft.aneka.TaskItem;
 
-import org.cloudbus.foggatewaylib.core.utils.StringUtils;
+import org.cloudbus.foggatewaylib.utils.StringUtils;
 
 public class WSDLBuilder {
     public static ArrayOfFile buildArrayOfFile(String storageBucketId, String path,

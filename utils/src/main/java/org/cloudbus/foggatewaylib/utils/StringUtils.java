@@ -1,4 +1,4 @@
-package org.cloudbus.foggatewaylib.core.utils;
+package org.cloudbus.foggatewaylib.utils;
 
 import androidx.annotation.NonNull;
 

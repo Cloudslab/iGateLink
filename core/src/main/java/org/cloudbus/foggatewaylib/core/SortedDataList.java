@@ -1,6 +1,6 @@
 package org.cloudbus.foggatewaylib.core;
 
-import org.cloudbus.foggatewaylib.core.utils.SortedLinkedList;
+import org.cloudbus.foggatewaylib.utils.SortedLinkedList;
 
 import java.util.Collection;
 import java.util.LinkedList;

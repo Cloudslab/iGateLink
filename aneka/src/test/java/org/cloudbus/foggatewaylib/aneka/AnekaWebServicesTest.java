@@ -8,7 +8,7 @@ import com.manjrasoft.aneka.ExecuteTaskItem;
 import com.manjrasoft.aneka.Job;
 import com.manjrasoft.aneka.TaskItem;
 
-import org.cloudbus.foggatewaylib.aneka.ftp.SimpleFTPClient;
+import org.cloudbus.foggatewaylib.utils.SimpleFTPClient;
 import org.junit.Test;
 
 import java.util.Date;
@@ -293,7 +293,7 @@ public class AnekaWebServicesTest {
 
                 assertEquals(STATUS_COMPLETED, termination_status);
 
-                SimpleFTPClient ftpClient = new SimpleFTPClient(bucket);
+                SimpleFTPClient ftpClient = bucket.buildFTPClient();
                 String out = ftpClient.getString("/" + myid + "/output.txt");
 
                 System.out.println(out);
@@ -331,7 +331,7 @@ public class AnekaWebServicesTest {
                     Credentials.PASSWORD,
                     Credentials.HOST);
 
-            SimpleFTPClient ftpClient = new SimpleFTPClient(bucket);
+            SimpleFTPClient ftpClient = bucket.buildFTPClient();
 
             String folder = "/" + myid;
             String inputPath = folder + "/input.txt";

@@ -2,7 +2,7 @@ package org.cloudbus.foggatewaylib.core;
 
 import android.util.Log;
 
-import org.cloudbus.foggatewaylib.core.utils.Timer;
+import org.cloudbus.foggatewaylib.utils.Timer;
 
 /**
  * Abstract {@link AsyncProvider} that will call its @{@link AsyncProvider#execute(long, Data[])}

@@ -1,1 +1,1 @@
-include ':camerademo', ':core', ':bluetoothdemo', ':bluetooth', ':camera', ':service', ':fogbus', ':aneka', ':aneka-wsdl'
+include ':camerademo', ':core', ':bluetoothdemo', ':bluetooth', ':camera', ':service', ':fogbus', ':aneka', ':aneka-wsdl', ':utils'

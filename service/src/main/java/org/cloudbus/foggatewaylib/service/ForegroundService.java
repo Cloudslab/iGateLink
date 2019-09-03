@@ -12,7 +12,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-import org.cloudbus.foggatewaylib.core.utils.NotificationUtils;
+import org.cloudbus.foggatewaylib.utils.NotificationUtils;
 
 /**
  * {@link Service} extension that automatically puts itself in the foreground at the start.

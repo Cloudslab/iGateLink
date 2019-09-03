@@ -5,7 +5,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import org.cloudbus.foggatewaylib.core.utils.MultiMap;
+import org.cloudbus.foggatewaylib.utils.MultiMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;

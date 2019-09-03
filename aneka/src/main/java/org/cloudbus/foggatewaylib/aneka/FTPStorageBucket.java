@@ -2,6 +2,8 @@ package org.cloudbus.foggatewaylib.aneka;
 
 import com.manjrasoft.aneka.Property;
 
+import org.cloudbus.foggatewaylib.utils.SimpleFTPClient;
+
 public class FTPStorageBucket extends StorageBucket {
     public final static int DEFAULT_FTP_PORT = 21;
 
@@ -65,5 +67,12 @@ public class FTPStorageBucket extends StorageBucket {
 
     public int getPort() {
         return port;
+    }
+
+    /**
+     * Create a new {@link SimpleFTPClient} instance copying the parameters from this bucket.
+     */
+    public SimpleFTPClient buildFTPClient(){
+        return new SimpleFTPClient(getUser(), getPassword(), getHost(), getPort());
     }
 }

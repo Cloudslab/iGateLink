@@ -10,9 +10,9 @@ import com.manjrasoft.aneka.Job;
 import com.manjrasoft.aneka.JobStatus;
 
 import org.apache.commons.net.ftp.FTP;
-import org.cloudbus.foggatewaylib.aneka.ftp.SimpleFTPClient;
 import org.cloudbus.foggatewaylib.core.Data;
 import org.cloudbus.foggatewaylib.core.ThreadPoolProvider;
+import org.cloudbus.foggatewaylib.utils.SimpleFTPClient;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -65,8 +65,7 @@ public abstract class AnekaProvider<T extends Data, S extends Data> extends Thre
 
         progressPublisher.publish(0, "Uploading input to FTP server");
 
-        SimpleFTPClient inputFTPClient
-                = new SimpleFTPClient(getFTPInputBucket());
+        SimpleFTPClient inputFTPClient = getFTPInputBucket().buildFTPClient();
         if (!inputFTPClient.connect())
             throw new Exception("Input FTP login failed.");
         if (fileType == FTP.ASCII_FILE_TYPE){
@@ -106,8 +105,7 @@ public abstract class AnekaProvider<T extends Data, S extends Data> extends Thre
 
         progressPublisher.publish(0, "Downloading output from FTP server");
 
-        SimpleFTPClient outputFTPClient
-                = new SimpleFTPClient(getFTPOutputBucket());
+        SimpleFTPClient outputFTPClient = getFTPOutputBucket().buildFTPClient();
         if (!outputFTPClient.connect()) {
             throw new Exception("Output FTP login failed.");
         }

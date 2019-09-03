@@ -1,12 +1,10 @@
-package org.cloudbus.foggatewaylib.aneka.ftp;
+package org.cloudbus.foggatewaylib.utils;
 
 import androidx.annotation.Nullable;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPClientConfig;
-import org.cloudbus.foggatewaylib.aneka.FTPStorageBucket;
-import org.cloudbus.foggatewaylib.core.utils.StreamReader;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -50,14 +48,6 @@ public class SimpleFTPClient {
         this.port = port;
 
         ftpClient = new FTPClient();
-    }
-
-    /**
-     * Create a new {@link SimpleFTPClient} instance copying the parameters from the given
-     * {@link FTPStorageBucket}.
-     */
-    public SimpleFTPClient(FTPStorageBucket bucket){
-        this(bucket.getUser(), bucket.getPassword(), bucket.getHost(), bucket.getPort());
     }
 
     /**
