@@ -1,6 +1,6 @@
 package org.cloudbus.foggatewaylib.aneka;
 
-import org.cloudbus.foggatewaylib.aneka.wsdl.Property;
+import com.manjrasoft.aneka.Property;
 
 public class FTPStorageBucket extends StorageBucket {
     public final static int DEFAULT_FTP_PORT = 21;

@@ -1,8 +1,8 @@
 package org.cloudbus.foggatewaylib.aneka;
 
-import org.cloudbus.foggatewaylib.aneka.wsdl.ArrayOfProperty;
-import org.cloudbus.foggatewaylib.aneka.wsdl.Property;
-import org.cloudbus.foggatewaylib.aneka.wsdl.PropertyGroup;
+import com.manjrasoft.aneka.ArrayOfProperty;
+import com.manjrasoft.aneka.Property;
+import com.manjrasoft.aneka.PropertyGroup;
 
 public class StorageBucket {
     private String type;

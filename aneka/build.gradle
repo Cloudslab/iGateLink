@@ -31,9 +31,7 @@ configurations {
 }
 
 dependencies {
-    api files('libs/ksoap2-android-assembly-3.1.1-jar-with-dependencies.jar')
-    api files('libs/wsdl2ksoap2.jar')
-    implementation files('libs/log4j-1.2.17.jar')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation 'androidx.appcompat:appcompat:1.0.2'
     testImplementation 'junit:junit:4.12'
@@ -41,9 +39,8 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
 
-    annotationProcessor files('libs/ksoap2-android-assembly-3.1.1-jar-with-dependencies.jar')
-
-    implementation project(':core')
+    api project(':core')
+    api project(':aneka-wsdl')
 
     api "commons-net:commons-net:$rootProject.commons_net_version"
 }

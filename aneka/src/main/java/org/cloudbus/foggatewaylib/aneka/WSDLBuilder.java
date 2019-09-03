@@ -1,10 +1,11 @@
 package org.cloudbus.foggatewaylib.aneka;
 
-import org.cloudbus.foggatewaylib.aneka.wsdl.ArrayOfFile;
-import org.cloudbus.foggatewaylib.aneka.wsdl.ArrayOfTaskItem;
-import org.cloudbus.foggatewaylib.aneka.wsdl.ExecuteTaskItem;
-import org.cloudbus.foggatewaylib.aneka.wsdl.File;
-import org.cloudbus.foggatewaylib.aneka.wsdl.TaskItem;
+import com.manjrasoft.aneka.ArrayOfFile;
+import com.manjrasoft.aneka.ArrayOfTaskItem;
+import com.manjrasoft.aneka.ExecuteTaskItem;
+import com.manjrasoft.aneka.File;
+import com.manjrasoft.aneka.TaskItem;
+
 import org.cloudbus.foggatewaylib.core.utils.StringUtils;
 
 public class WSDLBuilder {

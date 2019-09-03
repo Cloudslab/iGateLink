@@ -1,20 +1,21 @@
 package org.cloudbus.foggatewaylib.aneka;
 
+import com.manjrasoft.aneka.ApplicationResult;
+import com.manjrasoft.aneka.ArrayOfFile;
+import com.manjrasoft.aneka.ArrayOfTaskItem;
+import com.manjrasoft.aneka.CopyTaskItem;
+import com.manjrasoft.aneka.ExecuteTaskItem;
+import com.manjrasoft.aneka.Job;
+import com.manjrasoft.aneka.TaskItem;
+
 import org.cloudbus.foggatewaylib.aneka.ftp.SimpleFTPClient;
-import org.cloudbus.foggatewaylib.aneka.wsdl.ApplicationResult;
-import org.cloudbus.foggatewaylib.aneka.wsdl.ArrayOfFile;
-import org.cloudbus.foggatewaylib.aneka.wsdl.ArrayOfTaskItem;
-import org.cloudbus.foggatewaylib.aneka.wsdl.CopyTaskItem;
-import org.cloudbus.foggatewaylib.aneka.wsdl.ExecuteTaskItem;
-import org.cloudbus.foggatewaylib.aneka.wsdl.Job;
-import org.cloudbus.foggatewaylib.aneka.wsdl.TaskItem;
 import org.junit.Test;
 
 import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
 
-import static org.cloudbus.foggatewaylib.aneka.wsdl.JobStatus.STATUS_COMPLETED;
+import static com.manjrasoft.aneka.JobStatus.STATUS_COMPLETED;
 import static org.junit.Assert.assertEquals;
 
 public class AnekaWebServicesTest {

@@ -6,13 +6,14 @@ import android.content.res.Configuration;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 
+import com.manjrasoft.aneka.ArrayOfFile;
+import com.manjrasoft.aneka.ArrayOfTaskItem;
+
 import org.apache.commons.net.ftp.FTP;
 import org.cloudbus.foggatewaylib.aneka.AnekaProvider;
 import org.cloudbus.foggatewaylib.aneka.FTPStorageBucket;
 import org.cloudbus.foggatewaylib.aneka.StorageBucket;
 import org.cloudbus.foggatewaylib.aneka.WSDLBuilder;
-import org.cloudbus.foggatewaylib.aneka.wsdl.ArrayOfFile;
-import org.cloudbus.foggatewaylib.aneka.wsdl.ArrayOfTaskItem;
 import org.cloudbus.foggatewaylib.camera.ImageData;
 
 class SimpleAnekaProvider extends AnekaProvider<ImageData, ImageData> {

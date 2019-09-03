@@ -6,9 +6,10 @@ import android.util.Log;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.manjrasoft.aneka.ArrayOfFile;
+import com.manjrasoft.aneka.ArrayOfTaskItem;
+
 import org.apache.commons.net.ftp.FTP;
-import org.cloudbus.foggatewaylib.aneka.wsdl.ArrayOfFile;
-import org.cloudbus.foggatewaylib.aneka.wsdl.ArrayOfTaskItem;
 import org.cloudbus.foggatewaylib.core.ExecutionManager;
 import org.cloudbus.foggatewaylib.core.GenericData;
 import org.cloudbus.foggatewaylib.core.IndividualTrigger;

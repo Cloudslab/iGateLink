@@ -4,12 +4,13 @@ import android.os.AsyncTask;
 
 import androidx.annotation.CallSuper;
 
+import com.manjrasoft.aneka.ArrayOfFile;
+import com.manjrasoft.aneka.ArrayOfTaskItem;
+import com.manjrasoft.aneka.Job;
+import com.manjrasoft.aneka.JobStatus;
+
 import org.apache.commons.net.ftp.FTP;
 import org.cloudbus.foggatewaylib.aneka.ftp.SimpleFTPClient;
-import org.cloudbus.foggatewaylib.aneka.wsdl.ArrayOfFile;
-import org.cloudbus.foggatewaylib.aneka.wsdl.ArrayOfTaskItem;
-import org.cloudbus.foggatewaylib.aneka.wsdl.Job;
-import org.cloudbus.foggatewaylib.aneka.wsdl.JobStatus;
 import org.cloudbus.foggatewaylib.core.Data;
 import org.cloudbus.foggatewaylib.core.ThreadPoolProvider;
 
