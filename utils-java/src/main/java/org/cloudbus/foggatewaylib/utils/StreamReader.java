@@ -6,6 +6,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
+/**
+ * Utility class for common stream operations.
+ *
+ * @author Riccardo Mancini
+ */
 public class StreamReader {
     /**
      * Converts the contents of an InputStream to a {@link String} up to a maximum of

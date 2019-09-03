@@ -5,6 +5,8 @@ package org.cloudbus.foggatewaylib.core;
  * given value and message.
  *
  * @param <T> type of data in input and output
+ *
+ * @author Riccardo Mancini
  */
 public class DummyProvider<T extends Data> extends SequentialProvider<T, T> {
     private int progress;

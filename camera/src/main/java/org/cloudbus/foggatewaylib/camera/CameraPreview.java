@@ -13,6 +13,8 @@ import java.util.List;
  * A basic Camera preview class.
  *
  * @see <a href="https://developer.android.com/guide/topics/media/camera">https://developer.android.com/guide/topics/media/camera</a>
+ *
+ * @author Riccardo Mancini
  */
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private static final String TAG = "CameraPreview";
