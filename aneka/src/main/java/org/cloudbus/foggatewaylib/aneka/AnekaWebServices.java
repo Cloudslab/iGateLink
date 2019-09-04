@@ -152,7 +152,6 @@ public class AnekaWebServices {
         return queryApplicationStatus(defaultApplicationId);
     }
 
-    @Nullable
     public boolean abortApplication(String applicationId){
         AbortApplicationResponse response;
 
@@ -173,7 +172,6 @@ public class AnekaWebServices {
         }
     }
 
-    @Nullable
     public boolean abortApplication(){
         return abortApplication(defaultApplicationId);
     }
