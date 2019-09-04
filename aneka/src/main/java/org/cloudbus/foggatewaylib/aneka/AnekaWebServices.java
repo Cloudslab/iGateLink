@@ -85,8 +85,7 @@ public class AnekaWebServices {
              dumpError(response.getCreateApplicationResult());
              if (response.getCreateApplicationResult().isSuccess()){
                  String applicationId = response.getCreateApplicationResult().getApplicationId();
-                 if (defaultApplicationId == null)
-                     defaultApplicationId = applicationId;
+                 defaultApplicationId = applicationId;
                  return applicationId;
              } else
                  return null;
