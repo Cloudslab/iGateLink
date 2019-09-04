@@ -86,7 +86,7 @@ public abstract class AnekaProvider<T extends Data, S extends Data> extends Thre
 
         progressPublisher.publish(0, "Submitting Job to Aneka");
 
-        String jobId = anekaWebServices.submitJob(job);
+        String jobId = anekaWebServices.submitJobWait(job);
         if (jobId == null){
             if (anekaWebServices.getError() != null)
                 throw new Exception(anekaWebServices.getError());
