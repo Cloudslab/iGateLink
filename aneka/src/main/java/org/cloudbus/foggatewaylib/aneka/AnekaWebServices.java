@@ -10,7 +10,22 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.IOException;
 import java.util.Date;
 
+/**
+ * Helper class for accessing the Aneka Web Services.
+ *
+ * First action after creation must be {@link #authenticateUser(String, String)} that authenticates
+ * the user and saves the provided token.
+ * After that, a new application must be created using {@code createApplication*} methods.
+ * The id of the latest created application will be stored and used when no application id is
+ * provided.
+ * Within the new application, jobs can be submitted to Aneka using {@code #submitJob*} methods.
+ * Last, when the application is no longer needed, it may be aborted using
+ * {@link #abortApplication(String)}.
+ *
+ * @author Riccardo Mancini
+ */
 public class AnekaWebServices {
+
     private TaskService service;
     private UserCredential mUserCredential;
     private String error;
@@ -20,14 +35,38 @@ public class AnekaWebServices {
     private int jobTimeout = 60000;
     private int pollingPeriod = 500;
 
+    /**
+     * Constructs a new helper that uses the specified url. Debug is disabled.
+     *
+     * @param url url to the server API (e.g. http://www.example.com/Aneka.2.0/TaskService.asmx).
+     * @see #AnekaWebServices(String, boolean)
+     */
     public AnekaWebServices(String url){
         this(url, false);
     }
 
+    /**
+     * Constructs a new helper that uses the specified url with the possibility to enable debug.
+     *
+     * @param url url to the server API (e.g. http://www.example.com/Aneka.2.0/TaskService.asmx).
+     * @param debug {@code true} to enable debug, {@code false} otherwise.
+     * @see TaskService#TaskService(String, int, boolean)
+     */
     public AnekaWebServices(String url, boolean debug){
         service = new TaskService(url, 2, debug);
     }
 
+    /**
+     * Authenticates in the API using the given credentials. Access token is stored in
+     * {@link #mUserCredential}.
+     * In case of error, the error message will be saved in the attribute {@link #error},
+     * accessible through {@link #getError()}.
+     *
+     * @param username the Aneka username.
+     * @param password the Aneka password.
+     * @return {@code true} if authentication was successful, {@code false} otherwise.
+     * @see #getError()
+     */
     public boolean authenticateUser(String username, String password){
         AuthenticateUserResponse response;
 
@@ -47,6 +86,24 @@ public class AnekaWebServices {
         }
     }
 
+    /**
+     * Creates a new application with the given name, shared files and storage buckets.
+     * The latest created application id will be saved in {@link #defaultApplicationId},
+     * accessible through {@link #getDefaultApplicationId()}.
+     * In case of error, the error message will be saved in the attribute {@link #error},
+     * accessible through {@link #getError()}.
+     *
+     * NB: immediately after calling this method, the application will not already be ready to be
+     *     used. You need to check its status before using it.
+     *
+     * @param name an arbitrary name for the new application.
+     * @param sharedFiles shared files, if any, {@code null} otherwise.
+     * @param storageBuckets storage buckets, if any.
+     * @return the application id if the application was submitted successfully,
+     *         {@code null} otherwise.
+     * @see #getError()
+     * @see #createApplicationWait(String, ArrayOfFile, StorageBucket...)
+     */
     @Nullable
     public String createApplication(String name, ArrayOfFile sharedFiles,
                                     StorageBucket... storageBuckets){
@@ -97,6 +154,15 @@ public class AnekaWebServices {
         }
     }
 
+    /**
+     * Queries application information for the given application id.
+     * In case of error, the error message will be saved in the attribute {@link #error},
+     * accessible through {@link #getError()}.
+     *
+     * @param applicationId the id of the application.
+     * @return the retrieved {@link ApplicationResult} class if successful, {@code null} otherwise.
+     * @see #getError()
+     */
     @Nullable
     public ApplicationResult queryApplication(String applicationId){
         QueryApplicationResponse response;
@@ -118,11 +184,26 @@ public class AnekaWebServices {
         }
     }
 
+    /**
+     * Queries the default application.
+     *
+     * @see #queryApplication(String)
+     */
     @Nullable
     public ApplicationResult queryApplication(){
         return queryApplication(defaultApplicationId);
     }
 
+    /**
+     * Queries application status for the given application id.
+     * In case of error, the error message will be saved in the attribute {@link #error},
+     * accessible through {@link #getError()}.
+     *
+     * @param applicationId the id of the application.
+     * @return one of the constants in {@link ApplicationStatus}, representing the application
+     *         status if API call was successful, {@code null} otherwise.
+     * @see #getError()
+     */
     @Nullable
     public String queryApplicationStatus(String applicationId){
         QueryApplicationStatusResponse response;
@@ -147,11 +228,25 @@ public class AnekaWebServices {
         }
     }
 
+    /**
+     * Queries the status of the default application.
+     *
+     * @see #queryApplicationStatus(String)
+     */
     @Nullable
     public String queryApplicationStatus(){
         return queryApplicationStatus(defaultApplicationId);
     }
 
+    /**
+     * Aborts the application identified by the given application id.
+     * In case of error, the error message will be saved in the attribute {@link #error},
+     * accessible through {@link #getError()}.
+     *
+     * @param applicationId the id of the application.
+     * @return {@code true} in case of success, {@code false} otherwise.
+     * @see #getError()
+     */
     public boolean abortApplication(String applicationId){
         AbortApplicationResponse response;
 
@@ -172,10 +267,28 @@ public class AnekaWebServices {
         }
     }
 
+    /**
+     * Aborts the default application.
+     *
+     * @see #abortApplication(String)
+     */
     public boolean abortApplication(){
         return abortApplication(defaultApplicationId);
     }
 
+    /**
+     * Waits for the application identified by the given {@code applicationId} to be ready to be
+     * used.
+     * This method calls {@link #queryApplicationStatus(String)} every {@link #pollingPeriod}
+     * milliseconds until the application is ready or after {@link #requestTimeout} milliseconds
+     * have elapsed.
+     * In case of error, the error message will be saved in the attribute {@link #error},
+     * accessible through {@link #getError()}.
+     *
+     * @param applicationId the id of the application.
+     * @return {@code true} in case of success, {@code false} otherwise.
+     * @see #getError()
+     */
     public boolean waitApplicationCreation(String applicationId){
         long stopTime = new Date().getTime() + requestTimeout;
         while(true){
@@ -216,10 +329,25 @@ public class AnekaWebServices {
         }
     }
 
+    /**
+     * Waits for the default application to be ready to be used.
+     *
+     * @see #waitApplicationCreation(String)
+     */
     public boolean waitApplicationCreation(){
         return waitApplicationCreation(defaultApplicationId);
     }
 
+    /**
+     * Creates a new application and waits for it to be ready.
+     * In case of error, the error message will be saved in the attribute {@link #error},
+     * accessible through {@link #getError()}.
+     *
+     * NB: this method will block the thread it is executing in.
+     *
+     * @see #createApplication(String, ArrayOfFile, StorageBucket...)
+     * @see #waitApplicationCreation(String)
+     */
     @Nullable
     public String createApplicationWait(String name, ArrayOfFile sharedFiles,
                                         StorageBucket... storageBuckets){
@@ -235,6 +363,15 @@ public class AnekaWebServices {
         }
     }
 
+    /**
+     * Creates a new application and waits for it to be ready.
+     * In case of error, the error message will be saved in the attribute {@link #error},
+     * accessible through {@link #getError()}.
+     *
+     * NB: this method will block the thread it is executing in.
+     *
+     * @see #createApplicationWait(String, ArrayOfFile, StorageBucket...)
+     */
     @Nullable
     public String createApplicationWait(String name, StorageBucket... storageBuckets){
         return createApplicationWait(name, null, storageBuckets);
@@ -265,6 +402,17 @@ public class AnekaWebServices {
             return new String[jobs.length];
     }
 
+    /**
+     * Submits the given {@code jobs} to the application identified by the given
+     * {@code applicationId}.
+     * In case of error, the error message will be saved in the attribute {@link #error},
+     * accessible through {@link #getError()}.
+     *
+     * @param applicationId the id of the application.
+     * @param jobs the jobs to be submitted.
+     * @return an array of the same length as {@code jobs} containing the ids of the created jobs
+     *         in the order they were given. If a job creation fails, its id will be {@code null}.
+     */
     @NonNull
     public String[] submitJobs(String applicationId, Job... jobs) {
 
@@ -352,11 +500,26 @@ public class AnekaWebServices {
         }
     }
 
+    /**
+     * Submits the given {@code jobs} to the default, retrying any failing jobs every
+     * {@link #pollingPeriod} milliseconds for a maximum time {@link #requestTimeout} milliseconds.
+     *
+     * @see #submitJobsWait(String, Job...)
+     */
     @NonNull
     public String[] submitJobsWait(Job... jobs) {
         return submitJobsWait(defaultApplicationId, jobs);
     }
 
+    /**
+     * Queries all information about the given job.
+     * In case of error, the error message will be saved in the attribute {@link #error},
+     * accessible through {@link #getError()}.
+     *
+     * @param applicationId the id of the application the job runs in.
+     * @param jobId the id of the job to query.
+     * @return the state of the job or {@code null} in case of error.
+     */
     @Nullable
     public JobResult queryJob(String applicationId, String jobId){
         QueryJobResponse response;
@@ -382,11 +545,27 @@ public class AnekaWebServices {
         }
     }
 
+    /**
+     * Queries all information about the given job in the default application.
+     *
+     * @see #queryJob(String, String)
+     */
     @Nullable
     public JobResult queryJob(String jobId) {
         return queryJob(defaultApplicationId, jobId);
     }
 
+    /**
+     * Queries the status of a job.
+     * In case of error, the error message will be saved in the attribute {@link #error},
+     * accessible through {@link #getError()}.
+     *
+     * @param applicationId the id of the application the job runs in.
+     * @param jobId the id of the job to query.
+     * @return one of the constants in {@link JobStatus}, representing the job status,
+     *         if API call was successful. {@code null} otherwise.
+     * @see JobStatus
+     */
     @Nullable
     public String queryJobStatus(String applicationId, String jobId){
         QueryJobStatusResponse response;
@@ -412,11 +591,25 @@ public class AnekaWebServices {
         }
     }
 
+    /**
+     * Quesries the status of a job in the default application.
+     *
+     * @see #queryJobStatus(String, String)
+     */
     @Nullable
     public String queryJobStatus(String jobId) {
         return queryJobStatus(defaultApplicationId, jobId);
     }
 
+    /**
+     * Aborts the given job.
+     * In case of error, the error message will be saved in the attribute {@link #error},
+     * accessible through {@link #getError()}.
+     *
+     * @param applicationId the id of the application the job runs in.
+     * @param jobId the id of the job to abort.
+     * @return {@code true} in case of success, {@code false} otherwise.
+     */
     public boolean abortJob(String applicationId, String jobId){
         AbortJobResponse response;
 
@@ -437,31 +630,77 @@ public class AnekaWebServices {
         }
     }
 
+    /**
+     * Aborts the given job in the default application.
+     *
+     * @see #abortJob(String, String)
+     */
     @Nullable
     public boolean abortJob(String jobId) {
         return abortJob(defaultApplicationId, jobId);
     }
 
+    /**
+     * Submits the given job.
+     *
+     * @param applicationId the id of the application the job runs in.
+     * @param job the job to be submitted.
+     * @return the id of the created job or {@code null} in case of error.
+     * @see #submitJobs(String, Job...)
+     */
     @Nullable
     public String submitJob(String applicationId, Job job){
         return submitJobs(applicationId, job)[0];
     }
 
+    /**
+     * Submits the given job in the default application.
+     *
+     * @see #submitJob(Job...)
+     */
     @Nullable
     public String submitJob(Job job){
         return submitJob(defaultApplicationId, job);
     }
 
+    /**
+     * Submits the given {@code job} to the application identified by the given
+     * {@code applicationId}, retrying every {@link #pollingPeriod} milliseconds in case of failure
+     * up to a maximum time of {@link #requestTimeout} milliseconds.
+     *
+     * @param applicationId the id of the application the job runs in.
+     * @param job the job to be submitted.
+     * @return the id of the created job or {@code null} in case of error.
+     * @see #submitJobsWait(String, Job...)
+     */
     @Nullable
     public String submitJobWait(String applicationId, Job job){
         return submitJobsWait(applicationId, job)[0];
     }
 
+    /**
+     * Submits the given {@code job} to the default application, retrying every
+     * {@link #pollingPeriod} milliseconds in case of failure, up to a maximum time of
+     * {@link #requestTimeout} milliseconds.
+     *
+     * @see #submitJobWait(String, Job)
+     */
     @Nullable
     public String submitJobWait(Job job){
         return submitJobWait(defaultApplicationId, job);
     }
 
+    /**
+     * Waits for the given job termination for up to {@link #jobTimeout} milliseconds, polling
+     * the Aneka server every {@link #pollingPeriod} milliseconds.
+     *
+     * NB: this method will block the thread.
+     *
+     * @param applicationId the id of the application the job runs in.
+     * @param jobId the id of the job to wait.
+     * @return one of the constants in {@link JobStatus} representing the job status,
+     *      if API call was successful. {@code null} otherwise.
+     */
     @Nullable
     public String waitJobTermination(String applicationId, String jobId){
         long stopTime = new Date().getTime() + jobTimeout;
@@ -503,6 +742,15 @@ public class AnekaWebServices {
         }
     }
 
+    /**
+     * Waits for the given job termination for up to {@link #jobTimeout} milliseconds, polling
+     * the Aneka server every {@link #pollingPeriod} milliseconds. The job must be in the default
+     * application.
+     *
+     * NB: this method will block the thread.
+     *
+     * @see #waitJobTermination(String, String)
+     */
     @Nullable
     public String waitJobTermination(String jobId){
         return waitJobTermination(defaultApplicationId, jobId);
@@ -520,54 +768,106 @@ public class AnekaWebServices {
         error = e.getMessage();
     }
 
+    /**
+     * Returns the latest error message or {@code null} if there was none.
+     */
     public String getError() {
         return error;
     }
 
+    /**
+     * Returns the user credentials used by this instance or {@code null} in case of authentication
+     * error (or no authentication at all).
+     */
     public UserCredential getUserCredential() {
         return mUserCredential;
     }
 
+    /**
+     * Sets the user credential to an arbitrary value.
+     */
     public void setUserCredential(UserCredential mUserCredential) {
         this.mUserCredential = mUserCredential;
     }
 
+    /**
+     * Returns the id of the current default application, which is the latest created application.
+     */
     public String getDefaultApplicationId() {
         return defaultApplicationId;
     }
 
+    /**
+     * Sets the default application id to an arbitrary value.
+     */
     public void setDefaultApplicationId(String defaultApplicationId) {
         this.defaultApplicationId = defaultApplicationId;
     }
 
+    /**
+     * Returns the currently set request timeout.
+     */
     public int getRequestTimeout() {
         return requestTimeout;
     }
 
+    /**
+     * Sets a new request timeout in milliseconds. A value lower than or equal to {@code 0}
+     * means no timeout at all. Default value is 5 seconds ({@code 5000}).
+     *
+     * @see #waitApplicationCreation(String)
+     * @see #submitJobsWait(String, Job...)
+     */
     public void setRequestTimeout(int requestTimeout) {
         this.requestTimeout = requestTimeout;
     }
 
+    /**
+     * Returns the currently set job timeout.
+     */
     public int getJobTimeout() {
         return jobTimeout;
     }
 
+    /**
+     * Sets a new job timeout in milliseconds. A value lower than or equal to {@code 0}
+     * means no timeout at all. Default value is 1 minute ({@code 60000}).
+     *
+     * @see #waitJobTermination(String, String)
+     */
     public void setJobTimeout(int jobTimeout) {
         this.jobTimeout = jobTimeout;
     }
 
+    /**
+     * Returns the currently set polling period.
+     */
     public int getPollingPeriod() {
         return pollingPeriod;
     }
 
+    /**
+     * Sets a new polling period in milliseconds. A value lower than or equal to {@code 0}
+     * will result in back-to-back requests. Default value is half second ({@code 500}).
+     *
+     * @see #waitApplicationCreation(String)
+     * @see #submitJobsWait(String, Job...)
+     * @see #waitJobTermination(String, String)
+     */
     public void setPollingPeriod(int pollingPeriod) {
         this.pollingPeriod = pollingPeriod;
     }
 
+    /**
+     * Returns {@code true} if this instance is authenticated, {@code false} otherwise.
+     */
     public boolean isLoggedIn(){
         return mUserCredential != null;
     }
 
+    /**
+     * Returns {@code true} if the default application is set, {@code false} otherwise.
+     */
     public boolean hasValidDefaultApplication(){
         return defaultApplicationId != null;
     }
