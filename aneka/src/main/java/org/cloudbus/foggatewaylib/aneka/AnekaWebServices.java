@@ -462,12 +462,13 @@ public class AnekaWebServices {
         return submitJobWait(defaultApplicationId, job);
     }
 
+    @Nullable
     public String waitJobTermination(String applicationId, String jobId){
         long stopTime = new Date().getTime() + jobTimeout;
         while(true){
             String status = queryJobStatus(applicationId, jobId);
             if (status == null)
-                status = "NULL";
+                return null;
 
             switch (status){
                 case JobStatus.STATUS_QUEUED:
@@ -475,7 +476,8 @@ public class AnekaWebServices {
                 case JobStatus.STATUS_STAGINGIN:
                 case JobStatus.STATUS_STAGINGOUT:
                     if (jobTimeout > 0 && new Date(stopTime).before(new Date())){
-                        return "Timeout";
+                        error = "Timeout";
+                        return null;
                     } else
                         break;
 
@@ -495,7 +497,7 @@ public class AnekaWebServices {
                 } catch (InterruptedException e){
                     e.printStackTrace();
                     dumpError(e);
-                    return "ERROR";
+                    return null;
                 }
             }
         }

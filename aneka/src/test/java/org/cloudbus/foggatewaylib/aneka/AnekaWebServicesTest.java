@@ -59,7 +59,7 @@ public class AnekaWebServicesTest {
 
             String termination_status = services.waitJobTermination(applicationId, jobId);
 
-            assert termination_status.equals(STATUS_COMPLETED);
+            assertEquals(STATUS_COMPLETED, termination_status);
         } finally {
             if (services.getError() != null){
                 System.out.println(services.getError());
