@@ -2,42 +2,7 @@ package org.cloudbus.foggatewaylib.aneka;
 
 import androidx.annotation.Nullable;
 
-import com.manjrasoft.aneka.AbortApplication;
-import com.manjrasoft.aneka.AbortApplicationResponse;
-import com.manjrasoft.aneka.AbortJob;
-import com.manjrasoft.aneka.AbortJobResponse;
-import com.manjrasoft.aneka.ApplicationAbortRequest;
-import com.manjrasoft.aneka.ApplicationQueryRequest;
-import com.manjrasoft.aneka.ApplicationResult;
-import com.manjrasoft.aneka.ApplicationStatus;
-import com.manjrasoft.aneka.ApplicationSubmissionRequest;
-import com.manjrasoft.aneka.ArrayOfFile;
-import com.manjrasoft.aneka.ArrayOfJob;
-import com.manjrasoft.aneka.ArrayOfPropertyGroup;
-import com.manjrasoft.aneka.AuthenticateUser;
-import com.manjrasoft.aneka.AuthenticateUserResponse;
-import com.manjrasoft.aneka.CreateApplication;
-import com.manjrasoft.aneka.CreateApplicationResponse;
-import com.manjrasoft.aneka.Job;
-import com.manjrasoft.aneka.JobAbortRequest;
-import com.manjrasoft.aneka.JobQueryRequest;
-import com.manjrasoft.aneka.JobResult;
-import com.manjrasoft.aneka.JobStatus;
-import com.manjrasoft.aneka.JobSubmissionRequest;
-import com.manjrasoft.aneka.PropertyGroup;
-import com.manjrasoft.aneka.QueryApplication;
-import com.manjrasoft.aneka.QueryApplicationResponse;
-import com.manjrasoft.aneka.QueryApplicationStatus;
-import com.manjrasoft.aneka.QueryApplicationStatusResponse;
-import com.manjrasoft.aneka.QueryJob;
-import com.manjrasoft.aneka.QueryJobResponse;
-import com.manjrasoft.aneka.QueryJobStatus;
-import com.manjrasoft.aneka.QueryJobStatusResponse;
-import com.manjrasoft.aneka.Result;
-import com.manjrasoft.aneka.SubmitJobs;
-import com.manjrasoft.aneka.SubmitJobsResponse;
-import com.manjrasoft.aneka.TaskService;
-import com.manjrasoft.aneka.UserCredential;
+import com.manjrasoft.aneka.*;
 
 import org.xmlpull.v1.XmlPullParserException;
 
