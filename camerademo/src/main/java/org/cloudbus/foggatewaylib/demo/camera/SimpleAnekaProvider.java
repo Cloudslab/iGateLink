@@ -21,8 +21,6 @@ class SimpleAnekaProvider extends AnekaProvider<ImageData, ImageData> {
 
     public SimpleAnekaProvider() {
         super(FTP.BINARY_FILE_TYPE, 2, ImageData.class, ImageData.class);
-        inputVirtualPath = "input/input.jpg";
-        outputVirtualPath = "output/0_0.jpg";
     }
 
     @Override
@@ -103,5 +101,15 @@ class SimpleAnekaProvider extends AnekaProvider<ImageData, ImageData> {
     @Override
     protected ImageData[] stringToOutput(String string) {
         return new ImageData[0];
+    }
+
+    @Override
+    protected String getInputVirtualPath() {
+        return "input/input.jpg";
+    }
+
+    @Override
+    protected String getOutputVirtualPath() {
+        return "output/0_0.jpg";
     }
 }

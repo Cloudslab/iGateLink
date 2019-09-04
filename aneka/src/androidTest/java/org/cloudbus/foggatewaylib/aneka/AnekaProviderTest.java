@@ -78,8 +78,6 @@ public class AnekaProviderTest {
 
         public SimpleAnekaProvider() {
             super(FTP.ASCII_FILE_TYPE, 1, GenericData.class, GenericData.class);
-            inputVirtualPath = "input.txt";
-            outputVirtualPath = "output.txt";
         }
 
         @Override
@@ -153,6 +151,16 @@ public class AnekaProviderTest {
         @Override
         protected GenericData[] stringToOutput(String string) {
             return new GenericData[]{new GenericData<>(string)};
+        }
+
+        @Override
+        protected String getInputVirtualPath() {
+            return "input.txt";
+        }
+
+        @Override
+        protected String getOutputVirtualPath() {
+            return "output.txt";
         }
     }
 

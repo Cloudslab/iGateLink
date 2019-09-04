@@ -28,8 +28,6 @@ public abstract class AnekaProvider<T extends Data, S extends Data> extends Thre
 
     protected ArrayOfFile sharedFiles;
 
-    protected String inputVirtualPath;
-    protected String outputVirtualPath;
 
     private AnekaWebServices anekaWebServices;
 
@@ -143,22 +141,6 @@ public abstract class AnekaProvider<T extends Data, S extends Data> extends Thre
 
     }
 
-    protected Job buildJob(String anekaRequestId, T... input){
-        Job job = new Job();
-        job.setReservationId(anekaRequestId);
-        job.setTasks(buildTasks());
-        job.setInputFiles(WSDLBuilder.buildArrayOfFile(
-                getInputBucket().getName(),
-                buildInputPath(anekaRequestId),
-                inputVirtualPath));
-        job.setOutputFiles(WSDLBuilder.buildArrayOfFile(
-                getOutputBucket().getName(),
-                buildOutputPath(anekaRequestId),
-                outputVirtualPath));
-        return job;
-
-    }
-
     protected abstract ArrayOfTaskItem buildTasks();
 
     protected abstract void initCredentials();
@@ -172,6 +154,9 @@ public abstract class AnekaProvider<T extends Data, S extends Data> extends Thre
 
     protected abstract S[] bytesToOutput(byte[] bytes);
     protected abstract S[] stringToOutput(String string);
+
+    protected abstract String getInputVirtualPath();
+    protected abstract String getOutputVirtualPath();
 
     protected void onLogin(AnekaWebServices anekaWebServices, boolean error){}
 
@@ -196,13 +181,28 @@ public abstract class AnekaProvider<T extends Data, S extends Data> extends Thre
     }
 
     protected String buildInputPath(String anekaRequestId){
-        return String.format("/%s/%s", anekaRequestId, inputVirtualPath);
+        return String.format("/%s/%s", anekaRequestId, getInputVirtualPath());
     }
 
     protected String buildOutputPath(String anekaRequestId){
-        return String.format("/%s/%s", anekaRequestId, outputVirtualPath);
+        return String.format("/%s/%s", anekaRequestId, getOutputVirtualPath());
     }
 
+    protected Job buildJob(String anekaRequestId, T... input){
+        Job job = new Job();
+        job.setReservationId(anekaRequestId);
+        job.setTasks(buildTasks());
+        job.setInputFiles(WSDLBuilder.buildArrayOfFile(
+                getInputBucket().getName(),
+                buildInputPath(anekaRequestId),
+                getInputVirtualPath()));
+        job.setOutputFiles(WSDLBuilder.buildArrayOfFile(
+                getOutputBucket().getName(),
+                buildOutputPath(anekaRequestId),
+                getOutputVirtualPath()));
+        return job;
+
+    }
     @Override
     @CallSuper
     public void onAttach() {
