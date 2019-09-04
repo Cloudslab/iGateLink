@@ -45,7 +45,6 @@ import java.io.IOException;
 import java.util.Date;
 
 public class AnekaWebServices {
-    private String url;
     private TaskService service;
     private UserCredential mUserCredential;
     private String error;
@@ -60,7 +59,6 @@ public class AnekaWebServices {
     }
 
     public AnekaWebServices(String url, boolean debug){
-        this.url = url;
         service = new TaskService(url, 2, debug);
     }
 
