@@ -160,10 +160,6 @@ public abstract class AnekaProvider<T extends Data, S extends Data> extends Thre
 
     protected void onLogin(AnekaWebServices anekaWebServices, boolean error){}
 
-    private void login(){
-        new LoginTask().execute();
-    }
-
     protected FTPStorageBucket getFTPInputBucket(){
         return (FTPStorageBucket) storageBuckets.values().iterator().next();
     }
@@ -203,6 +199,11 @@ public abstract class AnekaProvider<T extends Data, S extends Data> extends Thre
         return job;
 
     }
+
+    private void login(){
+        new LoginTask().execute();
+    }
+
     @Override
     @CallSuper
     public void onAttach() {
