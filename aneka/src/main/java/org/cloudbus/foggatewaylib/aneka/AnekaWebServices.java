@@ -26,14 +26,18 @@ import java.util.Date;
  */
 public class AnekaWebServices {
 
+    public static final int DEFAULT_REQUEST_TIMEOUT = 5000;
+    public static final int DEFAULT_JOB_TIMEOUT = 60000;
+    public static final int DEFAULT_POLLING_PERIOD = 500;
+
     private TaskService service;
     private UserCredential mUserCredential;
     private String error;
     private String defaultApplicationId;
 
-    private int requestTimeout = 5000;
-    private int jobTimeout = 60000;
-    private int pollingPeriod = 500;
+    private int requestTimeout = DEFAULT_REQUEST_TIMEOUT;
+    private int jobTimeout = DEFAULT_JOB_TIMEOUT;
+    private int pollingPeriod = DEFAULT_POLLING_PERIOD;
 
     /**
      * Constructs a new helper that uses the specified url. Debug is disabled.
@@ -815,6 +819,7 @@ public class AnekaWebServices {
      * Sets a new request timeout in milliseconds. A value lower than or equal to {@code 0}
      * means no timeout at all. Default value is 5 seconds ({@code 5000}).
      *
+     * @see #DEFAULT_REQUEST_TIMEOUT
      * @see #waitApplicationCreation(String)
      * @see #submitJobsWait(String, Job...)
      */
@@ -833,6 +838,7 @@ public class AnekaWebServices {
      * Sets a new job timeout in milliseconds. A value lower than or equal to {@code 0}
      * means no timeout at all. Default value is 1 minute ({@code 60000}).
      *
+     * @see #DEFAULT_JOB_TIMEOUT
      * @see #waitJobTermination(String, String)
      */
     public void setJobTimeout(int jobTimeout) {
@@ -850,6 +856,7 @@ public class AnekaWebServices {
      * Sets a new polling period in milliseconds. A value lower than or equal to {@code 0}
      * will result in back-to-back requests. Default value is half second ({@code 500}).
      *
+     * @see #DEFAULT_POLLING_PERIOD
      * @see #waitApplicationCreation(String)
      * @see #submitJobsWait(String, Job...)
      * @see #waitJobTermination(String, String)

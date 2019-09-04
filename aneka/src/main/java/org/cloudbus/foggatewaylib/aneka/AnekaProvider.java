@@ -33,9 +33,9 @@ public abstract class AnekaProvider<T extends Data, S extends Data> extends Thre
 
     private int fileType;
 
-    private int requestTimeout = 5000;
-    private int jobTimeout = 60000;
-    private int pollingPeriod = 500;
+    private int requestTimeout = AnekaWebServices.DEFAULT_REQUEST_TIMEOUT;
+    private int jobTimeout = AnekaWebServices.DEFAULT_JOB_TIMEOUT;
+    private int pollingPeriod = AnekaWebServices.DEFAULT_POLLING_PERIOD;
 
     protected Map<String, StorageBucket> storageBuckets = new HashMap<>();
 
