@@ -1,5 +1,6 @@
 package org.cloudbus.foggatewaylib.aneka;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.manjrasoft.aneka.*;
@@ -241,11 +242,11 @@ public class AnekaWebServices {
         return createApplicationWait(name, null, storageBuckets);
     }
 
-    @Nullable
+    @NonNull
     private String[] __submitJobs(String applicationId, Job... jobs)
             throws IOException, XmlPullParserException{
         if (jobs.length == 0)
-            return null;
+            return new String[jobs.length];
 
         SubmitJobsResponse response;
 
@@ -263,10 +264,10 @@ public class AnekaWebServices {
         if(response.getSubmitJobsResult().isSuccess())
             return response.getSubmitJobsResult().getIds().getString();
         else
-            return null;
+            return new String[jobs.length];
     }
 
-    @Nullable
+    @NonNull
     public String[] submitJobs(String applicationId, Job... jobs) {
 
         try{
@@ -274,24 +275,66 @@ public class AnekaWebServices {
         } catch (IOException|XmlPullParserException e) {
             e.printStackTrace();
             dumpError(e);
-            return null;
+            return new String[jobs.length];
         }
     }
 
-    @Nullable
+    /**
+     * Submits the given {@code jobs} to the default application.
+     *
+     * @see #submitJob(String, Job)
+     */
+    @NonNull
     public String[] submitJobs(Job... jobs) {
         return submitJobs(defaultApplicationId, jobs);
     }
 
-    @Nullable
+    private int countNulls(Object... objs){
+        int n = 0;
+        for (Object o:objs)
+            if (o == null)
+                n++;
+        return n;
+    }
+
+    /**
+     * Submits the given {@code jobs} to the application identified by the given
+     * {@code applicationId}, retrying any failing jobs every {@link #pollingPeriod} milliseconds
+     * up to a maximum time of {@link #requestTimeout} milliseconds.
+     * In case of error, the error message will be saved in the attribute {@link #error},
+     * accessible through {@link #getError()}.
+     *
+     * @param applicationId the id of the application.
+     * @param jobs the jobs to be submitted.
+     * @return an array of the same length as {@code jobs} containing the ids of the created jobs
+     *         in the order they were given. If a job creation fails, its id will be {@code null}.
+     * @see #submitJobs(String, Job...)
+     */
+    @NonNull
     public String[] submitJobsWait(String applicationId, Job... jobs) {
         long stopTime = new Date().getTime() + requestTimeout;
         try{
-            String [] result;
-            while ((result = __submitJobs(applicationId, jobs)) == null) {
+            String[] result = new String[jobs.length];
+            int nNulls;
+
+            while ((nNulls = countNulls(result)) != 0) {
+                Job[] remainingJobs = new Job[nNulls];
+
+                for (int i = 0, j = 0; i < jobs.length; i++){
+                    if (result[i] == null)
+                        remainingJobs[j++] = jobs[i];
+                }
+
+                String[] retryResult = __submitJobs(applicationId, remainingJobs);
+
+                for (int i = 0, j = 0; i < jobs.length; i++){
+                    if (result[i] == null)
+                        result[i] = retryResult[j++];
+                }
+
                 if (requestTimeout > 0 && new Date(stopTime).before(new Date())){
                     error = "Timeout";
-                    return null;
+                    return new String[jobs.length];
                 }
                 if (pollingPeriod > 0){
                     try {
@@ -299,7 +342,7 @@ public class AnekaWebServices {
                     } catch (InterruptedException e){
                         e.printStackTrace();
                         dumpError(e);
-                        return null;
+                        return new String[jobs.length];
                     }
                 }
             }
@@ -307,11 +350,11 @@ public class AnekaWebServices {
         } catch (IOException|XmlPullParserException e) {
             e.printStackTrace();
             dumpError(e);
-            return null;
+            return new String[jobs.length];
         }
     }
 
-    @Nullable
+    @NonNull
     public String[] submitJobsWait(Job... jobs) {
         return submitJobsWait(defaultApplicationId, jobs);
     }
@@ -403,11 +446,7 @@ public class AnekaWebServices {
 
     @Nullable
     public String submitJob(String applicationId, Job job){
-        String[] ids = submitJobs(applicationId, job);
-        if (ids != null && ids.length > 0)
-            return ids[0];
-        else
-            return null;
+        return submitJobs(applicationId, job)[0];
     }
 
     @Nullable
@@ -417,11 +456,7 @@ public class AnekaWebServices {
 
     @Nullable
     public String submitJobWait(String applicationId, Job job){
-        String[] ids = submitJobsWait(applicationId, job);
-        if (ids != null && ids.length > 0)
-            return ids[0];
-        else
-            return null;
+        return submitJobsWait(applicationId, job)[0];
     }
 
     @Nullable
