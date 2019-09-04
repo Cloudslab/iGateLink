@@ -1,4 +1,5 @@
 # FogGatewayLib
+
 FogGatewayLib is an Android library that makes integration with IoT
 devices and Fod/Cloud computing resources easier using your Android
 device as a gateway between them.
@@ -10,13 +11,12 @@ definition of how to collect data and how to send this data to the
 Fog/Cloud (and any other possible step in between).
 
 Simple implementations of most common operations are also provided
-within the library (simple HTTP connections, camera management,
-Bluetooth (coming soon), Bluetooth LE (coming soon)).
+within the library (e.g. simple HTTP and FTP connections, 
+camera management, Bluetooth LE, etc.).
 
-In the future it will also be possible to schedule tasks between
-multiple Fog/Cloud and the device itself.
 
 ## Architecture
+
 The main components are:
  * `ExecutionManager`: this class coordinates the other components and 
     provides an API for managing them. 
@@ -39,17 +39,33 @@ The main components are:
     associated with that store are fired. For example, a `Trigger` could
     start a `Provider` with the recently stored `Data`.
 
+
 ## Project Structure
- * `bluetooth`: module for bluetooth integration.
- * `bluetoothdemo`: demo application for bluetooth using 
-    [FogBus](https://github.com/Cloudslab/FogBus):
- * `camera`: module for simple camera integration.
- * `camerademo`: demo application for camera using 
-    [EdgeLens](https://github.com/Cloudslab/EdgeLens).
- * `core`: module containing the library core.
- * `service`: module for integrating the library with a Foreground 
-    Service.  
-    
+
+The project is divided into modules, each of which is dedicated to a 
+specific function. Where possible, Android-specific code and generic Java 
+code have been kept separated.
+
+ * `aneka`: Android library module for Aneka REST API integration.
+ * `aneka-wsdl`: Java module for Aneka REST API WSDL bindings.
+ * `bluetooth`: Android module for bluetooth LE integration.
+ * `bluetoothdemo`: demo application for bluetooth module using 
+                    [FogBus](https://github.com/Cloudslab/FogBus).
+ * `camera`: Android module for simple camera integration.
+ * `camerademo`: demo application for camera module using 
+                 [EdgeLens](https://github.com/Cloudslab/EdgeLens).
+ * `core`: Android module containing the Android-specific part of the 
+           library core.
+ * `core-java`: Java module containing the library core.
+ * `fogbus`: Android module containing a simple integration with
+             [FogBus](https://github.com/Cloudslab/FogBus).
+ * `service`: Android module for integrating the library with a Foreground 
+              Service.   
+ * `utils`: Android module for Android-specific utility classes 
+            (NotificationUtils, Timer)
+ * `utils-java`: Java module for utility classes such as MultiMap,
+                 SimpleFTPClient, SimpleHttpConnection, etc.
+
 
 ___
 
