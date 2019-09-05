@@ -13,7 +13,8 @@ import java.util.List;
  *
  * @author Riccardo Mancini
  */
-public class SortedDataList<E extends Data> extends SortedLinkedList<E> {
+public class SortedDataList<E extends Data> extends SortedLinkedList<E>
+        implements InMemoryStore.BackingCollection<E> {
 
     /**
      * Constructs an empty list.

@@ -120,8 +120,22 @@ public class MainActivity extends FogGatewayServiceActivity
     }
 
     protected void initExecutionManager(ExecutionManager executionManager) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        if (prefs.getBoolean("enable_fogbus", false)){
+            executionManager.addProvider(KEY_PROVIDER_FOGBUS, KEY_DATA_OUTPUT,
+                    new EdgeLensProvider(4));
+        } else{
+            executionManager.removeProvider(KEY_PROVIDER_FOGBUS);
+        }
+
+        if (prefs.getBoolean("enable_aneka", false)){
+            executionManager.addProvider(KEY_PROVIDER_ANEKA, KEY_DATA_OUTPUT,
+                    new SimpleAnekaProvider());
+        } else{
+            executionManager.removeProvider(KEY_PROVIDER_ANEKA);
+        }
+
         executionManager
-                .addStore(KEY_DATA_OUTPUT, new InMemoryStore<>(ImageData.class))
                 .addProvider(KEY_PROVIDER_INPUT, KEY_DATA_INPUT,
                         new CameraProvider())
                 .addProvider(KEY_PROVIDER_INPUT_BITMAP, KEY_DATA_INPUT_BITMAP,
@@ -154,20 +168,5 @@ public class MainActivity extends FogGatewayServiceActivity
                             }
                         })
                 .addChooser(KEY_DATA_OUTPUT, new RoundRobinChooser());
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        if (prefs.getBoolean("enable_fogbus", false)){
-            executionManager.addProvider(KEY_PROVIDER_FOGBUS, KEY_DATA_OUTPUT,
-                    new EdgeLensProvider(4));
-        } else{
-            executionManager.removeProvider(KEY_PROVIDER_FOGBUS);
-        }
-
-        if (prefs.getBoolean("enable_aneka", false)){
-            executionManager.addProvider(KEY_PROVIDER_ANEKA, KEY_DATA_OUTPUT,
-                    new SimpleAnekaProvider());
-        } else{
-            executionManager.removeProvider(KEY_PROVIDER_ANEKA);
-        }
     }
 }

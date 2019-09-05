@@ -24,6 +24,9 @@ import java.util.Map;
 public class ExecutionManager{
     public static final String TAG = "ExecutionManager";
 
+    public static final Class<? extends InMemoryStore.BackingCollection> DEFAULT_DATA_STRUCTURE
+             = SortedDataList.class;
+
     /**
      * Key for the progress data.
      *
@@ -127,7 +130,7 @@ public class ExecutionManager{
         choosers = new HashMap<>();
         UITriggers = new HashMap<>();
 
-        addStore(KEY_DATA_PROGRESS, new InMemoryStore<>(ProgressData.class));
+        addStore(KEY_DATA_PROGRESS, new InMemoryStore<>(ProgressData.class, DEFAULT_DATA_STRUCTURE));
     }
 
     /**
@@ -374,7 +377,7 @@ public class ExecutionManager{
         Store store = stores.get(key);
         if (store == null){
             if (type != null && autoCreate){
-                store = new InMemoryStore(type);
+                store = new InMemoryStore(type, DEFAULT_DATA_STRUCTURE);
                 addStore(key, store);
             } else
                 throw new StoreNotDefinedException(key);

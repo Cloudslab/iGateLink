@@ -18,36 +18,39 @@ public class InMemoryStoreTest {
 
     @Test
     public void add_isCorrect() {
-        InMemoryStore<Data> store = new InMemoryStore<>(Data.class);
+        Store<Data> store = new InMemoryStore<>(Data.class, SortedDataList.class);
+
         long[] array = new long[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         store.store(new Data[]{
-                new Data(2),
-                new Data(4),
-                new Data(6),
+                new Data(2, 0),
+                new Data(4, 0),
+                new Data(6, 0),
         });
         store.store(new Data[]{
-                new Data(8),
-                new Data(3),
-                new Data(5),
+                new Data(8, 0),
+                new Data(0, 0),
+                new Data(10, 0),
         });
         store.store(
-                new Data(0),
-                new Data(10),
-                new Data(1),
-                new Data(7),
-                new Data(9)
+
+                new Data(3, 1),
+                new Data(5, 1),
+                new Data(1, 1),
+                new Data(7, 1),
+                new Data(9, 1)
         );
         store.store(new Data(11));
 
         assertEquals(11, store.retrieveLast().getId());
         assertArrayEquals(new long[]{7, 8, 9, 10, 11}, dataToLong(store.retrieveLastN(5)));
         assertArrayEquals(new long[]{3, 4, 5}, dataToLong(store.retrieveInterval(3,6)));
+        assertArrayEquals(new long[]{3, 5}, dataToLong(store.retrieveInterval(3,6, 1)));
     }
 
 
     @Test
     public void cast_isCorrect() {
-        Store<Data> store = new InMemoryStore<>(Data.class);
+        Store<Data> store = new InMemoryStore<>(Data.class, SortedDataList.class);
         IndividualTrigger<Data> mIndividualTrigger = new IndividualTrigger<Data>(Data.class) {
             @Override
             public void onNewData(Store<Data> store, Data data) { }

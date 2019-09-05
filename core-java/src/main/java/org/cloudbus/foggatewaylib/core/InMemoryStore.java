@@ -1,8 +1,10 @@
 package org.cloudbus.foggatewaylib.core;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -23,16 +25,20 @@ import java.util.Map;
  *
  * @author Riccardo Mancini
  */
-public class InMemoryStore<E extends Data> extends Store<E> {
+public class InMemoryStore<E extends Data, C extends InMemoryStore.BackingCollection>
+        extends Store<E> {
+
+    private Class<C> backingCollectionClass;
+
     /**
      * List that stores all the data in this {@link InMemoryStore}.
      */
-    private SortedDataList<E> dataList = new SortedDataList<>();
+    private BackingCollection<E> dataList;
 
     /**
      * Lists that link all the data of the same request.
      */
-    private Map<Long, SortedDataList<E>> dataRequestMap = new HashMap<>();
+    private Map<Long, BackingCollection<E>> dataRequestMap = new HashMap<>();
 
     /**
      * Maximum number of elements.
@@ -46,9 +52,8 @@ public class InMemoryStore<E extends Data> extends Store<E> {
      *
      * @param dataType the type of the elements stored.
      */
-    public InMemoryStore(Class<E> dataType){
-        super(dataType);
-        maxElements = 0;
+    public InMemoryStore(Class<E> dataType, Class<C> backingCollectionClass){
+        this(0, dataType, backingCollectionClass);
     }
 
     /**
@@ -58,9 +63,15 @@ public class InMemoryStore<E extends Data> extends Store<E> {
      * @param dataType the type of the elements stored.
      * @see #maxElements
      */
-    public InMemoryStore(int maxElements, Class<E> dataType){
+    public InMemoryStore(int maxElements, Class<E> dataType, Class<C> backingCollectionClass){
         super(dataType);
         this.maxElements = maxElements;
+        this.backingCollectionClass = backingCollectionClass;
+        try {
+            dataList = newBackingCollectionInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -83,7 +94,7 @@ public class InMemoryStore<E extends Data> extends Store<E> {
     @Override
     @SuppressWarnings("unchecked")
     public E[] retrieveLastN(int N, long requestID) {
-        SortedDataList<E> requestList = dataRequestMap.get(requestID);
+        BackingCollection<E> requestList = dataRequestMap.get(requestID);
         if (requestList == null){
             return (E[]) Array.newInstance(getDataType());
         }
@@ -109,7 +120,7 @@ public class InMemoryStore<E extends Data> extends Store<E> {
      */
     @Override
     public E retrieveLast(long requestID) {
-        SortedDataList<E> requestList = dataRequestMap.get(requestID);
+        BackingCollection<E> requestList = dataRequestMap.get(requestID);
         if (requestList == null){
             return null;
         }
@@ -133,7 +144,7 @@ public class InMemoryStore<E extends Data> extends Store<E> {
     @Override
     @SuppressWarnings("unchecked")
     public E[] retrieveInterval(long from, long to, long requestID) {
-        SortedDataList<E> requestList = dataRequestMap.get(requestID);
+        BackingCollection<E> requestList = dataRequestMap.get(requestID);
         if (requestList == null){
             return (E[]) Array.newInstance(getDataType());
         }
@@ -160,9 +171,9 @@ public class InMemoryStore<E extends Data> extends Store<E> {
         List<E> newData = Arrays.asList(data);
         dataList.addAll(newData);
 
-        SortedDataList<E> requestList = dataRequestMap.get(data[0].getRequestID());
+        BackingCollection<E> requestList = dataRequestMap.get(data[0].getRequestID());
         if (requestList == null){
-            requestList = new SortedDataList<>();
+            requestList = newBackingCollectionInstance();
             dataRequestMap.put(data[0].getRequestID(), requestList);
         }
         requestList.addAll(newData);
@@ -170,7 +181,7 @@ public class InMemoryStore<E extends Data> extends Store<E> {
         if (maxElements != 0 && dataList.size() > maxElements){
             for (int i = 0; i < dataList.size() - maxElements; i++){
                 E removedE = dataList.removeLast();
-                SortedDataList<E> listRemoved = dataRequestMap.get(removedE.getRequestID());
+                BackingCollection<E> listRemoved = dataRequestMap.get(removedE.getRequestID());
                 listRemoved.removeLast();
             }
         }
@@ -185,5 +196,57 @@ public class InMemoryStore<E extends Data> extends Store<E> {
     @Override
     public int size() {
         return dataList.size();
+    }
+
+    /**
+     * Interface for a {@link Collection} to be used as the backing data structure for the
+     * {@link InMemoryStore}.
+     *
+     * @param <E> the type of the elements
+     */
+    public interface BackingCollection<E extends Comparable> extends Collection<E>{
+
+        /**
+         * Returns a iterator over the elements of the list in descending order.
+         *
+         * @return the iterator.
+         */
+        Iterator<E> descendingIterator();
+
+        /**
+         * Gets the last element in the list.
+         *
+         * @return last element or {@code null} if the list is empty
+         */
+        E getLast();
+
+        /**
+         * Removes the last element in the list.
+         *
+         * @return removed element or {@code null} if the list is empty
+         */
+        E removeLast();
+
+        /**
+         * Returns a sublist with all the elements with {@link Data#id} between {@code from}
+         * (included) and {@code to} (excluded).
+         *
+         * @param from lower bound (included)
+         * @param to upper bound (excluded)
+         * @return the sublist.
+         */
+        List<E> subList(long from, long to);
+    }
+
+    private BackingCollection<E> newBackingCollectionInstance(){
+        try {
+            return backingCollectionClass.getConstructor().newInstance();
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException(
+                    "Error instantiating " + backingCollectionClass.getName(),
+                    e
+            );
+        }
     }
 }
