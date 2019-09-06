@@ -483,7 +483,8 @@ public class AnekaWebServices {
                 }
 
                 if (requestTimeout > 0 && new Date(stopTime).before(new Date())){
-                    error = "Timeout";
+                    if (error == null)
+                        error = "Timeout.";
                     return new String[jobs.length];
                 }
                 if (pollingPeriod > 0){
@@ -762,7 +763,10 @@ public class AnekaWebServices {
 
     private void dumpError(Result result){
         if (result != null && result.getError() != null){
-            error = result.getError().getMessage();
+            if (result.getError().getFullTypeName() != null)
+                error = result.getError().getFullTypeName() + ": "+ result.getError().getMessage();
+            else
+                error = result.getError().getMessage();
         } else{
             error = null;
         }
