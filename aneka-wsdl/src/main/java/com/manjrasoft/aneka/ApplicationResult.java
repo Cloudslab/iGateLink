@@ -28,7 +28,7 @@ public class ApplicationResult extends Result {
 	private boolean useFileTransfer;
 
 	/** Mandatory property */
-	private ApplicationStatus state;
+	private String state;
 
 
 	public ApplicationResult() {
@@ -57,8 +57,7 @@ public class ApplicationResult extends Result {
 		Object jobsValue = KSoap2Utils.getProperty((SoapObject) response, "Jobs");
 		object.setJobs(jobsValue != null ? (ArrayOfJobResult) KSoap2Utils.getObject(new ArrayOfJobResult(), (AttributeContainer) jobsValue) : null);
 		useFileTransfer = KSoap2Utils.getBoolean((SoapObject) response, "UseFileTransfer");
-		Object stateValue = KSoap2Utils.getProperty((SoapObject) response, "State");
-		object.setState(stateValue != null ? (ApplicationStatus) KSoap2Utils.getObject(new ApplicationStatus(), (AttributeContainer) stateValue) : null);
+		state = KSoap2Utils.getString((SoapObject) response, "State");
 	}
 
 	public int getPropertyCount() {
@@ -120,7 +119,7 @@ public class ApplicationResult extends Result {
 				break;
 			case 8:
 				info.name = "State";
-				info.type = ApplicationStatus.class;
+				info.type = String.class;
 				info.namespace = "http://www.manjrasoft.com/Aneka/v2.0/WebServices";
 				break;
 			default:
@@ -176,11 +175,11 @@ public class ApplicationResult extends Result {
 		this.useFileTransfer = useFileTransfer;
 	}
 
-	public ApplicationStatus getState() {
+	public String getState() {
 		return state;
 	}
 
-	public void setState(ApplicationStatus state) {
+	public void setState(String state) {
 		this.state = state;
 	}
 

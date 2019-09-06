@@ -8,7 +8,7 @@ import org.ksoap2.serialization.SoapObject;
 public class AuthenticateResult extends Result {
 
 	/** Optional property */
-	private UserCredential userCredential;
+	private String userCredential;
 
 	public AuthenticateResult() {
 		super("http://www.manjrasoft.com/Aneka/v2.0/WebServices", "AuthenticateResult");
@@ -24,8 +24,7 @@ public class AuthenticateResult extends Result {
 
 	protected void fromSoapResponse(AuthenticateResult object, AttributeContainer response) {
 		super.fromSoapResponse(object, response);
-		Object userCredentialValue = KSoap2Utils.getProperty((SoapObject) response, "UserCredential");
-		object.setUserCredential(userCredentialValue != null ? (UserCredential) KSoap2Utils.getObject(new UserCredential(), (AttributeContainer) userCredentialValue) : null);
+		userCredential = KSoap2Utils.getString((SoapObject) response, "UserCredential");
 	}
 
 	public int getPropertyCount() {
@@ -45,7 +44,7 @@ public class AuthenticateResult extends Result {
 		switch (index) {
 			case 2:
 				info.name = "UserCredential";
-				info.type = UserCredential.class;
+				info.type = String.class;
 				info.namespace = "http://www.manjrasoft.com/Aneka/v2.0/WebServices";
 				break;
 			default:
@@ -55,11 +54,11 @@ public class AuthenticateResult extends Result {
 
 	public void setProperty(int index, Object object) {}
 
-	public UserCredential getUserCredential() {
+	public String getUserCredential() {
 		return userCredential;
 	}
 
-	public void setUserCredential(UserCredential newValue) {
+	public void setUserCredential(String newValue) {
 		userCredential = newValue;
 	}
 

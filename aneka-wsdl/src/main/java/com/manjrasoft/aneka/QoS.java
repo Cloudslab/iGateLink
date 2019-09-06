@@ -18,7 +18,7 @@ public class QoS extends SoapObject implements Deserializable {
 	private double budget;
 
 	/** Mandatory property */
-	private com.manjrasoft.aneka.OptimizationStrategy optimizationStrategy;
+	private String optimizationStrategy;
 
 	/** Mandatory property */
 	private TimeSpan averageTaskExecutionTime;
@@ -51,8 +51,7 @@ public class QoS extends SoapObject implements Deserializable {
 		object.setBudgetSpent(KSoap2Utils.getDouble(response, "BudgetSpent"));
 		object.setDeadline(KSoap2Utils.getCalendar(response, "Deadline"));
 		object.setBudget(KSoap2Utils.getDouble(response, "Budget"));
-		Object optimizationStrategyValue = KSoap2Utils.getProperty((SoapObject) response, "OptimizationStrategy");
-		object.setOptimizationStrategy(optimizationStrategyValue != null ? (com.manjrasoft.aneka.OptimizationStrategy) KSoap2Utils.getObject(new com.manjrasoft.aneka.OptimizationStrategy(), (AttributeContainer) optimizationStrategyValue) : null);
+		object.setOptimizationStrategy(KSoap2Utils.getString(response, "OptimizationStrategy"));
 		Object averageTaskExecutionTimeValue = KSoap2Utils.getProperty((SoapObject) response, "AverageTaskExecutionTime");
 		object.setAverageTaskExecutionTime(averageTaskExecutionTimeValue != null ? (TimeSpan) KSoap2Utils.getObject(new TimeSpan(), (AttributeContainer) averageTaskExecutionTimeValue) : null);
 		object.setTotalWork(KSoap2Utils.getInteger(response, "TotalWork"));
@@ -111,7 +110,7 @@ public class QoS extends SoapObject implements Deserializable {
 			break;
 		case 3:
 			info.name = "OptimizationStrategy";
-			info.type = com.manjrasoft.aneka.OptimizationStrategy.class;
+			info.type = java.lang.String.class;
 			info.namespace = "http://www.manjrasoft.com/Aneka/v2.0/WebServices";
 			break;
 		case 4:
@@ -169,11 +168,11 @@ public class QoS extends SoapObject implements Deserializable {
 		budget = newValue;
 	}
 
-	public com.manjrasoft.aneka.OptimizationStrategy getOptimizationStrategy() {
+	public String getOptimizationStrategy() {
 		return optimizationStrategy;
 	}
 
-	public void setOptimizationStrategy(com.manjrasoft.aneka.OptimizationStrategy newValue) {
+	public void setOptimizationStrategy(String newValue) {
 		optimizationStrategy = newValue;
 	}
 

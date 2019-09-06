@@ -9,7 +9,7 @@ import org.ksoap2.serialization.SoapObject;
 public class Request extends SoapObject implements Deserializable {
 
 	/** Optional property */
-	private UserCredential userCredential;
+	private java.lang.String userCredential;
 
 	public Request() {
 		super("http://www.manjrasoft.com/Aneka/v2.0/WebServices", "Request");
@@ -24,8 +24,7 @@ public class Request extends SoapObject implements Deserializable {
 	}
 
 	protected void fromSoapResponse(Request object, AttributeContainer response) {
-		Object userCredentialValue = KSoap2Utils.getProperty((SoapObject) response, "UserCredential");
-		object.setUserCredential(userCredentialValue != null ? (UserCredential) KSoap2Utils.getObject(new UserCredential(), (AttributeContainer) userCredentialValue) : null);
+		object.setUserCredential(KSoap2Utils.getString(response, "UserCredential"));
 	}
 
 	public int getPropertyCount() {
@@ -45,7 +44,7 @@ public class Request extends SoapObject implements Deserializable {
 		switch (index) {
 		case 0:
 			info.name = "UserCredential";
-			info.type = UserCredential.class;
+			info.type = java.lang.String.class;
 			info.namespace = "http://www.manjrasoft.com/Aneka/v2.0/WebServices";
 			break;
 		default:
@@ -54,11 +53,11 @@ public class Request extends SoapObject implements Deserializable {
 
 	public void setProperty(int index, Object object) {}
 
-	public UserCredential getUserCredential() {
+	public String getUserCredential() {
 		return userCredential;
 	}
 
-	public void setUserCredential(UserCredential newValue) {
+	public void setUserCredential(String newValue) {
 		userCredential = newValue;
 	}
 

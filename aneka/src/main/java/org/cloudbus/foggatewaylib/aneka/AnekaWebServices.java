@@ -31,7 +31,7 @@ public class AnekaWebServices {
     public static final int DEFAULT_POLLING_PERIOD = 500;
 
     private TaskService service;
-    private UserCredential mUserCredential;
+    private String mUserCredential;
     private String error;
     private String defaultApplicationId;
 
@@ -222,7 +222,7 @@ public class AnekaWebServices {
             response = service.queryApplicationStatus(queryApplicationStatusParams);
             dumpError(response.getQueryApplicationStatusResult());
             if(response.getQueryApplicationStatusResult().getStatus() != null)
-                return response.getQueryApplicationStatusResult().getStatus().getValue();
+                return response.getQueryApplicationStatusResult().getStatus();
              else
                  return null;
         } catch (IOException|XmlPullParserException e) {
@@ -585,7 +585,7 @@ public class AnekaWebServices {
             response = service.queryJobStatus(queryJobStatusParams);
             dumpError(response.getQueryJobStatusResult());
             if(response.getQueryJobStatusResult().getStatus() != null)
-                return response.getQueryJobStatusResult().getStatus().getValue();
+                return response.getQueryJobStatusResult().getStatus();
             else
                 return null;
         } catch (IOException|XmlPullParserException e) {
@@ -783,14 +783,14 @@ public class AnekaWebServices {
      * Returns the user credentials used by this instance or {@code null} in case of authentication
      * error (or no authentication at all).
      */
-    public UserCredential getUserCredential() {
+    public String getUserCredential() {
         return mUserCredential;
     }
 
     /**
      * Sets the user credential to an arbitrary value.
      */
-    public void setUserCredential(UserCredential mUserCredential) {
+    public void setUserCredential(String mUserCredential) {
         this.mUserCredential = mUserCredential;
     }
 

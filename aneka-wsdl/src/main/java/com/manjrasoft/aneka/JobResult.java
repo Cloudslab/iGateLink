@@ -43,7 +43,7 @@ public class JobResult extends Result {
 	private boolean preemptableTag;
 
 	/** Mandatory property */
-	private JobStatus status;
+	private String status;
 
 	/** Optional property */
 	private String objectInstance;
@@ -74,8 +74,7 @@ public class JobResult extends Result {
 		Object maximumExecutionRuntimeValue = KSoap2Utils.getProperty((SoapObject) response, "MaximumExecutionRuntime");
 		object.setMaximumExecutionRuntime(maximumExecutionRuntimeValue != null ? (TimeSpan) KSoap2Utils.getObject(new TimeSpan(), (AttributeContainer) maximumExecutionRuntimeValue) : null);
 		preemptableTag = KSoap2Utils.getBoolean((SoapObject) response, "PreemptableTag");
-		Object statusValue = KSoap2Utils.getProperty((SoapObject) response, "Status");
-		object.setStatus(statusValue != null ? (JobStatus) KSoap2Utils.getObject(new JobStatus(), (AttributeContainer) statusValue) : null);
+		status = KSoap2Utils.getString((SoapObject) response, "Status");
 		objectInstance = KSoap2Utils.getString((SoapObject) response, "ObjectInstance");
 	}
 
@@ -175,7 +174,7 @@ public class JobResult extends Result {
 				break;
 			case 13:
 				info.name = "Status";
-				info.type = JobStatus.class;
+				info.type = String.class;
 				info.namespace = "http://www.manjrasoft.com/Aneka/v2.0/WebServices";
 				break;
 			case 14:
@@ -276,11 +275,11 @@ public class JobResult extends Result {
 		this.preemptableTag = preemptableTag;
 	}
 
-	public JobStatus getStatus() {
+	public String getStatus() {
 		return status;
 	}
 
-	public void setStatus(JobStatus status) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 

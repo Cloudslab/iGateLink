@@ -12,13 +12,13 @@ public class NodeRequirement extends SoapObject implements Deserializable {
 	private int numberOfNodes;
 
 	/** Mandatory property */
-	private com.manjrasoft.aneka.CpuSpeed cpuSpeed;
+	private String cpuSpeed;
 
 	/** Mandatory property */
-	private com.manjrasoft.aneka.DiskSize diskSize;
+	private String diskSize;
 
 	/** Mandatory property */
-	private com.manjrasoft.aneka.MemorySize memorySize;
+	private String memorySize;
 
 	/** Mandatory property */
 	private boolean multiCoreAllowed;
@@ -37,12 +37,9 @@ public class NodeRequirement extends SoapObject implements Deserializable {
 
 	protected void fromSoapResponse(NodeRequirement object, AttributeContainer response) {
 		object.setNumberOfNodes(KSoap2Utils.getInteger(response, "NumberOfNodes"));
-		Object cpuSpeedValue = KSoap2Utils.getProperty((SoapObject) response, "CpuSpeed");
-		object.setCpuSpeed(cpuSpeedValue != null ? (com.manjrasoft.aneka.CpuSpeed) KSoap2Utils.getObject(new com.manjrasoft.aneka.CpuSpeed(), (AttributeContainer) cpuSpeedValue) : null);
-		Object diskSizeValue = KSoap2Utils.getProperty((SoapObject) response, "DiskSize");
-		object.setDiskSize(diskSizeValue != null ? (com.manjrasoft.aneka.DiskSize) KSoap2Utils.getObject(new com.manjrasoft.aneka.DiskSize(), (AttributeContainer) diskSizeValue) : null);
-		Object memorySizeValue = KSoap2Utils.getProperty((SoapObject) response, "MemorySize");
-		object.setMemorySize(memorySizeValue != null ? (com.manjrasoft.aneka.MemorySize) KSoap2Utils.getObject(new com.manjrasoft.aneka.MemorySize(), (AttributeContainer) memorySizeValue) : null);
+		object.setCpuSpeed(KSoap2Utils.getString(response,  "CpuSpeed"));
+		object.setDiskSize(KSoap2Utils.getString(response,  "DiskSize"));
+		object.setMemorySize(KSoap2Utils.getString(response,  "MemorySize"));
 		object.setMultiCoreAllowed(KSoap2Utils.getBoolean(response, "MultiCoreAllowed"));
 	}
 
@@ -76,17 +73,17 @@ public class NodeRequirement extends SoapObject implements Deserializable {
 			break;
 		case 1:
 			info.name = "CpuSpeed";
-			info.type = com.manjrasoft.aneka.CpuSpeed.class;
+			info.type = String.class;
 			info.namespace = "http://www.manjrasoft.com/Aneka/v2.0/WebServices";
 			break;
 		case 2:
 			info.name = "DiskSize";
-			info.type = com.manjrasoft.aneka.DiskSize.class;
+			info.type = String.class;
 			info.namespace = "http://www.manjrasoft.com/Aneka/v2.0/WebServices";
 			break;
 		case 3:
 			info.name = "MemorySize";
-			info.type = com.manjrasoft.aneka.MemorySize.class;
+			info.type = String.class;
 			info.namespace = "http://www.manjrasoft.com/Aneka/v2.0/WebServices";
 			break;
 		case 4:
@@ -108,27 +105,27 @@ public class NodeRequirement extends SoapObject implements Deserializable {
 		numberOfNodes = newValue;
 	}
 
-	public com.manjrasoft.aneka.CpuSpeed getCpuSpeed() {
+	public String getCpuSpeed() {
 		return cpuSpeed;
 	}
 
-	public void setCpuSpeed(com.manjrasoft.aneka.CpuSpeed newValue) {
+	public void setCpuSpeed(String newValue) {
 		cpuSpeed = newValue;
 	}
 
-	public com.manjrasoft.aneka.DiskSize getDiskSize() {
+	public String getDiskSize() {
 		return diskSize;
 	}
 
-	public void setDiskSize(com.manjrasoft.aneka.DiskSize newValue) {
+	public void setDiskSize(String newValue) {
 		diskSize = newValue;
 	}
 
-	public com.manjrasoft.aneka.MemorySize getMemorySize() {
+	public String getMemorySize() {
 		return memorySize;
 	}
 
-	public void setMemorySize(com.manjrasoft.aneka.MemorySize newValue) {
+	public void setMemorySize(String newValue) {
 		memorySize = newValue;
 	}
 

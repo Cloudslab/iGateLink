@@ -8,7 +8,7 @@ import org.ksoap2.serialization.SoapObject;
 public class JobStatusResult extends Result {
 
 	/** Mandatory property */
-	private JobStatus status;
+	private String status;
 
 	public JobStatusResult() {
 		super("http://www.manjrasoft.com/Aneka/v2.0/WebServices", "JobStatusResult");
@@ -24,8 +24,7 @@ public class JobStatusResult extends Result {
 
 	protected void fromSoapResponse(JobStatusResult object, AttributeContainer response) {
 		super.fromSoapResponse(object, response);
-		Object stateValue = KSoap2Utils.getProperty((SoapObject) response, "Status");
-		object.setStatus(stateValue != null ? (com.manjrasoft.aneka.JobStatus) KSoap2Utils.getObject(new com.manjrasoft.aneka.JobStatus(), (AttributeContainer) stateValue) : null);
+		object.setStatus(KSoap2Utils.getString(response,  "Status"));
 	}
 
 	public int getPropertyCount() {
@@ -45,7 +44,7 @@ public class JobStatusResult extends Result {
 		switch (index) {
 			case 2:
 				info.name = "Status";
-				info.type = ApplicationStatus.class;
+				info.type = String.class;
 				info.namespace = "http://www.manjrasoft.com/Aneka/v2.0/WebServices";
 				break;
 			default:
@@ -53,11 +52,11 @@ public class JobStatusResult extends Result {
 		}
 	}
 
-	public JobStatus getStatus() {
+	public String getStatus() {
 		return status;
 	}
 
-	public void setStatus(JobStatus status) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 
