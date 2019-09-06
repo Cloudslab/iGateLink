@@ -57,7 +57,7 @@ public class AnekaWebServices {
      * @see TaskService#TaskService(String, int, boolean)
      */
     public AnekaWebServices(String url, boolean debug){
-        service = new TaskService(url, 2, debug);
+        service = new TaskService(url, 120, debug);
     }
 
     /**
