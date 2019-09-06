@@ -112,9 +112,8 @@ public class JobResult extends Result {
 			case 14:
 				return objectInstance;
 			default:
-				super.getProperty(index);
+				return super.getProperty(index);
 		}
-		return null;
 	}
 
 	public void getPropertyInfo(int index, java.util.Hashtable table, PropertyInfo info) {

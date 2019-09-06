@@ -36,9 +36,8 @@ public class ApplicationSubmissionResult extends Result {
 			case 2:
 				return applicationId;
 			default:
-				super.getProperty(index);
+				return super.getProperty(index);
 		}
-		return null;
 	}
 
 	public void getPropertyInfo(int index, java.util.Hashtable table, PropertyInfo info) {

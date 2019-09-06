@@ -82,9 +82,8 @@ public class ApplicationResult extends Result {
 			case 8:
 				return state;
 			default:
-				super.getProperty(index);
+				return super.getProperty(index);
 		}
-		return null;
 	}
 
 	public void getPropertyInfo(int index, java.util.Hashtable table, PropertyInfo info) {
