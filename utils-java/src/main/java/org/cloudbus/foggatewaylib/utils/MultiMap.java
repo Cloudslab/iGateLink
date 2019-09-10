@@ -65,7 +65,7 @@ public class MultiMap<K, V> {
      * {@link Set} associated with it may be empty.
      *
      * @param key the key to look for.
-     * @return true if the ky is present in the {@link MultiMap}, false otherwise.
+     * @return {@code true} if the key is present in the {@link MultiMap}, {@code false }otherwise.
      */
     public boolean containsKey(@Nullable Object key) {
         return map.containsKey(key);
