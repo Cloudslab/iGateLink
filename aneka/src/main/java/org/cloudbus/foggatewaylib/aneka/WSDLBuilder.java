@@ -37,7 +37,7 @@ public class WSDLBuilder {
             files[i] = new File();
             files[i].setStorageBucketId(storageBucketId);
 
-            if (virtualPath.length() > 0 && virtualPath.charAt(virtualPath.length()-1) == '/')
+            if (virtualPath.length() == 0 || virtualPath.charAt(virtualPath.length()-1) == '/')
                 files[i].setVirtualPath(virtualPath + filenames[i]);
             else
                 files[i].setVirtualPath(virtualPath + '/' + filenames[i]);
