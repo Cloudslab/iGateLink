@@ -1,6 +1,5 @@
 package org.cloudbus.foggatewaylib.service;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -61,8 +60,8 @@ public class FogGatewayService extends ForegroundService implements ExecutionMan
      *            notification.
      * @see #stop(Context)
      */
-    public static void start(Context context, Class<? extends Activity> cls){
-        ForegroundService.startForegroundService(context, FogGatewayService.class, cls);
+    public static void start(Context context){
+        ForegroundService.startForegroundService(context, FogGatewayService.class);
     }
 
     /**

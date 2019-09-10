@@ -1,12 +1,10 @@
 package org.cloudbus.foggatewaylib.utils;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
@@ -108,13 +106,7 @@ public class NotificationUtils {
      * @see #DEFAULT_NOTIFICATION_DESCRIPTION
      * @see #DEFAULT_CHANNEL_ID
      */
-    public static Notification buildDefaultNotification(Context context,
-                                                        Class<? extends Activity> activity) {
-        Intent notificationIntent = new Intent(context, activity);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context,
-                0, notificationIntent, 0);
-
-        return buildNotification(context, pendingIntent, DEFAULT_NOTIFICATION_TITLE,
-                DEFAULT_NOTIFICATION_DESCRIPTION, 0, DEFAULT_CHANNEL_ID);
+    public static Notification buildDefaultNotification(Context context) {
+        return new NotificationCompat.Builder(context, DEFAULT_CHANNEL_ID).build();
     }
 }

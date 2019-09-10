@@ -1,6 +1,5 @@
 package org.cloudbus.foggatewaylib.service;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
@@ -108,19 +107,15 @@ public abstract class ForegroundService extends Service {
      *                called.
      * @param extras extras to be added to the {@link Intent}.
      * @param serviceClass the class of the service to be started.
-     * @param activityClass the class of the activity to be started when the notification is
-     *                      clicked.
      * @see #sendIntentToForegroundService(Context, String, Bundle, Class)
      * @see #startForegroundService(Context, Class, Class)
      * @see #stopForegroundService(Context, Class)
      * @see #bind(Context, ServiceConnection, Class)
      */
     public static void startForegroundService(Context context, Bundle extras,
-                                              Class<? extends ForegroundService> serviceClass,
-                                              Class<? extends Activity> activityClass){
+                                              Class<? extends ForegroundService> serviceClass){
         if (extras == null)
             extras = new Bundle();
-        extras.putString("activity", activityClass.getName());
         sendIntentToForegroundService(context, ACTION_START, extras, serviceClass);
     }
 
@@ -130,18 +125,14 @@ public abstract class ForegroundService extends Service {
      * @param context the {@link Context} in which {@link Context#startService(Intent)} will be
      *                called.
      * @param serviceClass the class of the service to be started.
-     * @param activityClass the class of the activity to be started when the notification is
-     *                      clicked.
      * @see #sendIntentToForegroundService(Context, String, Bundle, Class)
      * @see #startForegroundService(Context, Bundle, Class, Class)
      * @see #stopForegroundService(Context, Class)
      * @see #bind(Context, ServiceConnection, Class)
      */
     public static void startForegroundService(Context context,
-                                              Class<? extends ForegroundService> serviceClass,
-                                              Class<? extends Activity> activityClass){
+                                              Class<? extends ForegroundService> serviceClass){
         Bundle extras = new Bundle();
-        extras.putString("activity", activityClass.getName());
         sendIntentToForegroundService(context, ACTION_START, extras, serviceClass);
     }
 
@@ -199,34 +190,33 @@ public abstract class ForegroundService extends Service {
     /**
      * Starts the service in the foreground.
      *
-     * @param extras {@link Intent} extras containing info about the activity to be called once
-     *                             the notification is clicked.
+     * @param extras {@link Intent} extras passed to the service, used for customizing the
+     *                             notification in case a custom notification is used.
      * @return true if everything was alright, false if the service should be aborted.
+     * @see #makeNotification(Bundle)
      */
     @SuppressWarnings("unchecked")
     protected boolean selfStartForeground(Bundle extras){
-        Class activity;
-        try{
-            String activityName = extras.getString("activity");
-            if (activityName != null)
-                activity = Class.forName(activityName);
-            else
-                return false;
-        } catch (ClassNotFoundException e){
-            e.printStackTrace();
-            Log.e(TAG, "Activity string is not valid!");
-            return false;
-        }
-
         NotificationUtils.initDefaultChannel(this);
-        Notification notification = NotificationUtils.buildDefaultNotification(this,
-                activity);
+        Notification notification = makeNotification(extras);
 
         startForeground(NotificationUtils.DEFAULT_NOTIFICATION_ID, notification);
         return true;
     }
 
     /**
+     * Builds the notification to be shown to the user. This creates the default notification
+     * unless overridden.
+     *
+     * @param extras extras passed to the service, used for customization of the notification.
+     * @return the built notification.
+     */
+    protected Notification makeNotification(Bundle extras){
+        return NotificationUtils.buildDefaultNotification(this);
+    }
+
+    /**
+     * Handles a custom action.
      * Override this method for defining a custom action.
      *
      * @param action the action to be handled.
