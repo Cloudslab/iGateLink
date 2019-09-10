@@ -36,5 +36,5 @@ dependencies {
 
     implementation "androidx.recyclerview:recyclerview:$rootProject.recyclerview_version"
     implementation "com.google.android.material:material:$rootProject.material_version"
-
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta2'
 }
