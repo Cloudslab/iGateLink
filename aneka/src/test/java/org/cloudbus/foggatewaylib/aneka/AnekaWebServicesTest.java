@@ -9,6 +9,7 @@ import com.manjrasoft.aneka.Job;
 import com.manjrasoft.aneka.TaskItem;
 
 import org.cloudbus.foggatewaylib.utils.SimpleFTPClient;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Date;
@@ -21,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 public class AnekaWebServicesTest {
     final static String APP_NAME = "My Application";
 
+    @Ignore("This test requires an Aneka master running therefore it may be ignored during build")
     @Test
     public void test1() {
         boolean check;
@@ -69,6 +71,7 @@ public class AnekaWebServicesTest {
         }
     }
 
+    @Ignore("This test requires an Aneka master running therefore it may be ignored during build")
     @Test
     public void test2() {
         AnekaWebServices services = new AnekaWebServices(Credentials.URL, true);
@@ -151,6 +154,7 @@ public class AnekaWebServicesTest {
         }
     }
 
+    @Ignore("This test requires an Aneka master running therefore it may be ignored during build")
     @Test
     public void test3() {
         AnekaWebServices services = new AnekaWebServices(Credentials.URL, true);
@@ -235,6 +239,7 @@ public class AnekaWebServicesTest {
         }
     }
 
+    @Ignore("This test requires an Aneka master running therefore it may be ignored during build")
     @Test
     public void testPython() {
         AnekaWebServices services = new AnekaWebServices(Credentials.URL, true);
@@ -311,7 +316,7 @@ public class AnekaWebServicesTest {
         }
     }
 
-
+    @Ignore("This test requires an Aneka master running therefore it may be ignored during build")
     @Test
     public void test4() {
         AnekaWebServices services = new AnekaWebServices(Credentials.URL, true);
@@ -400,6 +405,91 @@ public class AnekaWebServicesTest {
             }
         }
     }
+
+    @Ignore("This test requires an Aneka master running therefore it may be ignored during build")
+    @Test
+    public void test_sharedFilesStructure() {
+        AnekaWebServices services = new AnekaWebServices(Credentials.URL, true);
+        String myid = UUID.randomUUID().toString();
+
+        System.out.println(myid);
+
+        try {
+            boolean check;
+            check = services.authenticateUser(Credentials.USERNAME, Credentials.PASSWORD);
+
+            assert check;
+
+            FTPStorageBucket bucket = new FTPStorageBucket(
+                    "FTP",
+                    Credentials.USERNAME,
+                    Credentials.PASSWORD,
+                    Credentials.HOST);
+
+            SimpleFTPClient ftpClient = bucket.buildFTPClient();
+
+            String folder = "/" + myid;
+            String outputPath = folder + "/output.txt";
+
+            assert ftpClient.connect();
+            assert ftpClient.mkdir(folder);
+
+            ArrayOfFile sharedFiles = WSDLBuilder.buildArrayOfFile(
+                    "FTP",
+                    "/a",
+                    "",
+                    new String[]{"b.txt", "c/d.txt"}
+            );
+
+            String applicationId = services.createApplicationWait(APP_NAME, sharedFiles,
+                    bucket);
+
+            assert applicationId != null;
+
+            try {
+                ArrayOfFile inputFiles = new ArrayOfFile();
+
+                ArrayOfFile outputFiles = WSDLBuilder.buildArrayOfFile(
+                        "FTP",
+                        outputPath,
+                        "std.out");
+
+                ArrayOfTaskItem tasks = WSDLBuilder.buildArrayOfTaskItem(
+                        WSDLBuilder.buildExecuteTaskItem(
+                                "dir",
+                                "/s"
+                        )
+                );
+
+                Job job = new Job();
+                job.setInputFiles(inputFiles);
+                job.setOutputFiles(outputFiles);
+                job.setTasks(tasks);
+                job.setReservationId(myid);
+
+                String jobId = services.submitJobWait(applicationId, job);
+
+                assert jobId != null;
+
+                String termination_status = services.waitJobTermination(applicationId, jobId);
+
+                assertEquals(STATUS_COMPLETED, termination_status);
+
+                String outString = ftpClient.getString(outputPath);
+
+                System.out.println(outString);
+
+            } finally {
+                boolean deleted = services.abortApplication(applicationId);
+                assert deleted;
+            }
+        } finally {
+            if (services.getError() != null) {
+                System.out.println(services.getError());
+            }
+        }
+    }
+
     private static final String ALLOWED_CHARACTERS ="0123456789qwertyuiopasdfghjklzxcvbnm";
 
     private static String getRandomString(final int sizeOfRandomString)
