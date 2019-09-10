@@ -138,7 +138,7 @@ replace `./gradlew` with `gradlew.bat`):
 # Build and test module 'mymodule'
 ./gradlew :mymodule:build
 ```
-These commands build the release variant, to build the debug variant, 
+These commands build the release variant. In order to build the debug variant, 
 just append `Debug` to the command name (i.e. `assembleDebug`, `buildDebug`;
 debug variant is not available for Java modules).
 
