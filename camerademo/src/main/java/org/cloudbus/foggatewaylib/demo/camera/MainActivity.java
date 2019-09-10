@@ -121,52 +121,57 @@ public class MainActivity extends FogGatewayServiceActivity
 
     protected void initExecutionManager(ExecutionManager executionManager) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        if (prefs.getBoolean("enable_fogbus", false)){
+        boolean fogbusEnabled = prefs.getBoolean("enable_fogbus", false);
+        boolean anekaEnabled = prefs.getBoolean("enable_aneka", false);
+
+        if (fogbusEnabled){
             executionManager.addProvider(KEY_PROVIDER_FOGBUS, KEY_DATA_OUTPUT,
                     new EdgeLensProvider(4));
         } else{
             executionManager.removeProvider(KEY_PROVIDER_FOGBUS);
         }
 
-        if (prefs.getBoolean("enable_aneka", false)){
+        if (anekaEnabled){
             executionManager.addProvider(KEY_PROVIDER_ANEKA, KEY_DATA_OUTPUT,
                     new SimpleAnekaProvider());
         } else{
             executionManager.removeProvider(KEY_PROVIDER_ANEKA);
         }
 
-        executionManager
-                .addProvider(KEY_PROVIDER_INPUT, KEY_DATA_INPUT,
-                        new CameraProvider())
-                .addProvider(KEY_PROVIDER_INPUT_BITMAP, KEY_DATA_INPUT_BITMAP,
-                        new BitmapProvider(ImageData.class, GenericData.class))
-                .addProvider(KEY_PROVIDER_OUTPUT_BITMAP, KEY_DATA_OUTPUT_BITMAP,
-                        new BitmapProvider(ImageData.class, GenericData.class))
-                .addTrigger(KEY_DATA_INPUT, KEY_TRIGGER_EXEC,
-                        new ProduceDataTrigger<>(KEY_DATA_OUTPUT, ImageData.class))
-                .addTrigger(KEY_DATA_INPUT, KEY_TRIGGER_BITMAP_INPUT,
-                        new ProduceDataTrigger<>(KEY_DATA_INPUT_BITMAP, ImageData.class))
-                .addTrigger(KEY_DATA_OUTPUT, KEY_TRIGGER_BITMAP_OUTPUT,
-                        new ProduceDataTrigger<>(KEY_DATA_OUTPUT_BITMAP, ImageData.class))
-                .addTrigger(ExecutionManager.KEY_DATA_PROGRESS, KEY_TRIGGER_FALLBACK,
-                        new IndividualTrigger<ProgressData>(ProgressData.class) {
-                            @Override
-                            public void onNewData(Store store, ProgressData data) {
-                                if (data.getProgress() < 0){
-                                    if (data.getPublisher().equals(KEY_PROVIDER_FOGBUS)
-                                            || data.getPublisher().equals(KEY_PROVIDER_DUMMY)){
-                                        getExecutionManager().produceDataExcludeProviders(
-                                                KEY_DATA_OUTPUT,
-                                                data.getRequestID(),
-                                                new String[]{data.getPublisher()},
-                                                getExecutionManager().getStore(KEY_DATA_INPUT)
-                                                        .retrieveLast(data.getRequestID())
-                                        );
+        if (fogbusEnabled || anekaEnabled){
+            executionManager
+                    .addProvider(KEY_PROVIDER_INPUT, KEY_DATA_INPUT,
+                            new CameraProvider())
+                    .addProvider(KEY_PROVIDER_INPUT_BITMAP, KEY_DATA_INPUT_BITMAP,
+                            new BitmapProvider(ImageData.class, GenericData.class))
+                    .addProvider(KEY_PROVIDER_OUTPUT_BITMAP, KEY_DATA_OUTPUT_BITMAP,
+                            new BitmapProvider(ImageData.class, GenericData.class))
+                    .addTrigger(KEY_DATA_INPUT, KEY_TRIGGER_EXEC,
+                            new ProduceDataTrigger<>(KEY_DATA_OUTPUT, ImageData.class))
+                    .addTrigger(KEY_DATA_INPUT, KEY_TRIGGER_BITMAP_INPUT,
+                            new ProduceDataTrigger<>(KEY_DATA_INPUT_BITMAP, ImageData.class))
+                    .addTrigger(KEY_DATA_OUTPUT, KEY_TRIGGER_BITMAP_OUTPUT,
+                            new ProduceDataTrigger<>(KEY_DATA_OUTPUT_BITMAP, ImageData.class))
+                    .addTrigger(ExecutionManager.KEY_DATA_PROGRESS, KEY_TRIGGER_FALLBACK,
+                            new IndividualTrigger<ProgressData>(ProgressData.class) {
+                                @Override
+                                public void onNewData(Store store, ProgressData data) {
+                                    if (data.getProgress() < 0){
+                                        if (data.getPublisher().equals(KEY_PROVIDER_FOGBUS)
+                                                || data.getPublisher().equals(KEY_PROVIDER_DUMMY)){
+                                            getExecutionManager().produceDataExcludeProviders(
+                                                    KEY_DATA_OUTPUT,
+                                                    data.getRequestID(),
+                                                    new String[]{data.getPublisher()},
+                                                    getExecutionManager().getStore(KEY_DATA_INPUT)
+                                                            .retrieveLast(data.getRequestID())
+                                            );
 
+                                        }
                                     }
                                 }
-                            }
-                        })
-                .addChooser(KEY_DATA_OUTPUT, new RoundRobinChooser());
+                            })
+                    .addChooser(KEY_DATA_OUTPUT, new RoundRobinChooser());
+        }
     }
 }
