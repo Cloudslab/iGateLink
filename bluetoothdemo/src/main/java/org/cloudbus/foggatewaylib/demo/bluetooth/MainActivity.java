@@ -22,6 +22,11 @@ import org.cloudbus.foggatewaylib.service.FogGatewayServiceActivity;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Main Activity.
+ *
+ * @author Riccardo Mancini
+ */
 public class MainActivity extends FogGatewayServiceActivity
         implements PairBluetoothLeFragment.OnPairDevice {
 
@@ -39,6 +44,9 @@ public class MainActivity extends FogGatewayServiceActivity
 
     private static final int MY_REQUEST_CODE = 1;
 
+    /**
+     * Makes back button touch work as expected with the Navigation library.
+     */
     @Override
     public boolean onSupportNavigateUp() {
         return Navigation.findNavController(this, R.id.mainNavigationFragment).navigateUp();
@@ -49,9 +57,13 @@ public class MainActivity extends FogGatewayServiceActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // initialize the bottom navigation
+
         BottomNavigationView navView = findViewById(R.id.nav_view);
         NavigationUI.setupWithNavController(navView,
                 Navigation.findNavController(this, R.id.mainNavigationFragment));
+
+        // ask user for missing permissions (if any)
 
         Set<String> missingPermissions = new HashSet<>();
 
@@ -71,6 +83,11 @@ public class MainActivity extends FogGatewayServiceActivity
 
     }
 
+    /**
+     * Checks whether user granted the requested permissions.
+     *
+     * It basically does nothing but complaining to the user if they didn't grant permission.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
@@ -88,21 +105,39 @@ public class MainActivity extends FogGatewayServiceActivity
         }
     }
 
+    /**
+     * Initializes the {@link ExecutionManager} when it is bound to the activity.
+     */
     protected void initExecutionManager(ExecutionManager executionManager) {
         executionManager
+                // add the input provider
                 .addProvider(KEY_PROVIDER_INPUT, KEY_DATA_INPUT,
                         new BluetoothOximeterProvider())
+                // add the output provider
                 .addProvider(KEY_PROVIDER_OUTPUT, KEY_DATA_OUTPUT,
                         new HealthKeeperProvider())
+                // add the local output provider
                 .addProvider(KEY_PROVIDER_LOCAL, KEY_DATA_OUTPUT,
                         new LocalProvider())
+                // add the chooser
                 .addChooser(KEY_DATA_OUTPUT, new MyChooser());
+        // note that no store was added since it is implicit.
+        // furthermore, no trigger is necessary since analysis is started by user touch on a
+        // button.
     }
 
     @Override
     public void onDevicePaired(BluetoothGatt gatt) {
+        // a device has been paired
+        // in this simple demo there's nothing that's needed to be done.
     }
 
+    /**
+     * Returns the requirements that the bluetooth devices must satisfy in order to be
+     * managed by this application.
+     *
+     * @see PairBluetoothLeFragment.OnPairDevice
+     */
     @Override
     @SuppressWarnings("unchecked")
     public Set<BluetoothLeHandler.ServiceCharacteristicPair>[] getRequirements() {

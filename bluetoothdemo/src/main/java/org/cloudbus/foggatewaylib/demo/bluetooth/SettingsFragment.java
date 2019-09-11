@@ -18,6 +18,14 @@ import org.cloudbus.foggatewaylib.service.FogGatewayService;
 import org.cloudbus.foggatewaylib.service.FogGatewayServiceActivity;
 import org.cloudbus.foggatewaylib.service.ForegroundService;
 
+/**
+ * Fragment for app settings.
+ * The {@link PreferenceFragmentCompat} already takes care of managing the settings and showing
+ * them to the user. What is yet to be done is defining some callbacks for when the preferences
+ * change.
+ *
+ * @author Riccardo Mancini
+ */
 public class SettingsFragment extends PreferenceFragmentCompat {
     public static final String KEY_ENABLE_SERVICES = "enable_services";
     public static final String KEY_BT_SCAN_TIMEOUT = "bluetooth_scan_timeout";
@@ -29,13 +37,19 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         if (getActivity() == null)
             return;
 
+        // check if the service is running and enable/disable its SwitchPreference accordingly.
+
         PreferenceManager.getDefaultSharedPreferences(getActivity())
                 .edit()
                 .putBoolean(KEY_ENABLE_SERVICES,
                         ((ExecutionManager.Holder) getActivity()).getExecutionManager() != null)
                 .apply();
 
+        // sets the file containing the settings description (mandatory)
+
         setPreferencesFromResource(R.xml.preferences, rootKey);
+
+        // set callback for service enable/disable
 
         SwitchPreference preference = findPreference(KEY_ENABLE_SERVICES);
         if (preference != null){
@@ -46,6 +60,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                         return false;
 
                     if ((boolean) newValue) {
+                        // note that you need both to start and bind to the service
                         FogGatewayService.start(getActivity());
                         ForegroundService.bind(getActivity(),
                                 (FogGatewayServiceActivity) getActivity(),
@@ -57,6 +72,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 }
             });
         }
+
+        // set EditText InputType to numeric for the bluetooth scan timeout
 
         EditTextPreference bluetoothScanTimeout = findPreference(KEY_BT_SCAN_TIMEOUT);
         if (bluetoothScanTimeout != null){
@@ -70,6 +87,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             });
         }
 
+        // sets the action for when the configure master preference is clicked
+
         Preference configureMaster = findPreference(KEY_CONFIGURE_MASTER);
         if (configureMaster != null){
             configureMaster.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -77,6 +96,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 public boolean onPreferenceClick(Preference preference) {
                     if (getContext() == null)
                         return false;
+
+                    // start the browser at the management address
 
                     String masterIP = PreferenceManager.getDefaultSharedPreferences(getContext())
                             .getString(KEY_MASTER_DOMAIN, "");

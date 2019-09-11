@@ -4,6 +4,11 @@ import android.preference.PreferenceManager;
 
 import org.cloudbus.foggatewaylib.core.SequentialProvider;
 
+/**
+ * Provider for local execution.
+ *
+ * @author Riccardo Mancini
+ */
 public class LocalProvider extends SequentialProvider<OximeterData, AnalysisResultData> {
 
     public static final int DEFAULT_SLEEP_SEC = 5;
@@ -14,6 +19,9 @@ public class LocalProvider extends SequentialProvider<OximeterData, AnalysisResu
         super(OximeterData.class, AnalysisResultData.class);
     }
 
+    /**
+     * Computes the analysis for the given input data.
+     */
     @Override
     public AnalysisResultData[] getData(ProgressPublisher progressPublisher,
                                         long requestID,
@@ -75,6 +83,7 @@ public class LocalProvider extends SequentialProvider<OximeterData, AnalysisResu
             result.AHSeverity = "Highly Severe";
         }
 
+        // user-configurable sleep for showing the capabilities of the chooser MyChooser.
         if (sleep > 0)
             Thread.sleep(sleep);
 
@@ -86,6 +95,8 @@ public class LocalProvider extends SequentialProvider<OximeterData, AnalysisResu
     @Override
     public void onAttach() {
         super.onAttach();
+        // when the provider is attached to the execution manager (i.e. when the background service
+        // is started or restarted), retrieve the configuration set by the user.
         String sleepStr = PreferenceManager
                 .getDefaultSharedPreferences(getContext())
                 .getString("debug_sleep", Integer.toString(DEFAULT_SLEEP_SEC));

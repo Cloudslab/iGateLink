@@ -1,7 +1,6 @@
 package org.cloudbus.foggatewaylib.demo.bluetooth;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -33,7 +32,11 @@ import java.util.List;
 import static org.cloudbus.foggatewaylib.demo.bluetooth.MainActivity.KEY_DATA_INPUT;
 import static org.cloudbus.foggatewaylib.demo.bluetooth.MainActivity.KEY_DATA_OUTPUT;
 
-
+/**
+ * Fragment showing the real-time data and analysis results for a device.
+ *
+ * @author Riccardo Mancini
+ */
 public class ResultFragment extends Fragment {
     public static final String TAG = "Result Fragment";
     private static final int MAX_DATA = 60;
@@ -74,6 +77,8 @@ public class ResultFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_result, container, false);
 
+        // Initialize graph parameters ...
+
         graph = rootView.findViewById(R.id.graph_bpm);
 
         graph.getLegendRenderer().setVisible(true);
@@ -103,6 +108,8 @@ public class ResultFragment extends Fragment {
         graph.getSecondScale().setMaxY(100);
         graph.getGridLabelRenderer().setVerticalLabelsSecondScaleColor(Color.RED);
 
+        // get reference to TextViews holding the results
+
         textBPM = rootView.findViewById(R.id.text_bpm);
         textSpO2 = rootView.findViewById(R.id.text_spo2);
         textPI = rootView.findViewById(R.id.text_pi);
@@ -113,6 +120,8 @@ public class ResultFragment extends Fragment {
         textMaxBPM = rootView.findViewById(R.id.maxbpm);
         textAvgBPM = rootView.findViewById(R.id.avgbpm);
         textDiagnosis = rootView.findViewById(R.id.diagnosis);
+
+        // set "analyze" button action
 
         button = rootView.findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
@@ -135,24 +144,24 @@ public class ResultFragment extends Fragment {
             }
         });
 
+        // init progress bar
+
         progressBar = rootView.findViewById(R.id.progress_bar);
         progressBar.setIndeterminate(true);
 
         return rootView;
     }
 
-
-    @Override
-    public void onAttach(@NonNull final Context context) {
-        super.onAttach(context);
-
-    }
-
+    /**
+     * Called when fragment is shown to the user.
+     */
     @Override
     public void onResume() {
         super.onResume();
         if (getActivity() == null)
             return;
+
+        // get the device_address from the arguments
 
         if (getArguments() != null){
             String deviceAddress = getArguments().getString("device_address");
@@ -161,6 +170,8 @@ public class ResultFragment extends Fragment {
             device = Long.valueOf(deviceAddress.replaceAll(":", ""), 16);
         } else
             throw new RuntimeException("Missing arguments");
+
+        // reset analysis results
 
         time = new Date().getTime();
         textBPM.setText("-");
@@ -175,11 +186,15 @@ public class ResultFragment extends Fragment {
         textDiagnosis.setText("?");
         progressBar.setVisibility(View.INVISIBLE);
 
+        // initialize the ExecutionManager (if available)
+
         ExecutionManager executionManager
                 = ((ExecutionManager.Holder)getActivity()).getExecutionManager();
         if (executionManager != null){
             initExecutionManager(executionManager);
         } else{
+            // otherwise schedule its initialization when it becomes available
+
             seriesBPM.resetData(new DataPoint[0]);
             seriesSpO2.resetData(new DataPoint[0]);
             ((FogGatewayServiceActivity)getActivity())
@@ -196,11 +211,16 @@ public class ResultFragment extends Fragment {
         }
     }
 
+    /**
+     * Called when fragment is no longer visible.
+     */
     @Override
     public void onPause() {
         super.onPause();
         if (getActivity() == null)
             return;
+
+        // remove all UI-related triggers
 
         ExecutionManager executionManager
                 = ((ExecutionManager.Holder)getActivity()).getExecutionManager();
@@ -209,12 +229,19 @@ public class ResultFragment extends Fragment {
             executionManager.removeUITrigger("outputUpdateUI");
             executionManager.removeUITrigger("progressUpdateUI");
         }
+
+        // unregister the service connection listener
+
         ((FogGatewayServiceActivity)getActivity())
                 .removeServiceConnectionListener("resultFragment");
     }
 
+    /**
+     * Adds the UI-related triggers to the execution manager.
+     */
     @SuppressWarnings("unchecked")
     private void initExecutionManager(ExecutionManager executionManager){
+        // trigger for updating graph when new data is available
         executionManager.addUITrigger(KEY_DATA_INPUT,
                 "inputUpdateUI",
                 device,
@@ -258,6 +285,7 @@ public class ResultFragment extends Fragment {
                     }
                 });
 
+        // trigger for updating analysis results when they become available
         executionManager.addUITrigger(KEY_DATA_OUTPUT,
                 "outputUpdateUI",
                 device,
@@ -275,6 +303,9 @@ public class ResultFragment extends Fragment {
 
                     }
                 });
+
+        // trigger for showing/hiding the progress bar, as well as resetting the analysis results
+        // in case of error
         executionManager.addUITrigger(ExecutionManager.KEY_DATA_PROGRESS,
                 "progressUpdateUI",
                 device,
@@ -308,6 +339,8 @@ public class ResultFragment extends Fragment {
 
                     }
                 });
+
+        // Fill the graph with already existing data
 
         OximeterData[] data = ((Store<OximeterData>)executionManager.getStore(KEY_DATA_INPUT))
                                     .retrieveLastN(MAX_DATA);

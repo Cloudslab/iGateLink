@@ -11,11 +11,17 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Provider for HealthKeeper (FogBus).
+ *
+ * @author Riccardo Mancini
+ */
 public class HealthKeeperProvider extends FogBusProvider<OximeterData, AnalysisResultData> {
     public static final String TAG = "HealthKeeperProvider";
 
     public static final String SESSION_URL = "/HealthKeeper/RPi/Master/session.php";
 
+    // this is probably a very inefficient way for parsing HTML.
     private static Pattern pattern = Pattern.compile(
             "<br/>AHI \\(Apnea-hypopnea index\\) = ([0-9]+)[ \n]+" +
             "<br/>Minimum Oxygen Level = ([0-9]+)[ \n]+" +
@@ -31,6 +37,7 @@ public class HealthKeeperProvider extends FogBusProvider<OximeterData, AnalysisR
 
     @Override
     protected String getMasterIP() {
+        // retrieve the IP set by the user in the preferences
         return PreferenceManager
                 .getDefaultSharedPreferences(getContext())
                 .getString("fogbus_master_ip", "");
@@ -44,12 +51,14 @@ public class HealthKeeperProvider extends FogBusProvider<OximeterData, AnalysisR
     @Override
     protected Map<Integer, List<String>> serializeData(ProgressPublisher progressPublisher,
                                                        OximeterData... input) {
+        // let the UI know that upload is started
         progressPublisher.publish(0, "Uploading data...");
 
         List<String> bpmList = new ArrayList<>();
         List<String> spo2List = new ArrayList<>();
 
         for (OximeterData d:input){
+            // only valid points should be considered
             if (d.getBPM() != -1 && d.getSpO2() != -1){
                 bpmList.add(String.valueOf(d.getBPM()));
                 spo2List.add(String.valueOf(d.getSpO2()));
@@ -66,6 +75,7 @@ public class HealthKeeperProvider extends FogBusProvider<OximeterData, AnalysisR
     protected AnalysisResultData[] parseOutput(ProgressPublisher progressPublisher,
                                                String result, long requestID)
                 throws Exception{
+
         Matcher matcher = pattern.matcher(result);
         if (!matcher.find())
             throw new Exception("Output pattern does not match");
@@ -82,6 +92,7 @@ public class HealthKeeperProvider extends FogBusProvider<OximeterData, AnalysisR
         output.EKGDiagnosis = matcher.group(7);
 
 
+        // let the UI know that execution is completed
         progressPublisher.publish(100, "Done");
 
         return new AnalysisResultData[]{output};

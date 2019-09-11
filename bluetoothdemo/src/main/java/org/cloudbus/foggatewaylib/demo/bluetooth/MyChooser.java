@@ -9,6 +9,11 @@ import org.cloudbus.foggatewaylib.core.RoundRobinChooser;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Round-robin Chooser that skips the {@link LocalProvider} if it is busy or disabled.
+ *
+ * @author Riccardo Mancini
+ */
 public class MyChooser extends Chooser {
     
     private RoundRobinChooser roundRobinChooser = new RoundRobinChooser();
@@ -27,7 +32,10 @@ public class MyChooser extends Chooser {
         } else
             return roundRobinChooser.chooseProvider(providers);
     }
-    
+
+    /**
+     * Checks if an element is inside an array.
+     */
     private boolean contains(String[] array, String element){
         for (String e:array){
             if (e.equals(element))
@@ -35,7 +43,10 @@ public class MyChooser extends Chooser {
         }
         return false;
     }
-    
+
+    /**
+     * Returns an array that is the same as the input array without the given element.
+     */
     private String[] remove(String[] array, String element){
         List<String> resList = new ArrayList<>();
         for (String e:array){
