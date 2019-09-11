@@ -18,7 +18,6 @@ import android.os.Handler;
 public class SimpleBluetoothLeAdapter {
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothManager bluetoothManager;
-    private Context context;
     private BluetoothAdapter.LeScanCallback leScanCallback;
 
     private boolean mScanning = false;
@@ -42,8 +41,6 @@ public class SimpleBluetoothLeAdapter {
      * {@link BluetoothManager} and the {@link BluetoothAdapter} using the given {@link Context}.
      */
     public SimpleBluetoothLeAdapter(Context context) {
-        this.context = context;
-
         bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
     }
