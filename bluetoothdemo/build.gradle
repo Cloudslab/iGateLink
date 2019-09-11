@@ -26,19 +26,14 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation "androidx.appcompat:appcompat:1.1.0"
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    implementation 'androidx.navigation:navigation-fragment:2.0.0'
-    implementation 'androidx.navigation:navigation-ui:2.0.0'
+    testImplementation "junit:junit:4.12"
+    androidTestImplementation "androidx.test:runner:1.2.0"
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.2.0"
 
-    implementation 'com.google.android.material:material:1.1.0-alpha09'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta2'
-    implementation 'androidx.vectordrawable:vectordrawable:1.1.0-rc01'
+    implementation "androidx.constraintlayout:constraintlayout:2.0.0-beta2"
+    implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
 
     implementation project(':core')
     implementation project(':bluetooth')
@@ -46,17 +41,18 @@ dependencies {
     implementation project(':fogbus')
 
     // Navigation
-    implementation "androidx.navigation:navigation-fragment:$rootProject.nav_version"
-    implementation "androidx.navigation:navigation-ui:$rootProject.nav_version"
+    def navigation_version = "2.1.0"
+    implementation "androidx.navigation:navigation-fragment:$navigation_version"
+    implementation "androidx.navigation:navigation-ui:$navigation_version"
 
     // Preference
-    implementation "androidx.preference:preference:$rootProject.preference_version"
+    implementation "androidx.preference:preference:1.1.0"
 
     // RecyclerView
-    implementation "androidx.recyclerview:recyclerview:$rootProject.recyclerview_version"
+    implementation "androidx.recyclerview:recyclerview:1.1.0-beta04"
 
     //FAB
-    implementation "com.google.android.material:material:$rootProject.material_version"
+    implementation 'com.google.android.material:material:1.1.0-alpha10'
 
     implementation 'com.jjoe64:graphview:4.2.2'
 }

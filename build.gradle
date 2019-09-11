@@ -25,13 +25,3 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-ext{
-    nav_version = '2.2.0-alpha01'
-    appcompat_version = "1.1.0-rc01"
-    preference_version = "1.1.0-rc01"
-    material_version = '1.1.0-alpha09'
-    exif_version = "1.1.0-beta01"
-    recyclerview_version = '1.1.0-beta03'
-    commons_net_version = '3.6'
-    annotation_version = '1.1.0'
-}
