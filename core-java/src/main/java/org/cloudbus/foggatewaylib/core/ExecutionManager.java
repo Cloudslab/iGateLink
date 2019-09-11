@@ -14,6 +14,9 @@ import java.util.Map;
  * Orchestrator and manager of the other components ({@link Store}, {@link Provider},
  * {@link Chooser}, {@link Trigger}).
  *
+ * In order to be used, each component should be registered withing the {@link ExecutionManager}
+ * using one of the {@code add*} methods.
+ *
  * @see Store
  * @see Provider
  * @see Chooser

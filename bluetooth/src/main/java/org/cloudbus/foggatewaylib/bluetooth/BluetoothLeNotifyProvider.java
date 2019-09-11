@@ -52,6 +52,8 @@ public abstract class BluetoothLeNotifyProvider<T extends Data>
 
     /**
      * Called when the characteristic value changes, provides the output to be published.
+     * You can retrieve the value of the characteristic from within the method through
+     * {@link BluetoothGattCharacteristic#getValue()} (or equivalent).
      *
      * @param gatt the GATT server in which the change occurred.
      * @param characteristic the updated characteristic.

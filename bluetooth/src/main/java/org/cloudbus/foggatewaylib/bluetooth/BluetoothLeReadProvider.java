@@ -53,6 +53,8 @@ public abstract class BluetoothLeReadProvider<T extends Data>
 
     /**
      * Called when the characteristic value is read, provides the output to be published.
+     * You can retrieve the value of the characteristic from within the method through
+     * {@link BluetoothGattCharacteristic#getValue()} (or equivalent).
      *
      * @param gatt the GATT server in which the read occurred.
      * @param characteristic the read characteristic.
