@@ -1,0 +1,11 @@
+com.manjrasoft.aneka
+org.cloudbus.foggatewaylib.aneka
+org.cloudbus.foggatewaylib.bluetooth
+org.cloudbus.foggatewaylib.bluetooth.ui
+org.cloudbus.foggatewaylib.camera
+org.cloudbus.foggatewaylib.core
+org.cloudbus.foggatewaylib.demo.bluetooth
+org.cloudbus.foggatewaylib.demo.camera
+org.cloudbus.foggatewaylib.fogbus
+org.cloudbus.foggatewaylib.service
+org.cloudbus.foggatewaylib.utils
