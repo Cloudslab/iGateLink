@@ -4,7 +4,7 @@ FogGatewayLib is an Android library that makes handling data streams in
 Android easy and efficient. 
 The library makes it simple to create new data-driven applications 
 without having to care about Android service and thread management. 
-All the user of the library has to do is just defining of how to collect 
+Everything the user of the library has to do is just defining of how to collect 
 data and elaborate data within the framework.
  
 The goal of the library is to make the development of Android applications
@@ -81,9 +81,12 @@ before storing the `Data` to the `Store`.
 There are two sources of documentation for this project:
  
  * Javadoc, available for most classes and methods.
- * GitHub wiki
+ * Examples:
+   * `camerademo`
+   * `bluetoothdemo`
 
-## Project Structure
+
+### Project Structure
 
 The project is divided into modules, each of which is dedicated to a 
 specific feature. Where possible, Android-specific code and generic Java 
@@ -114,12 +117,16 @@ more portable.
 ## Building the project
 
 The project has been created using [Android Studio](https://developer.android.com/studio),
-which uses [Gradle](https://gradle.org/) to build the project. 
+which uses [Gradle](https://gradle.org/) to build the project. Therefore, 
+you can either import it in Android Studio or build it from command line
+using the Gradle wrapper.
+
 
 ### Importing in Android Studio
 
 Either clone this repository with `git` and import it in Android Studio
 or directly import the project from GitHub with Android Studio.
+
 
 ### Building from command line
 
@@ -149,6 +156,15 @@ Outputs of the building process can be found in (assuming you're building
  * `mymodule/build/outputs/aar/mymmodule-variant.aar` for Android library
     modules.
  * `mymodule/build/libs/mymmodule.jar` for Java modules.
+
+
+## Using the library
+
+At the moment the library is not distributed through Maven Central or 
+an equivalent platform. Therefore you can either clone the repository and
+import the modules you need in Android Studio or you can download the 
+`*.jar` or `*.aar` files from the latest release in the Release page and 
+use them in your project.
 
 
 ___
