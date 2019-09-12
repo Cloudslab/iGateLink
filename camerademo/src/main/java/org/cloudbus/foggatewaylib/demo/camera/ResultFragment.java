@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.widget.ContentLoadingProgressBar;
-import androidx.fragment.app.Fragment;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -20,8 +19,7 @@ import org.cloudbus.foggatewaylib.core.GenericData;
 import org.cloudbus.foggatewaylib.core.IndividualTrigger;
 import org.cloudbus.foggatewaylib.core.ProgressData;
 import org.cloudbus.foggatewaylib.core.Store;
-import org.cloudbus.foggatewaylib.service.FogGatewayService;
-import org.cloudbus.foggatewaylib.service.FogGatewayServiceActivity;
+import org.cloudbus.foggatewaylib.service.FogGatewayServiceFragment;
 
 import static org.cloudbus.foggatewaylib.demo.camera.MainActivity.KEY_DATA_INPUT_BITMAP;
 import static org.cloudbus.foggatewaylib.demo.camera.MainActivity.KEY_DATA_OUTPUT_BITMAP;
@@ -31,7 +29,7 @@ import static org.cloudbus.foggatewaylib.demo.camera.MainActivity.KEY_DATA_OUTPU
  *
  * @author Riccardo Mancini
  */
-public class ResultFragment extends Fragment {
+public class ResultFragment extends FogGatewayServiceFragment {
     public static final String TAG = "Result Fragment";
     private OnResultFragmentInteractionListener mListener;
 
@@ -41,8 +39,9 @@ public class ResultFragment extends Fragment {
 
     private long request_id;
 
+    // Required empty public constructor
     public ResultFragment() {
-        // Required empty public constructor
+        super("inputUpdateUI","outputUpdateUI", "messageUpdateUI");
     }
 
     @Override
@@ -85,54 +84,13 @@ public class ResultFragment extends Fragment {
 
     @Override
     public void onResume() {
-        super.onResume();
         // retrieve request_id from arguments
         if (getArguments() != null)
             request_id = getArguments().getLong("request_id", -1);
         else
             request_id = -1;
 
-        if (getActivity() == null)
-            return;
-
-        ExecutionManager executionManager
-                = ((ExecutionManager.Holder)getActivity()).getExecutionManager();
-        if (executionManager != null){
-            // init execution manager if available
-            initExecutionManager(executionManager);
-        } else{
-            // otherwise schedule its initiation
-            ((FogGatewayServiceActivity)getActivity())
-                    .addServiceConnectionListener("resultFragment",
-                    new FogGatewayServiceActivity.ServiceConnectionListener() {
-                        @Override
-                        public void onServiceConnected(FogGatewayService service) {
-                            initExecutionManager(service.getExecutionManager());
-                        }
-
-                        @Override
-                        public void onServiceDisconnected() { }
-                    });
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (getActivity() == null)
-            return;
-
-        // remove UI triggers associated with this fragment.
-
-        ExecutionManager executionManager
-                = ((ExecutionManager.Holder)getActivity()).getExecutionManager();
-        if (executionManager != null){
-            executionManager.removeUITrigger("inputUpdateUI");
-            executionManager.removeUITrigger("outputUpdateUI");
-            executionManager.removeUITrigger("messageUpdateUI");
-        }
-        ((FogGatewayServiceActivity)getActivity())
-                .removeServiceConnectionListener("resultFragment");
+        super.onResume();
     }
 
     @Override
@@ -141,8 +99,9 @@ public class ResultFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
-    private void initExecutionManager(ExecutionManager executionManager){
+    protected void initExecutionManager(ExecutionManager executionManager){
         // get last message, if any and update the UI
         ProgressData lastMsg = (ProgressData) executionManager
                 .getStore(ExecutionManager.KEY_DATA_PROGRESS)
@@ -179,30 +138,30 @@ public class ResultFragment extends Fragment {
                                     .getValue());
                     }
                 })
-            // add a trigger for setting the output image
-            .addUITrigger(KEY_DATA_OUTPUT_BITMAP,
-                "outputUpdateUI",
-                request_id,
-                new IndividualTrigger<GenericData>(GenericData.class) {
-                    @Override
-                    public void onNewData(Store store, GenericData data) {
-                        if (imageView != null)
-                            imageView.setImageBitmap(((GenericData<Bitmap>)data)
-                                    .getValue());
-                    }
-                })
-            // add a trigger for updating the progressbar and status message
-            .addUITrigger(ExecutionManager.KEY_DATA_PROGRESS,
-                "messageUpdateUI",
-                request_id,
-                new IndividualTrigger<ProgressData>(ProgressData.class) {
+                // add a trigger for setting the output image
+                .addUITrigger(KEY_DATA_OUTPUT_BITMAP,
+                        "outputUpdateUI",
+                        request_id,
+                        new IndividualTrigger<GenericData>(GenericData.class) {
+                            @Override
+                            public void onNewData(Store store, GenericData data) {
+                                if (imageView != null)
+                                    imageView.setImageBitmap(((GenericData<Bitmap>)data)
+                                            .getValue());
+                            }
+                        })
+                // add a trigger for updating the progressbar and status message
+                .addUITrigger(ExecutionManager.KEY_DATA_PROGRESS,
+                        "messageUpdateUI",
+                        request_id,
+                        new IndividualTrigger<ProgressData>(ProgressData.class) {
 
-                    @Override
-                    public void onNewData(Store<ProgressData> store,
-                                          ProgressData data) {
-                        updateUIOnProgress(data);
-                    }
-                });
+                            @Override
+                            public void onNewData(Store<ProgressData> store,
+                                                  ProgressData data) {
+                                updateUIOnProgress(data);
+                            }
+                        });
     }
 
     /**

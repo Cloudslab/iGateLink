@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.widget.ContentLoadingProgressBar;
-import androidx.fragment.app.Fragment;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
@@ -22,8 +21,7 @@ import org.cloudbus.foggatewaylib.core.ExecutionManager;
 import org.cloudbus.foggatewaylib.core.IndividualTrigger;
 import org.cloudbus.foggatewaylib.core.ProgressData;
 import org.cloudbus.foggatewaylib.core.Store;
-import org.cloudbus.foggatewaylib.service.FogGatewayService;
-import org.cloudbus.foggatewaylib.service.FogGatewayServiceActivity;
+import org.cloudbus.foggatewaylib.service.FogGatewayServiceFragment;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,7 +35,7 @@ import static org.cloudbus.foggatewaylib.demo.bluetooth.MainActivity.KEY_DATA_OU
  *
  * @author Riccardo Mancini
  */
-public class ResultFragment extends Fragment {
+public class ResultFragment extends FogGatewayServiceFragment {
     public static final String TAG = "Result Fragment";
     private static final int MAX_DATA = 60;
 
@@ -62,8 +60,9 @@ public class ResultFragment extends Fragment {
 
     private long time;
 
+    // Required empty public constructor
     public ResultFragment() {
-        // Required empty public constructor
+        super("inputUpdateUI", "outputUpdateUI", "progressUpdateUI");
     }
 
     @Override
@@ -157,12 +156,11 @@ public class ResultFragment extends Fragment {
      */
     @Override
     public void onResume() {
-        super.onResume();
-        if (getActivity() == null)
-            return;
+        // reset the plot
+        seriesBPM.resetData(new DataPoint[0]);
+        seriesSpO2.resetData(new DataPoint[0]);
 
         // get the device_address from the arguments
-
         if (getArguments() != null){
             String deviceAddress = getArguments().getString("device_address");
             if (deviceAddress == null)
@@ -171,8 +169,9 @@ public class ResultFragment extends Fragment {
         } else
             throw new RuntimeException("Missing arguments");
 
-        // reset analysis results
+        super.onResume();
 
+        // reset analysis results
         time = new Date().getTime();
         textBPM.setText("-");
         textSpO2.setText("-");
@@ -185,62 +184,14 @@ public class ResultFragment extends Fragment {
         textAvgBPM.setText("?");
         textDiagnosis.setText("?");
         progressBar.setVisibility(View.INVISIBLE);
-
-        // initialize the ExecutionManager (if available)
-
-        ExecutionManager executionManager
-                = ((ExecutionManager.Holder)getActivity()).getExecutionManager();
-        if (executionManager != null){
-            initExecutionManager(executionManager);
-        } else{
-            // otherwise schedule its initialization when it becomes available
-
-            seriesBPM.resetData(new DataPoint[0]);
-            seriesSpO2.resetData(new DataPoint[0]);
-            ((FogGatewayServiceActivity)getActivity())
-                    .addServiceConnectionListener("resultFragment",
-                    new FogGatewayServiceActivity.ServiceConnectionListener() {
-                        @Override
-                        public void onServiceConnected(FogGatewayService service) {
-                            initExecutionManager(service.getExecutionManager());
-                        }
-
-                        @Override
-                        public void onServiceDisconnected() { }
-                    });
-        }
-    }
-
-    /**
-     * Called when fragment is no longer visible.
-     */
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (getActivity() == null)
-            return;
-
-        // remove all UI-related triggers
-
-        ExecutionManager executionManager
-                = ((ExecutionManager.Holder)getActivity()).getExecutionManager();
-        if (executionManager != null){
-            executionManager.removeUITrigger("inputUpdateUI");
-            executionManager.removeUITrigger("outputUpdateUI");
-            executionManager.removeUITrigger("progressUpdateUI");
-        }
-
-        // unregister the service connection listener
-
-        ((FogGatewayServiceActivity)getActivity())
-                .removeServiceConnectionListener("resultFragment");
     }
 
     /**
      * Adds the UI-related triggers to the execution manager.
      */
+    @Override
     @SuppressWarnings("unchecked")
-    private void initExecutionManager(ExecutionManager executionManager){
+    protected void initExecutionManager(ExecutionManager executionManager){
         // trigger for updating graph when new data is available
         executionManager.addUITrigger(KEY_DATA_INPUT,
                 "inputUpdateUI",

@@ -15,7 +15,6 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -24,6 +23,7 @@ import org.cloudbus.foggatewaylib.camera.CameraPreview;
 import org.cloudbus.foggatewaylib.camera.CameraProvider;
 import org.cloudbus.foggatewaylib.camera.CameraUtils;
 import org.cloudbus.foggatewaylib.core.ExecutionManager;
+import org.cloudbus.foggatewaylib.service.FogGatewayServiceFragment;
 
 import static org.cloudbus.foggatewaylib.camera.CameraUtils.checkCameraHardware;
 
@@ -32,7 +32,7 @@ import static org.cloudbus.foggatewaylib.camera.CameraUtils.checkCameraHardware;
  *
  * @author Riccardo Mancini
  */
-public class PreviewFragment extends Fragment {
+public class PreviewFragment extends FogGatewayServiceFragment {
     private OnPreviewFragmentInteractionListener mListener;
 
     private Camera mCamera;
@@ -40,8 +40,9 @@ public class PreviewFragment extends Fragment {
 
     private AlertDialog alertDialog;
 
+    // Required empty public constructor
+
     public PreviewFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -51,13 +52,11 @@ public class PreviewFragment extends Fragment {
         // check that everything is alright
         if (getActivity() != null && checkCameraHardware(getActivity())){
 
-            ExecutionManager executionManager
-                    = ((ExecutionManager.Holder)getActivity()).getExecutionManager();
-            if (executionManager == null)
+            if (getExecutionManager() == null)
                 return;
 
             // get the instance of Camera from the provider
-            mCamera = ((CameraProvider)executionManager.getProvider(MainActivity.KEY_PROVIDER_INPUT))
+            mCamera = ((CameraProvider)getExecutionManager().getProvider(MainActivity.KEY_PROVIDER_INPUT))
                     .getCamera();
 
             if (mCamera == null)
@@ -157,11 +156,13 @@ public class PreviewFragment extends Fragment {
     }
 
     @Override
+    protected void initExecutionManager(ExecutionManager executionManager) { }
+
+    @Override
     public void onResume() {
         super.onResume();
         // if the execution manager is null, then it is not running
-        if (getActivity() != null
-                && ((ExecutionManager.Holder) getActivity()).getExecutionManager() == null){
+        if (getActivity() != null && getExecutionManager() == null){
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             alertDialog = builder.setMessage("Service is not running")
                     .setNegativeButton("Back", new DialogInterface.OnClickListener() {
