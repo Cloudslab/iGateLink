@@ -39,7 +39,6 @@ public class MainActivity extends FogGatewayServiceActivity
     public static final String KEY_PROVIDER_INPUT_BITMAP = "inputProviderBitmap";
     public static final String KEY_PROVIDER_FOGBUS = "fogbusProvider";
     public static final String KEY_PROVIDER_ANEKA = "anekaProvider";
-    public static final String KEY_PROVIDER_DUMMY = "dummyProvider";
     public static final String KEY_PROVIDER_OUTPUT_BITMAP = "outputProviderBitmap";
     public static final String KEY_TRIGGER_EXEC = "execTrigger";
     public static final String KEY_TRIGGER_BITMAP_OUTPUT = "bitmapOutputTrigger";
@@ -158,7 +157,7 @@ public class MainActivity extends FogGatewayServiceActivity
                                 public void onNewData(Store store, ProgressData data) {
                                     if (data.getProgress() < 0){
                                         if (data.getPublisher().equals(KEY_PROVIDER_FOGBUS)
-                                                || data.getPublisher().equals(KEY_PROVIDER_DUMMY)){
+                                                || data.getPublisher().equals(KEY_PROVIDER_ANEKA)){
                                             getExecutionManager().produceDataExcludeProviders(
                                                     KEY_DATA_OUTPUT,
                                                     data.getRequestID(),
