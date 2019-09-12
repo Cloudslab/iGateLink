@@ -143,9 +143,9 @@ public class MainActivity extends FogGatewayServiceActivity
                     .addProvider(KEY_PROVIDER_INPUT, KEY_DATA_INPUT,
                             new CameraProvider())
                     .addProvider(KEY_PROVIDER_INPUT_BITMAP, KEY_DATA_INPUT_BITMAP,
-                            new BitmapProvider(ImageData.class, GenericData.class))
+                            new BitmapProvider())
                     .addProvider(KEY_PROVIDER_OUTPUT_BITMAP, KEY_DATA_OUTPUT_BITMAP,
-                            new BitmapProvider(ImageData.class, GenericData.class))
+                            new BitmapProvider())
                     .addTrigger(KEY_DATA_INPUT, KEY_TRIGGER_EXEC,
                             new ProduceDataTrigger<>(KEY_DATA_OUTPUT, ImageData.class))
                     .addTrigger(KEY_DATA_INPUT, KEY_TRIGGER_BITMAP_INPUT,

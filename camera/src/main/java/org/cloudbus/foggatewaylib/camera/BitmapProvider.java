@@ -24,9 +24,8 @@ import static org.cloudbus.foggatewaylib.camera.CameraUtils.getExifOrientation;
  */
 public class BitmapProvider extends SequentialProvider<ImageData, GenericData> {
 
-    public BitmapProvider(Class<ImageData> inputType,
-                          Class<GenericData> outputType) {
-        super(inputType, outputType);
+    public BitmapProvider() {
+        super(ImageData.class, GenericData.class);
     }
 
     @Override
