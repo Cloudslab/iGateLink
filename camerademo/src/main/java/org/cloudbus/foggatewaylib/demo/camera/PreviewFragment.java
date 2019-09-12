@@ -27,6 +27,11 @@ import org.cloudbus.foggatewaylib.core.ExecutionManager;
 
 import static org.cloudbus.foggatewaylib.camera.CameraUtils.checkCameraHardware;
 
+/**
+ * Fragment that holds the camera preview.
+ *
+ * @author Riccardo Mancini
+ */
 public class PreviewFragment extends Fragment {
     private OnPreviewFragmentInteractionListener mListener;
 
@@ -43,14 +48,16 @@ public class PreviewFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // check that everything is alright
         if (getActivity() != null && checkCameraHardware(getActivity())){
 
             ExecutionManager executionManager
                     = ((ExecutionManager.Holder)getActivity()).getExecutionManager();
             if (executionManager == null)
                 return;
-            // Create an instance of Camera
-            mCamera = ((CameraProvider)executionManager.getProvider("inputProvider"))
+
+            // get the instance of Camera from the provider
+            mCamera = ((CameraProvider)executionManager.getProvider(MainActivity.KEY_PROVIDER_INPUT))
                     .getCamera();
 
             if (mCamera == null)
@@ -70,6 +77,8 @@ public class PreviewFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_preview, container, false);
+
+        // set action on the click of the button
         FloatingActionButton fab = rootView.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,14 +86,19 @@ public class PreviewFragment extends Fragment {
                 mListener.onCameraButtonClick();
             }
         });
+
+        // attach the preview to the layout
         FrameLayout preview = rootView.findViewById(R.id.camera_preview);
         if (mPreview != null && preview.getChildCount() == 0){
             if (mPreview.getParent() != null)
                 ((FrameLayout) mPreview.getParent()).removeView(mPreview);
             preview.addView(mPreview);
         }
+
         if (getActivity() == null)
             return rootView;
+
+        // fix preview dimensions
 
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         Point size = new Point();
@@ -93,7 +107,6 @@ public class PreviewFragment extends Fragment {
         int height = size.y;
         if (mCamera != null){
             Camera.Size cameraSize = mCamera.getParameters().getPreviewSize();
-    //        CameraPreview.getOptimalPreviewSize(mCamera.getParameters().getSupportedPreviewSizes(), width, height);
 
             double screenRatio = (double) width / height;
             double previewRatio = (double) cameraSize.width / cameraSize.height;
@@ -146,6 +159,7 @@ public class PreviewFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        // if the execution manager is null, then it is not running
         if (getActivity() != null
                 && ((ExecutionManager.Holder) getActivity()).getExecutionManager() == null){
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -182,12 +196,7 @@ public class PreviewFragment extends Fragment {
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
+     * to the activity.
      */
     public interface OnPreviewFragmentInteractionListener {
         void onCameraButtonClick();

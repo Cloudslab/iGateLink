@@ -16,6 +16,11 @@ import org.cloudbus.foggatewaylib.aneka.StorageBucket;
 import org.cloudbus.foggatewaylib.aneka.WSDLBuilder;
 import org.cloudbus.foggatewaylib.camera.ImageData;
 
+/**
+ * Simple provider for Aneka direct execution.
+ *
+ * @author Riccardo Mancini
+ */
 class SimpleAnekaProvider extends AnekaProvider<ImageData, ImageData> {
     private String host;
 
@@ -26,9 +31,11 @@ class SimpleAnekaProvider extends AnekaProvider<ImageData, ImageData> {
     @Override
     protected ArrayOfTaskItem buildTasks() {
         return WSDLBuilder.buildArrayOfTaskItem(
+                // unzip the library files
                 WSDLBuilder.buildExecuteTaskItem(
                         "7z",
                         "x", "-tzip", "Yolo.zip", "-y"),
+                // start the recognition
                 WSDLBuilder.buildExecuteTaskItem(
                         "python",
                         "test_images.py", "params.py")

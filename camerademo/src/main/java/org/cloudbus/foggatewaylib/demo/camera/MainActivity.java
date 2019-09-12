@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -19,7 +20,6 @@ import org.cloudbus.foggatewaylib.camera.CameraProvider;
 import org.cloudbus.foggatewaylib.camera.ImageData;
 import org.cloudbus.foggatewaylib.core.ExecutionManager;
 import org.cloudbus.foggatewaylib.core.GenericData;
-import org.cloudbus.foggatewaylib.core.InMemoryStore;
 import org.cloudbus.foggatewaylib.core.IndividualTrigger;
 import org.cloudbus.foggatewaylib.core.ProduceDataTrigger;
 import org.cloudbus.foggatewaylib.core.ProgressData;
@@ -27,6 +27,11 @@ import org.cloudbus.foggatewaylib.core.RoundRobinChooser;
 import org.cloudbus.foggatewaylib.core.Store;
 import org.cloudbus.foggatewaylib.service.FogGatewayServiceActivity;
 
+/**
+ * Main Activity.
+ *
+ * @author Riccardo Mancini
+ */
 public class MainActivity extends FogGatewayServiceActivity
         implements PreviewFragment.OnPreviewFragmentInteractionListener,
                    ResultFragment.OnResultFragmentInteractionListener {
@@ -47,6 +52,9 @@ public class MainActivity extends FogGatewayServiceActivity
 
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 1;
 
+    /**
+     * Makes back button touch work as expected with the Navigation library.
+     */
     @Override
     public boolean onSupportNavigateUp() {
         return Navigation.findNavController(this, R.id.mainNavigationFragment).navigateUp();
@@ -57,12 +65,14 @@ public class MainActivity extends FogGatewayServiceActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // initialize the bottom navigation
+
         BottomNavigationView navView = findViewById(R.id.nav_view);
         NavigationUI.setupWithNavController(navView,
                 Navigation.findNavController(this, R.id.mainNavigationFragment));
 
+        // ask user for missing permissions (if any)
 
-        // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -71,29 +81,48 @@ public class MainActivity extends FogGatewayServiceActivity
                     new String[]{Manifest.permission.CAMERA},
                     MY_PERMISSIONS_REQUEST_CAMERA);
 
-            // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-            // app-defined int constant. The callback method gets the
-            // result of the request.
         }
     }
 
+    /**
+     * Handles click on camera button from the {@link PreviewFragment}.
+     *
+     * @see PreviewFragment.OnPreviewFragmentInteractionListener#onCameraButtonClick()
+     */
     @Override
     public void onCameraButtonClick() {
+        if (getExecutionManager() == null)
+            return;
+
+        // get a new request id
         long request_ID = ExecutionManager.nextRequestID();
-        if (getExecutionManager() != null)
-            getExecutionManager().runProvider(KEY_PROVIDER_INPUT, request_ID);
+
+        // run the camera provider
+        getExecutionManager().runProvider(KEY_PROVIDER_INPUT, request_ID);
+
+        // start the result fragment, passing the request_id
         Bundle args = new Bundle();
         args.putLong("request_id", request_ID);
         Navigation.findNavController(this, R.id.mainNavigationFragment)
                 .navigate(R.id.resultFragment, args);
     }
 
+    /**
+     * Handles click on cancel button from the {@link ResultFragment}.
+     *
+     * @see PreviewFragment.OnPreviewFragmentInteractionListener#onCameraButtonClick()
+     */
     @Override
     public void onCancelButtonClick() {
         Navigation.findNavController(this, R.id.mainNavigationFragment)
                 .navigate(R.id.previewFragment);
     }
 
+    /**
+     * Checks whether user granted the requested permissions.
+     *
+     * It basically does nothing but complaining to the user if they didn't grant permission.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
@@ -109,23 +138,24 @@ public class MainActivity extends FogGatewayServiceActivity
                     return;
 
                 }
-                return;
             }
-
-            // other 'case' lines to check for other
-            // permissions this app might request.
         }
     }
 
+    /**
+     * Initializes the {@link ExecutionManager} when it is bound to the activity.
+     */
     protected void initExecutionManager(ExecutionManager executionManager) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean fogbusEnabled = prefs.getBoolean("enable_fogbus", false);
         boolean anekaEnabled = prefs.getBoolean("enable_aneka", false);
 
+
         if (fogbusEnabled){
             executionManager.addProvider(KEY_PROVIDER_FOGBUS, KEY_DATA_OUTPUT,
                     new EdgeLensProvider(4));
         } else{
+            // if disabled but still present, it should be removed
             executionManager.removeProvider(KEY_PROVIDER_FOGBUS);
         }
 
@@ -135,21 +165,31 @@ public class MainActivity extends FogGatewayServiceActivity
         } else{
             executionManager.removeProvider(KEY_PROVIDER_ANEKA);
         }
+        // NB: they can be both active, in which case the chooser will kick in
 
+        // If none of them is active, nothing should be done.
         if (fogbusEnabled || anekaEnabled){
             executionManager
+                    // provider for input camera image
                     .addProvider(KEY_PROVIDER_INPUT, KEY_DATA_INPUT,
                             new CameraProvider())
+                    // provider that converts input to bitmap
                     .addProvider(KEY_PROVIDER_INPUT_BITMAP, KEY_DATA_INPUT_BITMAP,
                             new BitmapProvider())
+                    // provider that converts output to bitmap
                     .addProvider(KEY_PROVIDER_OUTPUT_BITMAP, KEY_DATA_OUTPUT_BITMAP,
                             new BitmapProvider())
+                    // when input is ready, send it to output
                     .addTrigger(KEY_DATA_INPUT, KEY_TRIGGER_EXEC,
                             new ProduceDataTrigger<>(KEY_DATA_OUTPUT, ImageData.class))
+                    // when input is ready, convert it to a bitmap to be shown
                     .addTrigger(KEY_DATA_INPUT, KEY_TRIGGER_BITMAP_INPUT,
                             new ProduceDataTrigger<>(KEY_DATA_INPUT_BITMAP, ImageData.class))
+                    // when output is ready, convert it to a bitmap to be shown
                     .addTrigger(KEY_DATA_OUTPUT, KEY_TRIGGER_BITMAP_OUTPUT,
                             new ProduceDataTrigger<>(KEY_DATA_OUTPUT_BITMAP, ImageData.class))
+                    // add a fallback trigger that detects an error and retries with another
+                    // provider, if available
                     .addTrigger(ExecutionManager.KEY_DATA_PROGRESS, KEY_TRIGGER_FALLBACK,
                             new IndividualTrigger<ProgressData>(ProgressData.class) {
                                 @Override
@@ -169,6 +209,7 @@ public class MainActivity extends FogGatewayServiceActivity
                                     }
                                 }
                             })
+                    // add a simple round robin chooser
                     .addChooser(KEY_DATA_OUTPUT, new RoundRobinChooser());
         }
     }

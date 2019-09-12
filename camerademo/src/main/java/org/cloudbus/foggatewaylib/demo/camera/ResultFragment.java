@@ -26,7 +26,11 @@ import org.cloudbus.foggatewaylib.service.FogGatewayServiceActivity;
 import static org.cloudbus.foggatewaylib.demo.camera.MainActivity.KEY_DATA_INPUT_BITMAP;
 import static org.cloudbus.foggatewaylib.demo.camera.MainActivity.KEY_DATA_OUTPUT_BITMAP;
 
-
+/**
+ * Fragment that holds the image result.
+ *
+ * @author Riccardo Mancini
+ */
 public class ResultFragment extends Fragment {
     public static final String TAG = "Result Fragment";
     private OnResultFragmentInteractionListener mListener;
@@ -46,6 +50,8 @@ public class ResultFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_result, container, false);
+
+        // set the callback for the button
         FloatingActionButton fab = rootView.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,16 +59,18 @@ public class ResultFragment extends Fragment {
                 mListener.onCancelButtonClick();
             }
         });
+
+        // set references to some layout elements
         imageView = rootView.findViewById(R.id.image_view);
         progressBar = rootView.findViewById(R.id.progress_bar);
         progressText = rootView.findViewById(R.id.progress_text);
 
+        // show the progressbar
         progressBar.show();
         progressBar.setIndeterminate(true);
 
         return rootView;
     }
-
 
     @Override
     public void onAttach(@NonNull final Context context) {
@@ -78,18 +86,22 @@ public class ResultFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        // retrieve request_id from arguments
         if (getArguments() != null)
             request_id = getArguments().getLong("request_id", -1);
         else
             request_id = -1;
+
         if (getActivity() == null)
             return;
 
         ExecutionManager executionManager
                 = ((ExecutionManager.Holder)getActivity()).getExecutionManager();
         if (executionManager != null){
+            // init execution manager if available
             initExecutionManager(executionManager);
         } else{
+            // otherwise schedule its initiation
             ((FogGatewayServiceActivity)getActivity())
                     .addServiceConnectionListener("resultFragment",
                     new FogGatewayServiceActivity.ServiceConnectionListener() {
@@ -110,6 +122,8 @@ public class ResultFragment extends Fragment {
         if (getActivity() == null)
             return;
 
+        // remove UI triggers associated with this fragment.
+
         ExecutionManager executionManager
                 = ((ExecutionManager.Holder)getActivity()).getExecutionManager();
         if (executionManager != null){
@@ -129,6 +143,7 @@ public class ResultFragment extends Fragment {
 
     @SuppressWarnings("unchecked")
     private void initExecutionManager(ExecutionManager executionManager){
+        // get last message, if any and update the UI
         ProgressData lastMsg = (ProgressData) executionManager
                 .getStore(ExecutionManager.KEY_DATA_PROGRESS)
                 .retrieveLast(request_id);
@@ -136,6 +151,7 @@ public class ResultFragment extends Fragment {
         if (lastMsg != null)
             updateUIOnProgress(lastMsg);
 
+        // init the imageView
         if (imageView != null){
             GenericData<Bitmap> outputBitmap = (GenericData<Bitmap>) executionManager
                     .getStore(KEY_DATA_OUTPUT_BITMAP)
@@ -151,6 +167,7 @@ public class ResultFragment extends Fragment {
             }
         }
 
+        // add a trigger for setting the input image
         executionManager.addUITrigger(KEY_DATA_INPUT_BITMAP,
                 "inputUpdateUI",
                 request_id,
@@ -162,6 +179,7 @@ public class ResultFragment extends Fragment {
                                     .getValue());
                     }
                 })
+            // add a trigger for setting the output image
             .addUITrigger(KEY_DATA_OUTPUT_BITMAP,
                 "outputUpdateUI",
                 request_id,
@@ -173,6 +191,7 @@ public class ResultFragment extends Fragment {
                                     .getValue());
                     }
                 })
+            // add a trigger for updating the progressbar and status message
             .addUITrigger(ExecutionManager.KEY_DATA_PROGRESS,
                 "messageUpdateUI",
                 request_id,
@@ -186,6 +205,9 @@ public class ResultFragment extends Fragment {
                 });
     }
 
+    /**
+     * Updates the progressbar and status message with the given {@link ProgressData}.
+     */
     private void updateUIOnProgress(ProgressData data){
         if (progressText == null || progressBar == null)
             return;
@@ -215,12 +237,7 @@ public class ResultFragment extends Fragment {
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
+     * to the activity.
      */
     public interface OnResultFragmentInteractionListener {
         void onCancelButtonClick();
