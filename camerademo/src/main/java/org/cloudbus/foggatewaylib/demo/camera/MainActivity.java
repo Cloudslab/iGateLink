@@ -154,7 +154,7 @@ public class MainActivity extends FogGatewayServiceActivity
                             new IndividualTrigger<ProgressData>(ProgressData.class) {
                                 @Override
                                 public void onNewData(Store store, ProgressData data) {
-                                    if (data.getProgress() < 0){
+                                    if (data.getProgress() < 0 && getExecutionManager() != null){
                                         if (data.getPublisher().equals(KEY_PROVIDER_FOGBUS)
                                                 || data.getPublisher().equals(KEY_PROVIDER_ANEKA)){
                                             getExecutionManager().produceDataExcludeProviders(
