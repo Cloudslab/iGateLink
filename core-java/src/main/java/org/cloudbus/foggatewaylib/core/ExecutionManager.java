@@ -588,6 +588,8 @@ public class ExecutionManager{
      * @param request_id the id of the request this execution belongs to.
      * @param excludedProviders providers that must not be run.
      * @param input the input data
+     * @return {@code true} if a provider was found, {@code false} if all available providers
+     *         were excluded
      * @throws ChooserNotDefinedException if there are multiple {@link Provider}s but no
      *                                    {@link Chooser}.
      * @throws ProviderForDataNotDefinedException if no provider was found that provides the given
@@ -599,12 +601,20 @@ public class ExecutionManager{
      * @see #produceData(String, long, Data...)
      */
     @SuppressWarnings("unchecked")
-    public void produceDataExcludeProviders(String dataKey, long request_id,
+    public boolean produceDataExcludeProviders(String dataKey, long request_id,
                                             String[] excludedProviders,
                                             Data... input){
         List<String> providers = new ArrayList<>(providersOfData.getAll(dataKey));
+        if (providers.isEmpty())
+            throw new ProviderForDataNotDefinedException(dataKey);
+
         providers.removeAll(Arrays.asList(excludedProviders));
-        chooseProvider(providers, dataKey, request_id, input);
+        try {
+            chooseProvider(providers, dataKey, request_id, input);
+            return true;
+        } catch (ProviderForDataNotDefinedException e){
+            return false;
+        }
     }
 
     /**
