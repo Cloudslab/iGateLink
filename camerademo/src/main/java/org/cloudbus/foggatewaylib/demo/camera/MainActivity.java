@@ -78,7 +78,7 @@ public class MainActivity extends FogGatewayServiceActivity
     }
 
     @Override
-    public void onButtonClick() {
+    public void onCameraButtonClick() {
         long request_ID = ExecutionManager.nextRequestID();
         if (getExecutionManager() != null)
             getExecutionManager().runProvider(KEY_PROVIDER_INPUT, request_ID);

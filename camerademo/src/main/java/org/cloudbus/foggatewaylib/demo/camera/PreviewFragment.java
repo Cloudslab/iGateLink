@@ -74,7 +74,7 @@ public class PreviewFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mListener.onButtonClick();
+                mListener.onCameraButtonClick();
             }
         });
         FrameLayout preview = rootView.findViewById(R.id.camera_preview);
@@ -190,6 +190,6 @@ public class PreviewFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnPreviewFragmentInteractionListener {
-        void onButtonClick();
+        void onCameraButtonClick();
     }
 }
