@@ -1,19 +1,19 @@
 # FogGatewayLib
 
-FogGatewayLib is an Android library that makes handling data streams in 
-Android easy and efficient. 
-The library makes it simple to create new data-driven applications 
-without having to care about Android service and thread management. 
-Everything the user of the library has to do is just defining of how to collect 
-data and elaborate data within the framework.
- 
+FogGatewayLib is an Android library that makes handling data coming from
+different sources easy and efficient, making it simple to create new 
+data-driven applications without having to care about Android service 
+and thread management. 
+
 The goal of the library is to make the development of Android applications
-that act as a gateway between IoT and the Fog/Cloud easier.
-This is achieved also by providing the user with simple implementations of 
-most common operations out-of-the-box. E.g. simple HTTP and FTP connections, 
-camera management, Bluetooth LE, etc. The project has been developed
-with modularity in mind so the addition of new features should be 
-straightforward.
+that act as a gateway between IoT and the Fog/Cloud easier by bringing
+together all the common core parts and leaving to the developer only the 
+definition of the application-specific parts. On top of this
+core, simple implementations of most common operations are also provided 
+out-of-the-box (e.g. simple HTTP and FTP connections, camera management, 
+Bluetooth LE) in order to reduce common boiler-plate code. 
+The project has been developed with modularity in mind so the addition 
+of new features should be straightforward.
 
 
 ## Architecture
@@ -34,8 +34,8 @@ The main components are:
     provides an API for managing them. 
  * `Data`: not a proper component but is the base class that 
     every data inside this library must extend. It is characterized by
-    an `id` and a `request_id`, the former must be unique between data
-    of the same `Store`, the latter is useful for tracking data belonging 
+    an `id` and a `request_id`: the former must be unique between data
+    of the same `Store`; the latter is useful for tracking data belonging 
     to the same request.  
  * `Store`: stores `Data` elements and provides two operations: 
     `retrieve` for retrieving previously stored data and 
@@ -68,12 +68,14 @@ Please note that there is no built-in synchronization mechanism for a
 operations should not be executed concurrently.
 
 This is not an issue in Android when using the provided
-`AsyncProvider` implementation of a `Provider` since it takes advantage
+`AsyncProvider` implementation of a `Provider` (or any of its subclasses) 
+since it takes advantage
 of the the `onPreExecute` and `onPostExecute` callbacks of the `AsyncTask`
 in order to execute thread-unsafe code in the main thread. Furthermore, 
 it also has built-in thread-safety mechanisms in its `publishResults` 
 and `publishProgress` methods that check the thread they're running in 
-before storing the `Data` to the `Store`. 
+before storing the `Data` to the `Store` and, in case it's not the main
+thread, the operation will be queued to the main thread. 
 
 
 ### Documentation
@@ -92,6 +94,8 @@ The project is divided into modules, each of which is dedicated to a
 specific feature. Where possible, Android-specific code and generic Java 
 code have been kept separated in order to make the core of the project
 more portable.
+
+Below you can find the list of modules in alphabetical order:
 
  * `aneka`: Android library module for Aneka REST API integration.
  * `aneka-wsdl`: Java module for Aneka REST API WSDL bindings.
@@ -149,8 +153,8 @@ These commands build the release variant. In order to build the debug variant,
 just append `Debug` to the command name (i.e. `assembleDebug`, `buildDebug`;
 debug variant is not available for Java modules).
 
-Outputs of the building process can be found in (assuming you're building 
-`mymodule` with variant `variant`):
+Outputs of the building process can be found in the following paths 
+(assuming you're building `mymodule` with variant `variant`):
  * `mymodule/build/outputs/apk/mymmodule-variant.apk` for Android application
     modules.
  * `mymodule/build/outputs/aar/mymmodule-variant.aar` for Android library
