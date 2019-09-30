@@ -1,4 +1,4 @@
-# FogGatewayLib
+# iGateLink (previously FogGatewayLib)
 
 FogGatewayLib is an Android library that makes handling data coming from
 different sources easy and efficient, making it simple to create new 
